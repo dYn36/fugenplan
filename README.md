@@ -16,7 +16,7 @@ Plane Fliesen und Dielen direkt im Browser. Übernimm deinen PDF-Grundriss,<br>p
   <a href="#selbst-hosten"><img src="https://img.shields.io/badge/Hosting-statisch-245d4a?style=flat-square&amp;labelColor=20382e" alt="Hosting: statisch"></a>
 </p>
 
-**[Jetzt starten](#schnell-starten)** · **[Funktionen entdecken](#dein-boden-bevor-er-liegt)** · **[Anleitung lesen](docs/ANLEITUNG.md)**
+**[Jetzt starten](#schnell-starten)** · **[PDF-Demo ansehen](#vom-grundriss-zum-verlegeplan)** · **[Funktionen entdecken](#dein-boden-bevor-er-liegt)** · **[Anleitung lesen](docs/ANLEITUNG.md)**
 
 <br>
 
@@ -85,9 +85,16 @@ Die Anwendung braucht keine API-Schlüssel, keine `.env`-Datei und keine Datenba
 
 **Dein vorhandener Grundriss wird zur Grundlage deiner Planung.** Öffne eine PDF, markiere eine bekannte Wand und gib ihre Länge an. Danach zeichnest du die Räume direkt auf der Vorlage nach.
 
-<a href="screenshots/03-pdf-grundriss.jpg">
-  <img src="screenshots/03-pdf-grundriss.jpg" alt="PDF-Ansicht mit einer kalibrierten Wand von 480 cm und den markierten Räumen Küche und Wohnen." width="1280" loading="lazy">
+<a href="screenshots/demo-pdf.gif">
+  <picture>
+    <source media="(prefers-reduced-motion: reduce)" srcset="screenshots/demo-pdf-poster.jpg">
+    <img src="screenshots/demo-pdf.gif" alt="Demo in der echten Oberfläche: PDF öffnen, zwei Wandpunkte markieren, 480 cm als Länge speichern, Raumecken markieren und den Verlegeplan mit Zuschnitten prüfen." width="1120" loading="lazy">
+  </picture>
 </a>
+
+*PDF laden → Wandmaß setzen → Raum markieren → Verlegeplan prüfen.*
+
+Die Demo verwendet einen synthetischen Beispielgrundriss. [Standbild ansehen](screenshots/demo-pdf-poster.jpg) · [PDF-Ansicht ansehen](screenshots/03-pdf-grundriss.jpg)
 
 1. **Grundriss öffnen.** PDF auswählen und zur gewünschten Seite wechseln.
 2. **Eine Wand messen.** Die beiden Endpunkte markieren. Die bekannte Länge in Zentimetern eingeben, zum Beispiel `480` für 4,80 m.
