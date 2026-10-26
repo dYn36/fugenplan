@@ -1,0 +1,47 @@
+node_modules/
+dist/
+test-results/
+playwright-report/
+*.tsbuildinfo
+.DS_Store
+*.log
+coverage/
+.idea/
+.vscode/
+
+# Local credentials, key material and tool state must never be published.
+.env
+.env.*
+!.env.example
+.npmrc
+.netrc
+.pypirc
+.ssh/
+.aws/
+.azure/
+.config/
+.codex/
+.claude/
+.netlify/
+.vercel/
+credentials.json
+credentials.*.json
+secrets.*
+*.key
+*.pem
+*.p12
+*.pfx
+*.jks
+id_rsa*
+id_ed25519*
+
+# Private plans and exports. The single committed PDF is generated test data.
+*.fugenplan.json
+*.pdf
+!tests/fixtures/grundriss-drei-seiten.pdf
+private/
+uploads/
+exports/
+
+# Generated from the installed PDF.js package.
+/public/pdfjs/

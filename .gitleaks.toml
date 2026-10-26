@@ -1,0 +1,14 @@
+title = "Fugenplan"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "generic-api-key"
+
+[[rules.allowlists]]
+description = "Öffentlicher localStorage-Name für Varianten, kein Zugangsschlüssel."
+condition = "AND"
+regexTarget = "secret"
+regexes = ['''^fugenplan\.variants\.v1$''']
+paths = ['''(^|/)src/lib/project\.ts$''']

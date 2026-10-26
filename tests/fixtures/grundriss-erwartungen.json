@@ -1,0 +1,188 @@
+{
+  "note": "Coordinates use PDF.js natural viewport at scale 1, including intrinsic page rotation; origin is top-left.",
+  "pages": [
+    {
+      "number": 1,
+      "width": 600,
+      "height": 400,
+      "rotation": 0,
+      "type": "vector",
+      "calibration": {
+        "start": {
+          "x": 60,
+          "y": 70
+        },
+        "end": {
+          "x": 300,
+          "y": 70
+        },
+        "lengthMm": 4800,
+        "mmPerPoint": 20
+      },
+      "rooms": [
+        {
+          "name": "Raum A",
+          "points": [
+            {
+              "x": 60,
+              "y": 70
+            },
+            {
+              "x": 300,
+              "y": 70
+            },
+            {
+              "x": 300,
+              "y": 330
+            },
+            {
+              "x": 60,
+              "y": 330
+            }
+          ],
+          "widthMm": 4800,
+          "heightMm": 5200,
+          "areaM2": 24.96
+        },
+        {
+          "name": "Raum B",
+          "points": [
+            {
+              "x": 300,
+              "y": 70
+            },
+            {
+              "x": 540,
+              "y": 70
+            },
+            {
+              "x": 540,
+              "y": 330
+            },
+            {
+              "x": 300,
+              "y": 330
+            }
+          ],
+          "widthMm": 4800,
+          "heightMm": 5200,
+          "areaM2": 24.96
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "width": 400,
+      "height": 600,
+      "rotation": 90,
+      "type": "vector-rotated",
+      "calibration": {
+        "start": {
+          "x": 80,
+          "y": 100
+        },
+        "end": {
+          "x": 80,
+          "y": 500
+        },
+        "lengthMm": 2000,
+        "mmPerPoint": 5
+      },
+      "rooms": [
+        {
+          "name": "Raum C",
+          "points": [
+            {
+              "x": 80,
+              "y": 100
+            },
+            {
+              "x": 320,
+              "y": 100
+            },
+            {
+              "x": 320,
+              "y": 500
+            },
+            {
+              "x": 80,
+              "y": 500
+            }
+          ],
+          "widthMm": 1200,
+          "heightMm": 2000,
+          "areaM2": 2.4
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "width": 600,
+      "height": 400,
+      "rotation": 0,
+      "type": "raster",
+      "calibration": {
+        "start": {
+          "x": 100,
+          "y": 80
+        },
+        "end": {
+          "x": 300,
+          "y": 80
+        },
+        "lengthMm": 3000,
+        "mmPerPoint": 15
+      },
+      "rooms": [
+        {
+          "name": "Scan A",
+          "points": [
+            {
+              "x": 100,
+              "y": 80
+            },
+            {
+              "x": 300,
+              "y": 80
+            },
+            {
+              "x": 300,
+              "y": 320
+            },
+            {
+              "x": 100,
+              "y": 320
+            }
+          ],
+          "widthMm": 3000,
+          "heightMm": 3600,
+          "areaM2": 10.8
+        },
+        {
+          "name": "Scan B",
+          "points": [
+            {
+              "x": 300,
+              "y": 80
+            },
+            {
+              "x": 500,
+              "y": 80
+            },
+            {
+              "x": 500,
+              "y": 320
+            },
+            {
+              "x": 300,
+              "y": 320
+            }
+          ],
+          "widthMm": 3000,
+          "heightMm": 3600,
+          "areaM2": 10.8
+        }
+      ]
+    }
+  ]
+}
