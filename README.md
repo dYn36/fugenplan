@@ -48,6 +48,7 @@ Passt eine ganze Fliese an die Tür? Wie schmal wird der Streifen an der Wand? W
 | Deine Entscheidung | Das zeigt dir Fugenplan |
 | --- | --- |
 | **Wie sieht mein Raum aus?** | Rechteck, L-Form oder freie Kontur. Rechteckige Hindernisse wie Säulen bleiben frei. |
+| **Wie passen meine Räume zusammen?** | Mehrere Verlegepläne gleichzeitig in der Projektübersicht. Räume direkt öffnen und einzeln bearbeiten. |
 | **Welches Muster passt?** | Sieben Verlegemuster mit eigenen Produktmaßen, Fugen, Randabständen und Drehung. |
 | **Wo fange ich an?** | Eine Ecke oder Wandmitte direkt im Plan wählen. Die Startfliese bleibt markiert. |
 | **Was muss ich schneiden?** | Zuschnitte hervorheben. Einzelne Schnittkonturen, Kantenlängen und Hüllmaße prüfen. |
@@ -67,7 +68,7 @@ npm start
 
 Der Browser öffnet **[Fugenplan auf deinem Rechner](http://127.0.0.1:5173)**. Lass das Terminal während der Nutzung geöffnet. Mit `Strg+C` beendest du den Server.
 
-**Dein erster Plan:** Raummaße eingeben → Belag festlegen → Muster und Start wählen → Zuschnitte prüfen.
+**Dein erster Plan:** Raum in der Projektübersicht öffnen → Raummaße eingeben → Belag festlegen → Muster und Start wählen → Zuschnitte prüfen. Die Formatvorgaben enthalten auch **12 × 30 cm**.
 
 > [!NOTE]
 > Das Repository ist derzeit privat. Zum Klonen brauchst du Zugriff und eine eingerichtete GitHub-Anmeldung. Mehr dazu steht unter [Projektstatus](#projektstatus-und-lizenz).
@@ -86,16 +87,16 @@ Die Anwendung braucht keine API-Schlüssel, keine `.env`-Datei und keine Datenba
 
 ## Vom Grundriss zum Verlegeplan
 
-**Dein vorhandener Grundriss wird zur Grundlage deiner Planung.** Öffne eine PDF, markiere eine bekannte Wand und gib ihre Länge an. Danach zeichnest du die Räume direkt auf der Vorlage nach.
+**Dein vorhandener Grundriss wird zur Grundlage deiner Planung.** Der Assistent führt dich durch vier Schritte: PDF und Seite wählen, Maßstab festlegen, Raum markieren und Ergebnis prüfen.
 
 <a href="screenshots/03-pdf-grundriss.jpg">
   <img src="screenshots/03-pdf-grundriss.jpg" alt="PDF-Grundriss mit markierten Räumen und einer bekannten Wandlänge von 480 cm." width="1280" loading="lazy">
 </a>
 
-1. **Grundriss öffnen.** PDF auswählen und zur gewünschten Seite wechseln.
+1. **Grundriss öffnen.** PDF auswählen, zur gewünschten Seite wechseln und „Seite verwenden“ wählen.
 2. **Eine Wand messen.** Die beiden Endpunkte markieren. Die bekannte Länge in Zentimetern eingeben, zum Beispiel `480` für 4,80 m.
 3. **Räume bestimmen.** Die inneren Raumecken der Reihe nach markieren und den Raum benennen.
-4. **Raum für Raum planen.** Für jeden Raum Belag, Muster und Startposition festlegen.
+4. **Weitere Räume erfassen und gemeinsam ansehen.** Im Assistenten „Weiteren Raum markieren“ wählen. Die Projektübersicht zeigt die Verlegepläne nebeneinander. In jedem Raum Belag, Muster und Startposition festlegen.
 5. **Alles mitnehmen.** Die Projektdatei sichert alle Räume, Maßstäbe und die Original-PDF zusammen.
 
 Vektor-PDFs und gescannte Vorlagen sind möglich. Jede Seite hat einen eigenen Maßstab. Ein Projekt unterstützt bis zu **50 Räume** sowie eine PDF mit bis zu **200 Seiten und 20 MiB**.
@@ -265,8 +266,9 @@ docs/            Bedienung, Rechenregeln und Prüfnachweise
 | Bedienung, Tastatursteuerung und Grenzen | [Bedienungsanleitung](docs/ANLEITUNG.md) |
 | Fachliche Grundlagen und Rechenregeln | [Recherche und Quellen](docs/RECHERCHE.md) |
 | PDF-Verarbeitung und lokale Assets | [PDF-Technik](docs/PDF-TECHNIK.md) |
+| Projektansicht und PDF-Assistent | [Abnahme und Spezialistenberichte](docs/UX-ABNAHME.md) |
 | Nachweise für die direkte Startwahl | [Prüfung der Startauswahl](docs/START-UX-PRUEFUNG.md) |
-| Nachweise für die letzten Fehlerkorrekturen | [Prüfbericht](docs/REVIEW-FIXES-PRUEFUNG.md) |
+| Nachweise für frühere Fehlerkorrekturen | [Prüfbericht](docs/REVIEW-FIXES-PRUEFUNG.md) |
 | Umgang mit Zugangsdaten und privaten Plänen | [Sicherheit](SECURITY.md) |
 
 ## Projektstatus und Lizenz

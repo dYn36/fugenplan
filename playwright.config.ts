@@ -2,7 +2,7 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
-  testMatch: ['e2e.spec.ts', 'floorplan.e2e.spec.ts'],
+  testMatch: ['e2e.spec.ts', 'floorplan.e2e.spec.ts', 'project.e2e.spec.ts'],
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: 0,

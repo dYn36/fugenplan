@@ -3,7 +3,7 @@ import { calculateLayout, getRoomPolygon } from '../src/lib/geometry';
 import { roomVertexCount } from '../src/lib/layout-start';
 import { createCutCsv, createPlanSvg, svgDimensions } from '../src/lib/export';
 import {
-  DEFAULT_PROJECT, filename, formatArea, loadProject, loadVariants, parseProject, RECOVERED_START_NOTICE, STORAGE_KEY, updateRoom, VARIANTS_KEY,
+  DEFAULT_PROJECT, filename, formatArea, isUnchangedExampleProject, loadProject, loadVariants, parseProject, RECOVERED_START_NOTICE, STORAGE_KEY, updateRoom, VARIANTS_KEY,
 } from '../src/lib/project';
 import type { Project } from '../src/types';
 
@@ -22,6 +22,30 @@ beforeEach(() => vi.stubGlobal('localStorage', storage()));
 afterEach(() => vi.unstubAllGlobals());
 
 describe('Projektdatei und Schema', () => {
+  it('erkennt das unveränderte Beispiel auch nach dem erneuten Einlesen', () => {
+    const restored = parseProject(JSON.parse(JSON.stringify(fresh())));
+    expect(isUnchangedExampleProject(fresh())).toBe(true);
+    expect(isUnchangedExampleProject(restored)).toBe(true);
+  });
+
+  it('behandelt bearbeitete oder ungültige Räume nicht als ersetzbares Beispiel', () => {
+    const changes: ((project: Project) => void)[] = [
+      project => { project.name = 'Mein Wohnzimmer'; },
+      project => { project.name = 'Wohnzimmer '; },
+      project => { project.room.width = 4000; },
+      project => { project.room.points[1].x = 4000; },
+      project => { project.room.obstacles.push({ id: 'pillar', x: 100, y: 100, width: 100, height: 100 }); },
+      project => { project.material.width = 120; },
+      project => { project.layout.offsetX = 1; },
+      project => { project.layout.start = { kind: 'corner', index: 0 }; },
+      project => { project.room.points = []; },
+    ];
+    for (const change of changes) {
+      const project = fresh(); change(project);
+      expect(isUnchangedExampleProject(project)).toBe(false);
+    }
+  });
+
   it('erhält alle Standardwerte durch Speichern und erneutes Einlesen', () => {
     const input = fresh();
     expect(parseProject(JSON.parse(JSON.stringify(input)))).toEqual(input);

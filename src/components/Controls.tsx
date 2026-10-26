@@ -130,7 +130,7 @@ function NameField({ name, onCommit }: { name: string; onCommit: (name: string) 
   const cancelBlur = useRef(false);
 
   return <div className={`fp-field${error ? ' fp-field--invalid' : ''}`}>
-    <label htmlFor={id}>Projektname</label>
+    <label htmlFor={id}>Raumname</label>
     <input id={id} type="text" value={draft} maxLength={100} autoComplete="off"
       aria-invalid={error ? true : undefined} aria-describedby={error ? `${id}-error` : undefined}
       onChange={(event) => { setDraft(event.target.value); setError(''); }}
@@ -201,6 +201,7 @@ function roomPoints(room: RoomConfig): Point[] {
 }
 
 const tileFormats = [
+  { label: '12 × 30 cm', width: 120, height: 300 },
   { label: '60 × 60 cm', width: 600, height: 600 },
   { label: '60 × 30 cm', width: 600, height: 300 },
   { label: '120 × 60 cm', width: 1200, height: 600 },

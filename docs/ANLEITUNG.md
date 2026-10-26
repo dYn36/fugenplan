@@ -2,13 +2,23 @@
 
 Installation und Schnellstart stehen in der [README](../README.md).
 
+## Projekt und Räume
+
+Die App beginnt in der **Projektübersicht**. Unter „Räume anzeigen“ wählst du mehrere Räume. Ihre Verlegepläne erscheinen gleichzeitig im gleichen Bildschirmmaßstab. Ausblenden löscht keinen Raum. „Zuschnitte“ markiert angeschnittene Elemente in allen sichtbaren Plänen.
+
+„Raum hinzufügen“ legt einen weiteren Raum an. Öffne eine Vorschau mit „Raum bearbeiten“. Im Einzelplan kannst du direkt über die Raumliste wechseln. „Projekt“ führt zurück zur Übersicht; deine Auswahl bleibt während der Sitzung erhalten. Vor dem Entfernen eines Raums erscheint eine Bestätigung mit dessen Namen. „Rückgängig“ stellt ihn wieder her.
+
+Auf dem Smartphone steht der Plan vor den Einstellungen. „Raum und Belag einstellen“ und „Zur Planvorschau“ verbinden beide Bereiche.
+
 ## Einen Boden planen
 
+Öffne zuerst einen Raum aus der Projektübersicht.
+
 1. **Raum:** Innenmaße in Zentimetern eingeben. Rechteck, L-Form oder eigene Eckpunkte wählen. Hindernisse bei Bedarf ergänzen.
-2. **Belag:** Das tatsächliche Werkmaß eingeben. Fugenbreite und Randabstand in Millimetern festlegen. Fliesen und Dielen werden als Rechtecke gerechnet.
+2. **Belag:** Das tatsächliche Werkmaß eingeben oder eine Formatvorgabe wählen, zum Beispiel **12 × 30 cm**. Fugenbreite und Randabstand in Millimetern festlegen. Fliesen und Dielen werden als Rechtecke gerechnet.
 3. **Verlegung:** Über dem Raumplan „Start wählen“ anklicken. Dann eine Ecke oder Wandmitte direkt im Plan wählen. Muster wählen, drehen und verschieben. „Zentrieren“ richtet das Raster an der Raumbegrenzung aus und hebt die Startauswahl auf. Mit dem Werkzeug „Verband verschieben“ lässt sich die Position auch ziehen.
 4. **Prüfen:** Ein Element anklicken. Die Ansicht zeigt seine Schnittkontur, das Hüllmaß und die Kantenlängen. „Zuschnitte“ markiert alle angeschnittenen Elemente.
-5. **Vergleichen:** Mit „Variante merken“ bis zu zwölf Stände speichern. Jeder Stand enthält Raum, Belag und Verlegung.
+5. **Vergleichen:** Mit „Variante merken“ bis zu zwölf Stände speichern. Jeder Stand enthält Raum, Belag und Verlegung. Vor dem Laden nennt eine Bestätigung den Zielraum und die Daten, die ersetzt werden.
 6. **Sichern:** Unter „Exportieren“ eine Projektdatei, SVG-Grafik oder CSV-Elementliste laden. „Drucken / PDF“ öffnet den Druckdialog.
 
 Verfügbare Muster: Kreuzverband, Halbverband, Drittelverband, Viertelverband, Wilder Verband, Diagonalverband und Fischgrät. Diagonalverband und Fischgrät beginnen bei 45°. Das Winkelfeld dreht diese Muster zusätzlich.
@@ -29,20 +39,22 @@ Dezimalkomma und Dezimalpunkt sind möglich. Enter oder ein Fokuswechsel überni
 
 ## Räume aus einer PDF übernehmen
 
-1. **Grundriss öffnen:** „Grundriss“ wählen. Eine PDF auswählen oder in die Fläche ziehen. Bei mehreren Seiten die gewünschte PDF-Seite wählen.
+1. **Grundriss öffnen:** In der Projektübersicht „PDF-Grundriss übernehmen“ oder den Reiter „Grundriss“ wählen. Eine PDF auswählen oder in die Fläche ziehen. Die gewünschte PDF-Seite wählen und „Seite verwenden“ anklicken. Bei einem unveränderten Beispielraum kannst du wählen, ob der erste übernommene PDF-Raum ihn ersetzen soll.
 2. **Wand markieren:** „Wand markieren“ wählen. Den Anfang und das Ende einer bekannten Wand anklicken. Für genaue Punkte die Ansicht vergrößern. Ziehen verschiebt die Ansicht.
 3. **Maßstab speichern:** Die tatsächliche Wandlänge in **Zentimetern** eingeben. „Maßstab speichern“ wählen. Beispiel: Für eine 4,80 m lange Wand `480` eingeben.
-4. **Raum markieren:** „Raum markieren“ wählen. Die inneren Raumecken der Reihe nach anklicken. Einen Namen eingeben und „Raum übernehmen“ wählen. Die letzte Kante wird geschlossen. Der Verlegeplan öffnet sich.
-5. **Weitere Räume:** Zur Ansicht „Grundriss“ zurückkehren und den nächsten Raum markieren. In der Raumauswahl zwischen den Räumen wechseln. Jeder Raum hat eigene Belag- und Verlegeeinstellungen.
+4. **Raum markieren:** „Raum markieren“ wählen. Die inneren Raumecken der Reihe nach anklicken. Einen Namen eingeben und „Raum übernehmen“ wählen. Die letzte Kante wird geschlossen. Der Assistent zeigt den gespeicherten Raum im Schritt „Prüfen“.
+5. **Prüfen oder weiterzeichnen:** „Raum prüfen“ öffnet den Einzelplan. „Weiteren Raum markieren“ beginnt die nächste Kontur im selben Grundriss. „Zur Projektansicht“ zeigt alle Räume zusammen. Jeder Raum hat eigene Belag- und Verlegeeinstellungen.
 6. **Projekt sichern:** „Exportieren“ → „Projektdatei“ speichert alle Räume, Maßstäbe und die Original-PDF. SVG, Druck und CSV beziehen sich auf den aktiven Raum.
 
 Jede PDF-Seite hat einen eigenen Maßstab. Eine neue Kalibrierung passt alle zugeordneten Räume dieser Seite sowie deren Hindernisse an. Produktmaße und Verlegeeinstellungen bleiben erhalten. Änderungen der Raumkontur in den normalen Raumfeldern erscheinen auch in der PDF. Rückgängig und Wiederholen umfassen diese Änderungen.
 
+Die Schrittleiste führt zurück zu vorherigen Eingaben. Ein ungespeicherter Entwurf bleibt beim Zurückgehen erhalten. Vor einem Seitenwechsel, Ansichtswechsel oder Abbruch fragt die App, ob die Markierung verworfen werden soll. Auch „Rückgängig“ und „Wiederholen“ in der Kopfzeile schützen einen offenen Entwurf durch diese Rückfrage.
+
 Die PDF kann Vektoren oder ein gescanntes Bild enthalten. Die Anwendung erkennt Räume nicht automatisch. Die Kalibrierung setzt einen gleichmäßigen Maßstab in beide Richtungen voraus. Verzerrte Scans müssen vorher korrigiert werden. Die Genauigkeit hängt von der Vorlage und den markierten Punkten ab. Prüfe deshalb ein zweites bekanntes Maß am übernommenen Raum.
 
-Tastatur: Im PDF-Zeichenbereich verschieben Pfeiltasten den Zeiger; Enter setzt einen Punkt. Umschalt vergrößert den Schritt. Plus und Minus ändern den Zoom. Unter „Punkte per Tastatur eingeben“ lassen sich Positionen als Prozentwerte der Seite eingeben. Escape bricht die Markierung ab. „Letzten Punkt entfernen“ korrigiert einen Punkt.
+Tastatur: Im PDF-Zeichenbereich verschieben Pfeiltasten den Zeiger; Enter setzt einen Punkt. Umschalt vergrößert den Schritt. Plus und Minus ändern den Zoom. Unter „Punkte per Tastatur eingeben“ lassen sich Positionen als Prozentwerte der Seite eingeben. Nach dem zweiten Wandpunkt über diese Felder ist das Feld für die Wandlänge aktiv. Escape bricht die Markierung ab. „Letzten Punkt entfernen“ oder Strg/⌘ Z im fokussierten PDF-Zeichenbereich korrigiert einen Punkt.
 
-„Andere PDF“ erhält die bisherigen Raumpläne und löst ihre Zuordnung zur alten PDF. Dieselbe PDF erneut zu öffnen erhält die Zuordnung. Das hilft auch, wenn die PDF aus dem Browserspeicher gelöscht wurde. „Neuer Plan“ beginnt ein neues Projekt mit einem Raum. Dieser Schritt kann rückgängig gemacht werden.
+„Andere PDF“ erhält die bisherigen Raumpläne und löst nach deiner Bestätigung ihre Zuordnung zur alten PDF. Dieselbe PDF erneut zu öffnen erhält die Zuordnung. Das hilft auch, wenn die PDF aus dem Browserspeicher gelöscht wurde. „Neuer Plan“ beginnt ein neues Projekt mit einem Raum. Dieser Schritt kann rückgängig gemacht werden.
 
 ## Genauigkeit und Mengen
 
@@ -53,7 +65,7 @@ Tastatur: Im PDF-Zeichenbereich verschieben Pfeiltasten den Zeiger; Enter setzt 
 - SVG und Druck haben einen festgelegten Maßstab. Beim Drucken **100 %**, Papierformat A4 und keine automatische Seitenanpassung einstellen. Der Bericht enthält eine 50-mm-Kontrollstrecke. Zu große Pläne brauchen einen kleineren Maßstab.
 - Ein angeschnittenes Element zählt als ein Ausgangsstück. **Reststücke werden nicht anderen Elementen zugeordnet.** Die Mengen sind daher ohne Wiederverwendung berechnet. Wenn ein Ausgangsstück mehrere Schnittteile ergibt, zählt es einmal.
 - Verschnitt ist die nicht verlegte Fläche der gezählten Ausgangsstücke, geteilt durch deren volle Fläche. Reserve wird zusätzlich auf die Stückzahl aufgeschlagen. Pakete werden aufgerundet.
-- Die Raumfläche ist die Grundfläche ohne Hindernisse. Fugen und Randabstände werden bei dieser Raumfläche nicht abgezogen.
+- Die Raumfläche ist die Grundfläche abzüglich der Hindernisflächen. Fugen und Randabstände werden bei dieser Raumfläche nicht abgezogen.
 - Das Hüllmaß umschließt die Schnittkontur in den Elementachsen. Bei schrägen oder verwinkelten Schnitten ist es keine Mindest-Stegstärke. Die Warnschwelle bezieht sich auf dieses Hüllmaß.
 
 Der wilde Verband ist reproduzierbar. Er prüft keinen vom Hersteller geforderten Mindestabstand zwischen Kopfstößen. „Zentrieren“ ist keine automatische Verschnittoptimierung. Fugen, Randabstände, Versatz und Eignung für Fischgrät müssen zum verwendeten Produkt passen.

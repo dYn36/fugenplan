@@ -57,6 +57,7 @@ async function upload(page: Page) {
   await page.getByLabel('PDF-Grundriss öffnen', { exact: true }).setInputFiles(fixture);
   await readyPdf(page);
   await expect(page.getByRole('combobox', { name: 'PDF-Seite', exact: true }).locator('option')).toHaveCount(3);
+  await page.getByRole('button', { name: 'Seite verwenden', exact: true }).click();
 }
 
 async function precisePoint(page: Page, point: Point, number: number) {
@@ -84,22 +85,26 @@ async function pointerPoint(page: Page, point: Point, number: number) {
 
 async function calibrate(page: Page, number = 1, method: 'precise' | 'pointer' = 'precise', lengthMm?: number) {
   const expected = manifest.pages[number - 1].calibration;
+  await page.getByRole('navigation', { name: 'Schritte zum Verlegeplan' }).getByRole('button', { name: 'Maßstab', exact: true }).click();
   await page.getByRole('button', { name: /^(Wand markieren|Maßstab neu setzen)$/ }).click();
   const point = method === 'pointer' ? pointerPoint : precisePoint;
   await point(page, expected.start, number);
   await point(page, expected.end, number);
   await page.getByRole('textbox', { name: 'Länge der Wand', exact: true }).fill(String((lengthMm ?? expected.lengthMm) / 10).replace('.', ','));
   await page.getByRole('button', { name: 'Maßstab speichern', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Maßstab neu setzen', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Raum markieren', exact: true })).toBeEnabled();
   await expect.poll(async () => (await storedWorkspace(page)).floorPlan?.pages[number - 1].calibration?.lengthMm).toBe(lengthMm ?? expected.lengthMm);
 }
 
 async function drawRoom(page: Page, name: string, number = 1, index = 0, method: 'precise' | 'pointer' = 'precise') {
+  await page.getByRole('navigation', { name: 'Schritte zum Verlegeplan' }).getByRole('button', { name: 'Raum', exact: true }).click();
   await page.getByRole('button', { name: 'Raum markieren', exact: true }).click();
   await page.getByRole('textbox', { name: 'Raumname', exact: true }).fill(name);
   const point = method === 'pointer' ? pointerPoint : precisePoint;
   for (const coordinate of manifest.pages[number - 1].rooms[index].points) await point(page, coordinate, number);
   await page.getByRole('button', { name: 'Raum übernehmen', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Raum übernommen', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Raum prüfen', exact: true }).click();
   await expect(floorPlan(page)).toBeVisible();
   await expect(page.getByRole('heading', { name, exact: true }).first()).toBeVisible();
   await expect.poll(async () => (await storedWorkspace(page)).rooms.some(room => room.project.name === name)).toBe(true);
@@ -112,8 +117,7 @@ async function setNumber(page: Page, label: string, value: string) {
 }
 
 async function selectRoom(page: Page, name: string) {
-  const option = page.getByRole('combobox', { name: 'Aktiver Raum', exact: true }).locator('option').filter({ hasText: name });
-  await page.getByRole('combobox', { name: 'Aktiver Raum', exact: true }).selectOption((await option.getAttribute('value'))!);
+  await page.getByRole('navigation', { name: 'Räume im Projekt' }).getByRole('button', { name, exact: true }).click();
   await expect(page.getByRole('heading', { name, exact: true }).first()).toBeVisible();
 }
 
@@ -134,7 +138,7 @@ function assertRoom(room: WorkspaceRoom, expected: { widthMm: number; heightMm: 
   }, 0)) / 2e6;
   expect(Math.abs(width - expected.widthMm)).toBeLessThan(tolerance);
   expect(Math.abs(height - expected.heightMm)).toBeLessThan(tolerance);
-  expect(Math.abs(area - expected.areaM2)).toBeLessThan(tolerance / 100);
+  expect(Math.abs(area - expected.areaM2), `Raumpunkte: ${JSON.stringify(points)}`).toBeLessThan(tolerance / 100);
 }
 
 async function exportFile(page: Page) {
@@ -182,6 +186,7 @@ async function noOverflow(page: Page) {
 test.beforeEach(async ({ page }) => {
   observe(page);
   await page.goto('/');
+  await page.getByRole('button', { name: 'Plan', exact: true }).click();
   await expect(floorPlan(page)).toBeVisible();
 });
 test.afterEach(async ({ page }) => {
@@ -190,7 +195,7 @@ test.afterEach(async ({ page }) => {
 
 test('Echte PDF: Wandmaß und Raum bleiben bei Zeiger-Eingabe unabhängig vom Zoom', async ({ page }) => {
   await upload(page);
-  await expect(page.getByRole('button', { name: 'Raum markieren', exact: true })).toBeDisabled();
+  await expect(page.getByRole('navigation', { name: 'Schritte zum Verlegeplan' }).getByRole('button', { name: 'Raum', exact: true })).toBeDisabled();
   await calibrate(page, 1, 'pointer');
   const original = (await storedWorkspace(page)).floorPlan!.pages[0].calibration!;
   await page.getByRole('button', { name: 'PDF vergrößern', exact: true }).click();
@@ -239,7 +244,7 @@ test('Eigene Maßstäbe für Vektor, gedrehte Seite und Raster; neue Kalibrierun
   await expect(page.getByRole('textbox', { name: 'Breite', exact: true })).toHaveValue('30');
 
   await openFloorPlan(page, 2);
-  await expect(page.getByRole('button', { name: 'Raum markieren', exact: true })).toBeDisabled();
+  await expect(page.getByRole('navigation', { name: 'Schritte zum Verlegeplan' }).getByRole('button', { name: 'Raum', exact: true })).toBeDisabled();
   await calibrate(page, 2); await drawRoom(page, 'PDF Bad', 2);
   assertRoom(roomNamed(await storedWorkspace(page), 'PDF Bad'), manifest.pages[1].rooms[0]);
   await openFloorPlan(page, 3); await calibrate(page, 3); await drawRoom(page, 'PDF Scan', 3);
@@ -262,6 +267,7 @@ test('Eigene Maßstäbe für Vektor, gedrehte Seite und Raster; neue Kalibrierun
   expect(roomNamed(after, 'PDF Küche').project.room.obstacles[0]).toMatchObject({ x: 500, y: 500, width: 250, height: 200 });
   expect(roomNamed(after, 'PDF Bad')).toEqual(roomNamed(before, 'PDF Bad'));
   expect(roomNamed(after, 'PDF Scan')).toEqual(roomNamed(before, 'PDF Scan'));
+  await page.getByRole('navigation', { name: 'Schritte zum Verlegeplan' }).getByRole('button', { name: 'Prüfen', exact: true }).click();
   await page.getByRole('region', { name: 'Räume auf Seite 1', exact: true }).getByRole('button', { name: 'PDF Wohnen öffnen', exact: true }).click();
   await page.getByRole('button', { name: 'Belag', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Diele', exact: true })).toHaveAttribute('aria-pressed', 'true');
@@ -291,8 +297,7 @@ test('IndexedDB und vollständiger JSON-Roundtrip erhalten Original-PDF, Räume 
   const restored = await context.newPage(); observe(restored);
   try {
     await restored.goto('http://127.0.0.1:5173');
-    await expect(floorPlan(restored)).toBeVisible();
-    expect(await restored.evaluate(() => localStorage.getItem('fugenplan.workspace.v2'))).toBeNull();
+    await expect(restored.getByRole('heading', { name: 'Projektübersicht', exact: true })).toBeVisible();
     await restored.getByLabel('Projektdatei öffnen', { exact: true }).setInputFiles({ name: 'vollstaendig.fugenplan.json', mimeType: 'application/json', buffer: Buffer.from(exported.contents) });
     await expect(restored.getByRole('heading', { name: 'PDF Bad', exact: true }).first()).toBeVisible();
     await expect.poll(async () => (await storedWorkspace(restored)).rooms.length).toBe(before.rooms.length);
@@ -386,6 +391,7 @@ test('Fehlende PDF in IndexedDB lässt sich ohne Verlust der Räume und Maßstä
   }, before.floorPlan!.id);
   await page.reload();
   await expect(page.locator('.save-status')).toContainText('PDF fehlt');
+  await page.getByRole('button', { name: 'Plan', exact: true }).click();
   await expect(floorPlan(page)).toBeVisible();
   expect(await storedWorkspace(page)).toEqual(before);
   await page.getByRole('button', { name: 'Exportieren', exact: true }).click();

@@ -88,6 +88,7 @@ test.beforeEach(async ({ page }) => {
   page.context().on('request', request => networkRequests.get(page)!.push(request.url()));
   page.on('websocket', socket => networkRequests.get(page)!.push(socket.url()));
   await page.goto('/');
+  await page.getByRole('button', { name: 'Plan', exact: true }).click();
   await expect(plan(page)).toBeVisible();
   await expect.poll(() => pieces(page).count()).toBeGreaterThan(0);
 });
@@ -217,7 +218,7 @@ test('Regression: Escape verwirft Eingaben vor dem Abbruch der Startauswahl', as
   await expect(width).toHaveValue('420');
   await expect(picker).toBeVisible();
   expect(await geometrySignature(page)).toBe(previous);
-  const name = page.getByRole('textbox', { name: 'Projektname', exact: true });
+  const name = page.getByRole('textbox', { name: 'Raumname', exact: true });
   await name.fill('Unbestätigt');
   await name.press('Escape');
   await expect(name).toHaveValue('Wohnzimmer');
@@ -227,6 +228,7 @@ test('Regression: Escape verwirft Eingaben vor dem Abbruch der Startauswahl', as
   await expect(start).toBeFocused();
   await expect(page.getByRole('button', { name: 'Rückgängig', exact: true })).toBeDisabled();
   await page.reload();
+  await page.getByRole('button', { name: 'Plan', exact: true }).click();
   await expect(width).toHaveValue('420');
   await expect(name).toHaveValue('Wohnzimmer');
 });
@@ -263,8 +265,9 @@ for (const kind of ['Ecke', 'Wandmitte']) {
       return w.rooms?.find((room: { id: string }) => room.id === w.activeRoomId)?.project.room.points[3].y;
     })).toBe(0);
     await page.reload();
+  await page.getByRole('button', { name: 'Plan', exact: true }).click();
     await expect(plan(page)).toBeVisible();
-    await expect(page.getByRole('combobox', { name: 'Aktiver Raum' }).locator('option')).toHaveText(['Wohnzimmer', 'Raum 2']);
+    await expect(page.getByRole('navigation', { name: 'Räume im Projekt' }).getByRole('button')).toHaveText(['Wohnzimmer', 'Raum 2']);
     await expect(page.getByRole('textbox', { name: 'Punkt 4, Y', exact: true })).toHaveValue('0');
     await expect(page.getByRole('button', { name: 'Start wählen', exact: true })).toBeEnabled();
   });
@@ -283,6 +286,7 @@ test('Rückgängig, Wiederholen und lokales Speichern erhalten die Raummaße', a
   await expect(width).toHaveValue('480');
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('fugenplan.project.v1') ?? '{}').room?.width)).toBe(4800);
   await page.reload();
+  await page.getByRole('button', { name: 'Plan', exact: true }).click();
   await expect(width).toHaveValue('480');
   await expect(plan(page).locator('polygon').first()).toHaveAttribute('points', '0,0 4800,0 4800,3600 0,3600');
 });
@@ -297,8 +301,10 @@ test('Varianten lassen sich speichern, laden und getrennt vom aktuellen Plan lö
   await page.getByRole('button', { name: /^Varianten/ }).click();
   await expect(page.getByRole('heading', { name: 'Ruhige Aufteilung', exact: true })).toBeVisible();
   await page.reload();
+  await page.getByRole('button', { name: 'Plan', exact: true }).click();
   await page.getByRole('button', { name: /^Varianten/ }).click();
   await page.getByRole('button', { name: 'Ruhige Aufteilung laden', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Variante laden', exact: true }).click();
   await expect(page.getByRole('textbox', { name: 'Breite', exact: true })).toHaveValue('360');
   await expect(plan(page)).toBeVisible();
   await page.getByRole('button', { name: /^Varianten/ }).click();
@@ -310,7 +316,7 @@ test('Varianten lassen sich speichern, laden und getrennt vom aktuellen Plan lö
 
 test('Projektdatei lädt denselben Plan; eine defekte Datei erhält den aktuellen Stand', async ({ page }) => {
   await setNumber(page, 'Breite', '333,3');
-  const projectName = page.getByRole('textbox', { name: 'Projektname', exact: true });
+  const projectName = page.getByRole('textbox', { name: 'Raumname', exact: true });
   await projectName.fill('Küche & Flur');
   await projectName.press('Enter');
   await openExport(page);
@@ -506,6 +512,7 @@ test('Regression: Neuer Plan repariert beschädigte Speicherung bei sichtbaren A
   const original = await page.evaluate(() => JSON.parse(localStorage.getItem('fugenplan.project.v1')!));
   await page.evaluate(() => localStorage.setItem('fugenplan.workspace.v2', '{beschädigt'));
   await page.reload();
+  await page.getByRole('button', { name: 'Plan', exact: true }).click();
   await expect(plan(page)).toBeVisible();
   await expect(page.locator('.save-status')).toContainText('Nicht gespeichert');
   await expect(page.getByRole('textbox', { name: 'Breite', exact: true })).toHaveValue('420');
@@ -520,6 +527,7 @@ test('Regression: Neuer Plan repariert beschädigte Speicherung bei sichtbaren A
   })).toEqual(original);
   await expect(page.locator('.save-status')).toContainText('Lokal gespeichert');
   await page.reload();
+  await page.getByRole('button', { name: 'Plan', exact: true }).click();
   await expect(plan(page)).toBeVisible();
   await expect(page.locator('.save-status')).toContainText('Lokal gespeichert');
   await expect(page.getByText('Der gespeicherte Plan konnte nicht geladen werden.', { exact: false })).toHaveCount(0);

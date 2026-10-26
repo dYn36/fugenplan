@@ -83,6 +83,16 @@ export function parseProject(input: unknown, options: ProjectParseOptions = {}):
   return project;
 }
 
+/** Compare schema values, because loading a project can change object key order. */
+export function isUnchangedExampleProject(project: Project): boolean {
+  if (project.name !== DEFAULT_PROJECT.name) return false;
+  try {
+    return JSON.stringify(parseProject(project)) === JSON.stringify(parseProject(DEFAULT_PROJECT));
+  } catch {
+    return false;
+  }
+}
+
 export function loadProject(): {project:Project; error:string | null; warning?:string} {
   try {
     const saved=localStorage.getItem(STORAGE_KEY);
