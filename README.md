@@ -13,11 +13,11 @@ Plane Fliesen und Dielen direkt im Browser. Übernimm deinen PDF-Grundriss,<br>p
 <a href="screenshots/demo-pdf.gif">
   <picture>
     <source media="(prefers-reduced-motion: reduce)" srcset="screenshots/demo-pdf-poster.jpg">
-    <img src="screenshots/demo-pdf.gif" alt="Demo in der echten Oberfläche: PDF öffnen, zwei Wandpunkte markieren, 480 cm als Länge speichern, Raumecken markieren und den Verlegeplan mit Zuschnitten prüfen." width="1120">
+    <img src="screenshots/demo-pdf.gif" alt="Demo der neuen Oberfläche: PDF laden, zwei Wandpunkte markieren, 480 cm als Länge speichern, die Räume Wohnen und Essen markieren und beide Verlegepläne mit Zuschnitten gemeinsam in der Projektansicht ansehen." width="1120">
   </picture>
 </a>
 
-*PDF laden → Wandmaß setzen → Raum markieren → Verlegeplan prüfen.*
+*PDF laden → Wandmaß setzen → Zwei Räume markieren → Beide Verlegepläne gemeinsam ansehen.*
 
 Demo mit einem synthetischen Beispielgrundriss. [Standbild ansehen](screenshots/demo-pdf-poster.jpg)
 
