@@ -89,8 +89,8 @@ Die Anwendung braucht keine API-Schlüssel, keine `.env`-Datei und keine Datenba
 
 **Dein vorhandener Grundriss wird zur Grundlage deiner Planung.** Der Assistent führt dich durch vier Schritte: PDF und Seite wählen, Maßstab festlegen, Raum markieren und Ergebnis prüfen.
 
-<a href="screenshots/03-pdf-grundriss.jpg">
-  <img src="screenshots/03-pdf-grundriss.jpg" alt="PDF-Grundriss mit markierten Räumen und einer bekannten Wandlänge von 480 cm." width="1280" loading="lazy">
+<a href="screenshots/readme/grundriss-assistent.jpg">
+  <img src="screenshots/readme/grundriss-assistent.jpg" alt="PDF-Assistent im Schritt Räume prüfen: Die Räume Wohnen und Essen sind markiert. Die bekannte Wandlänge beträgt 480 cm." width="1280" loading="lazy">
 </a>
 
 1. **Grundriss öffnen.** PDF auswählen, zur gewünschten Seite wechseln und „Seite verwenden“ wählen.
@@ -114,7 +114,7 @@ Vom ruhigen Kreuzverband bis zum Fischgrät: Sieh, wie sich dein Belag im Raum v
 <details>
 <summary><strong>Musterwahl und Schnittkontur ansehen</strong></summary>
 
-![Fischgrät mit Musterauswahl, hervorgehobenen Randstücken und geöffneter Schnittkontur.](screenshots/02-muster-und-zuschnitte.jpg)
+![Fischgrät im Raum Wohnen: sieben Muster zur Auswahl, hervorgehobene Zuschnitte und die geöffnete Schnittkontur mit Hüllmaßen.](screenshots/readme/muster-zuschnitte.jpg)
 
 </details>
 
@@ -122,8 +122,8 @@ Vom ruhigen Kreuzverband bis zum Fischgrät: Sieh, wie sich dein Belag im Raum v
 
 Wähle eine **Ecke oder Wandmitte direkt im Plan**. Fugenplan richtet das Raster dort aus und markiert das erste verlegbare Element. Mit dem Versatz passt du die Aufteilung weiter an. So kannst du die Randstücke an den anderen Wänden prüfen.
 
-<a href="screenshots/startwahl-direkt-desktop.jpg">
-  <img src="screenshots/startwahl-direkt-desktop.jpg" alt="Direkte Startwahl im Raumplan. Die vier Raumecken sind nummeriert; unten rechts ist als Start gewählt." width="1280" loading="lazy">
+<a href="screenshots/readme/startwahl-desktop.jpg">
+  <img src="screenshots/readme/startwahl-desktop.jpg" alt="Startwahl im Raum Wohnen mit der Raumliste Wohnen und Essen. Die vier Raumecken sind nummeriert. Ecke 3 unten rechts ist als Start gewählt." width="1280" loading="lazy">
 </a>
 
 ### Schau dir den Schnitt an.
@@ -149,7 +149,7 @@ Separat gemerkte Varianten bleiben im Browser und sind nicht Teil der Projektdat
 <summary><strong>Auch auf dem Smartphone: Startposition direkt im Plan wählen</strong></summary>
 
 <p align="center">
-  <img src="screenshots/startwahl-direkt-mobil.jpg" alt="Mobile Startwahl: nummerierte Raumecken, Zoom und markierte Startfliese." width="320" loading="lazy">
+  <img src="screenshots/readme/startwahl-mobil.jpg" alt="Mobile Startwahl mit vier nummerierten Raumecken bei 125 Prozent Zoom. Ecke 3 ist gewählt und unter dem Plan als Start bestätigt." width="320" loading="lazy">
 </p>
 
 Die Oberfläche passt sich an die Bildschirmbreite an. Für große Grundrisse bietet ein Desktop mehr Platz. Eine automatische Synchronisierung zwischen Geräten gibt es nicht. Mit der Projektdatei kannst du einen Plan auf ein anderes Gerät übertragen.
