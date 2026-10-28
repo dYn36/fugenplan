@@ -3,7 +3,9 @@ import { fileURLToPath } from 'node:url';
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import type { Point } from '../src/types';
-import type { Workspace, WorkspaceFile, WorkspaceRoom } from '../src/floorplan-types';
+import type { Workspace, BuildingFile, WorkspaceRoom } from '../src/floorplan-types';
+
+import { seedLegacyProject, storedWorkspace, storedBuilding, buildingContents, selectPdfPage } from './helpers';
 
 const fixture = fileURLToPath(new URL('./fixtures/grundriss-drei-seiten.pdf', import.meta.url));
 const manifest = JSON.parse(await readFile(new URL('./fixtures/grundriss-erwartungen.json', import.meta.url), 'utf8')) as {
@@ -25,11 +27,6 @@ function observe(page: Page) {
   page.on('websocket', socket => requests.get(page)!.push(socket.url()));
 }
 
-async function storedWorkspace(page: Page): Promise<Workspace> {
-  await expect.poll(() => page.evaluate(() => localStorage.getItem('fugenplan.workspace.v2'))).not.toBeNull();
-  return page.evaluate(() => JSON.parse(localStorage.getItem('fugenplan.workspace.v2')!));
-}
-
 async function readyPdf(page: Page, number = 1) {
   const expected = manifest.pages[number - 1];
   await expect(overlay(page)).toBeVisible();
@@ -47,7 +44,7 @@ async function readyPdf(page: Page, number = 1) {
 
 async function openFloorPlan(page: Page, number?: number) {
   await page.getByRole('button', { name: 'Grundriss', exact: true }).click();
-  if (number) await page.getByRole('combobox', { name: 'PDF-Seite', exact: true }).selectOption(String(number));
+  if (number) await selectPdfPage(page, number);
   const active = number ?? Number(await page.getByRole('combobox', { name: 'PDF-Seite', exact: true }).inputValue());
   await readyPdf(page, active);
 }
@@ -117,7 +114,7 @@ async function setNumber(page: Page, label: string, value: string) {
 }
 
 async function selectRoom(page: Page, name: string) {
-  await page.getByRole('navigation', { name: 'Räume im Projekt' }).getByRole('button', { name, exact: true }).click();
+  await page.getByRole('navigation', { name: 'Räume auf dieser Etage' }).getByRole('button', { name, exact: true }).click();
   await expect(page.getByRole('heading', { name, exact: true }).first()).toBeVisible();
 }
 
@@ -152,7 +149,7 @@ async function exportFile(page: Page) {
   const contents = await readFile((await download.path())!, 'utf8');
   await page.keyboard.press('Escape');
   await expect(dialog).toHaveCount(0);
-  return { data: JSON.parse(contents) as WorkspaceFile, contents };
+  return { data: JSON.parse(contents) as BuildingFile, contents };
 }
 
 async function indexedPdf(page: Page, id: string) {
@@ -185,8 +182,9 @@ async function noOverflow(page: Page) {
 
 test.beforeEach(async ({ page }) => {
   observe(page);
+  await seedLegacyProject(page);
   await page.goto('/');
-  await page.getByRole('button', { name: 'Plan', exact: true }).click();
+  await page.getByRole('button', { name: 'Raumplan', exact: true }).click();
   await expect(floorPlan(page)).toBeVisible();
 });
 test.afterEach(async ({ page }) => {
@@ -249,14 +247,18 @@ test('Eigene Maßstäbe für Vektor, gedrehte Seite und Raster; neue Kalibrierun
   assertRoom(roomNamed(await storedWorkspace(page), 'PDF Bad'), manifest.pages[1].rooms[0]);
   await openFloorPlan(page, 3); await calibrate(page, 3); await drawRoom(page, 'PDF Scan', 3);
   assertRoom(roomNamed(await storedWorkspace(page), 'PDF Scan'), manifest.pages[2].rooms[0]);
-  const before = await storedWorkspace(page);
+  const beforeBuilding = await storedBuilding(page);
+  const beforeRooms = beforeBuilding.floors.flatMap(floor => floor.workspace.rooms);
+  const before = { ...(await storedWorkspace(page)), rooms: beforeRooms };
+  expect(beforeBuilding.floors).toHaveLength(3);
   expect(before.floorPlan!.pages.map(p => p.rotation)).toEqual([0, 90, 0]);
-  expect(before.floorPlan!.pages.map(p => p.calibration!.lengthMm)).toEqual([4800, 2000, 3000]);
+  expect(beforeBuilding.floors.map(floor => floor.workspace.floorPlan!.pages[floor.workspace.floorPlan!.activePage - 1].calibration!.lengthMm)).toEqual([4800, 2000, 3000]);
   assertRoom(roomNamed(before, 'PDF Küche'), manifest.pages[0].rooms[0]);
   assertRoom(roomNamed(before, 'PDF Wohnen'), manifest.pages[0].rooms[1]);
 
   await openFloorPlan(page, 1); await calibrate(page, 1, 'precise', 2400);
-  const after = await storedWorkspace(page);
+  const afterBuilding = await storedBuilding(page);
+  const after = { ...(await storedWorkspace(page)), rooms: afterBuilding.floors.flatMap(floor => floor.workspace.rooms) };
   for (const name of ['PDF Küche', 'PDF Wohnen']) {
     const current = roomNamed(after, name), previous = roomNamed(before, name);
     assertRoom(current, { widthMm: 2400, heightMm: 2600, areaM2: 6.24 });
@@ -284,28 +286,31 @@ test('IndexedDB und vollständiger JSON-Roundtrip erhalten Original-PDF, Räume 
   await page.getByRole('button', { name: 'Diagonalverband', exact: true }).click();
   await openFloorPlan(page, 2);
   const before = await storedWorkspace(page);
+  const beforeBuilding = await storedBuilding(page);
   expect(await indexedPdf(page, before.floorPlan!.id)).toEqual(Array.from(pdfBytes));
   await page.reload(); await openFloorPlan(page, 2);
   expect(await storedWorkspace(page)).toEqual(before);
   expect(await indexedPdf(page, before.floorPlan!.id)).toEqual(Array.from(pdfBytes));
   const exported = await exportFile(page);
-  expect(exported.data.format).toBe('fugenplan'); expect(exported.data.version).toBe(2);
-  expect(exported.data.workspace).toEqual(before);
-  expect(Buffer.from(exported.data.pdfBase64!, 'base64')).toEqual(pdfBytes);
+  expect(exported.data.format).toBe('fugenplan'); expect(exported.data.version).toBe(3);
+  expect(exported.data.building).toEqual(beforeBuilding);
+  expect(exported.data.assets).toHaveLength(1);
+  expect(Buffer.from(exported.data.assets[0].pdfBase64, 'base64')).toEqual(pdfBytes);
 
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, locale: 'de-DE', reducedMotion: 'reduce' });
   const restored = await context.newPage(); observe(restored);
   try {
-    await restored.goto('http://127.0.0.1:5173');
-    await expect(restored.getByRole('heading', { name: 'Projektübersicht', exact: true })).toBeVisible();
+    await restored.goto(new URL('/', page.url()).href);
+    await expect(restored.getByRole('heading', { name: 'Deine Projekte', exact: true })).toBeVisible();
     await restored.getByLabel('Projektdatei öffnen', { exact: true }).setInputFiles({ name: 'vollstaendig.fugenplan.json', mimeType: 'application/json', buffer: Buffer.from(exported.contents) });
-    await expect(restored.getByRole('heading', { name: 'PDF Bad', exact: true }).first()).toBeVisible();
+    await expect(restored.getByRole('heading', { name: 'Seite 2', exact: true }).first()).toBeVisible();
     await expect.poll(async () => (await storedWorkspace(restored)).rooms.length).toBe(before.rooms.length);
-    expect(await storedWorkspace(restored)).toEqual(before);
+    expect(buildingContents(await storedBuilding(restored))).toEqual(buildingContents(beforeBuilding));
     expect(await indexedPdf(restored, before.floorPlan!.id)).toEqual(Array.from(pdfBytes));
     await openFloorPlan(restored, 2);
     const second = await exportFile(restored);
-    expect(second.data).toEqual(exported.data);
+    expect(buildingContents(second.data.building)).toEqual(buildingContents(exported.data.building));
+    expect(second.data.assets).toEqual(exported.data.assets);
     await restored.reload(); await openFloorPlan(restored, 2);
     expect(errors.get(restored)).toEqual([]);
   } finally { await context.close(); }
@@ -325,7 +330,7 @@ test('Fehlerhafte PDF und JSON erhalten das bereits geladene Projekt', async ({ 
   await page.getByLabel('Projektdatei öffnen', { exact: true }).setInputFiles({ name: 'defekt.json', mimeType: 'application/json', buffer: Buffer.from('{invalid json') });
   await expect(page.locator('.toast')).toContainText('Die Datei ist keine gültige Projektdatei.');
   expect(await storedWorkspace(page)).toEqual(before);
-  await page.getByLabel('Projektdatei öffnen', { exact: true }).setInputFiles({ name: 'falsche-pdf.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ ...saved.data, pdfBase64: 'defekt?' })) });
+  await page.getByLabel('Projektdatei öffnen', { exact: true }).setInputFiles({ name: 'falsche-pdf.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ ...saved.data, assets: saved.data.assets.map(asset => ({ ...asset, pdfBase64: 'defekt?' })) })) });
   await expect(page.locator('.toast')).toContainText('PDF');
   expect(await storedWorkspace(page)).toEqual(before);
   expect(await indexedPdf(page, before.floorPlan!.id)).toEqual(Array.from(pdfBytes));
@@ -364,7 +369,7 @@ test('PDF-Renderer, Worker, Schriften und Eingaben verwenden nur lokale Requests
   await page.waitForLoadState('networkidle');
   const urls = requests.get(page)!;
   expect(urls.some(url => url.includes('pdf.worker'))).toBe(true);
-  const external = urls.filter(url => /^(https?|wss?):/.test(url)).filter(url => new URL(url).host !== '127.0.0.1:5173');
+  const external = urls.filter(url => /^(https?|wss?):/.test(url)).filter(url => new URL(url).host !== new URL(page.url()).host);
   expect(external).toEqual([]);
 });
 
@@ -374,6 +379,7 @@ test('Fehlende PDF in IndexedDB lässt sich ohne Verlust der Räume und Maßstä
   await page.getByRole('button', { name: 'Belag', exact: true }).click();
   await setNumber(page, 'Länge', '89,8'); await setNumber(page, 'Breite', '29,8');
   await openFloorPlan(page, 2); await calibrate(page, 2);
+  await drawRoom(page, 'Zweiter erhaltener Raum', 2);
   const before = await storedWorkspace(page);
   // Simulate browser storage eviction. Actual PDF bytes are removed, without mocking the renderer.
   await page.evaluate(async id => {
@@ -391,7 +397,7 @@ test('Fehlende PDF in IndexedDB lässt sich ohne Verlust der Räume und Maßstä
   }, before.floorPlan!.id);
   await page.reload();
   await expect(page.locator('.save-status')).toContainText('PDF fehlt');
-  await page.getByRole('button', { name: 'Plan', exact: true }).click();
+  await page.getByRole('button', { name: 'Raumplan', exact: true }).click();
   await expect(floorPlan(page)).toBeVisible();
   expect(await storedWorkspace(page)).toEqual(before);
   await page.getByRole('button', { name: 'Exportieren', exact: true }).click();
@@ -404,7 +410,7 @@ test('Fehlende PDF in IndexedDB lässt sich ohne Verlust der Räume und Maßstä
   await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Grundriss', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'PDF-Datei erneut öffnen', exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Raum markieren', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Weiteren Raum markieren', exact: true })).toBeDisabled();
   await page.getByLabel('PDF-Grundriss öffnen', { exact: true }).setInputFiles(fixture);
   await readyPdf(page, 2);
   await expect(page.locator('.toast')).toContainText('PDF wiederhergestellt. Maßstab und Räume sind erhalten.');
@@ -412,6 +418,6 @@ test('Fehlende PDF in IndexedDB lässt sich ohne Verlust der Räume und Maßstä
   expect(await storedWorkspace(page)).toEqual(before);
   expect(await indexedPdf(page, before.floorPlan!.id)).toEqual(Array.from(pdfBytes));
   const recovered = await exportFile(page);
-  expect(recovered.data.workspace).toEqual(before);
-  expect(Buffer.from(recovered.data.pdfBase64!, 'base64')).toEqual(pdfBytes);
+  expect(recovered.data.building.floors.find(floor => floor.id === recovered.data.building.activeFloorId)!.workspace).toEqual(before);
+  expect(Buffer.from(recovered.data.assets[0].pdfBase64, 'base64')).toEqual(pdfBytes);
 });

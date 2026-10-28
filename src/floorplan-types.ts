@@ -22,7 +22,9 @@ export type RoomSource = {
   points: Point[];
   origin: Point;
 };
-export type WorkspaceRoom = { id: string; project: Project; source?: RoomSource };
+// A manual placement is a translation in millimetres in the floor coordinate system.
+// An attached PDF source takes precedence over this placement.
+export type WorkspaceRoom = { id: string; project: Project; source?: RoomSource; placement?: Point };
 export type Workspace = {
   version: 2;
   activeRoomId: string;
@@ -34,4 +36,14 @@ export type WorkspaceFile = {
   version: 2;
   workspace: Workspace;
   pdfBase64?: string;
+};
+
+export type BuildingFloor = { id: string; name: string; workspace: Workspace };
+export type BuildingProject = { id: string; name: string; activeFloorId: string; floors: BuildingFloor[] };
+export type ProjectLibrary = { version: 3; activeProjectId: string; projects: BuildingProject[] };
+export type BuildingFile = {
+  format: 'fugenplan';
+  version: 3;
+  building: BuildingProject;
+  assets: { id: string; pdfBase64: string }[];
 };

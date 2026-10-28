@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { DEFAULT_PROJECT } from '../src/lib/project';
-import type { Workspace } from '../src/floorplan-types';
+import { seedLegacyProject, storedWorkspace as stored } from './helpers';
 import type { Point } from '../src/types';
 
 const fixture = fileURLToPath(new URL('./fixtures/grundriss-drei-seiten.pdf', import.meta.url));
@@ -13,10 +13,6 @@ const manifest = JSON.parse(await readFile(new URL('./fixtures/grundriss-erwartu
 };
 const steps = (page: Page) => page.getByRole('navigation', { name: 'Schritte zum Verlegeplan' });
 const overview = (page: Page) => page.getByRole('region', { name: 'Projektübersicht', exact: true });
-async function stored(page: Page): Promise<Workspace> {
-  await expect.poll(() => page.evaluate(() => localStorage.getItem('fugenplan.workspace.v2'))).not.toBeNull();
-  return page.evaluate(() => JSON.parse(localStorage.getItem('fugenplan.workspace.v2')!));
-}
 
 async function input(page: Page, label: string, value: string) {
   const field = page.getByRole('textbox', { name: label, exact: true });
@@ -67,11 +63,12 @@ async function accessibility(page: Page) {
 }
 
 test.beforeEach(async ({ page }) => {
+  await seedLegacyProject(page);
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Projektübersicht', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Etage 1', exact: true })).toBeVisible();
 });
 
-test('Projekt zeigt getrennte Räume gemeinsam; 12 × 30 cm und Auswahl bleiben ohne Datenverlust', async ({ page }) => {
+test('Manuelle Räume werden ausdrücklich angeordnet; Format 12 × 30 cm bleibt raumbezogen', async ({ page }) => {
   await page.getByRole('button', { name: 'Raum hinzufügen', exact: true }).click();
   await input(page, 'Raumname', 'Küche');
   await input(page, 'Breite', '270');
@@ -80,46 +77,39 @@ test('Projekt zeigt getrennte Räume gemeinsam; 12 × 30 cm und Auswahl bleiben 
   await page.getByRole('combobox', { name: 'Formatvorgabe', exact: true }).selectOption({ label: '12 × 30 cm' });
   await expect(page.getByRole('textbox', { name: 'Länge', exact: true })).toHaveValue('12');
   await expect(page.getByRole('textbox', { name: 'Breite', exact: true })).toHaveValue('30');
-  await expect(page.getByRole('textbox', { name: 'Fuge', exact: true })).toHaveValue('3');
   await expect.poll(async () => (await stored(page)).rooms[1]?.project.material.width).toBe(120);
-  const before = await stored(page);
-  expect(before.rooms[0].project).toEqual(DEFAULT_PROJECT);
-  await page.getByRole('button', { name: 'Projekt', exact: true }).click();
-  const cards = overview(page).getByRole('article');
-  await expect(cards).toHaveCount(2);
-  await expect(overview(page).getByRole('img', { name: 'Verlegeplan Küche', exact: true })).toBeVisible();
-  await expect(overview(page).getByRole('img', { name: 'Verlegeplan Wohnzimmer', exact: true })).toBeVisible();
-  const boxes = await cards.evaluateAll(elements => elements.map(element => { const r = element.getBoundingClientRect(); return { x: r.x, y: r.y }; }));
-  expect(boxes[0].y).toBe(boxes[1].y);
-  expect(boxes[0].x).toBeLessThan(boxes[1].x);
+  expect((await stored(page)).rooms[0].project).toEqual(DEFAULT_PROJECT);
+  await page.getByRole('button', { name: 'Etage', exact: true }).click();
+  await expect(overview(page).getByRole('region', { name: 'Noch nicht angeordnete Räume' }).getByRole('article')).toHaveCount(2);
+  await expect(page.getByRole('group', { name: 'Etagenplan Etage 1', exact: true })).toHaveCount(0);
+  for (const [name, x] of [['Wohnzimmer', '0'], ['Küche', '440']]) {
+    await page.getByRole('button', { name: `Position von ${name} festlegen`, exact: true }).click();
+    await page.getByRole('textbox', { name: 'X in cm', exact: true }).fill(x);
+    await page.getByRole('textbox', { name: 'Y in cm', exact: true }).fill('0');
+    await page.getByRole('button', { name: 'Position speichern', exact: true }).click();
+  }
+  const drawing = page.getByRole('group', { name: 'Etagenplan Etage 1', exact: true });
+  await expect(drawing.locator('[data-room-id]')).toHaveCount(2);
+  await expect(drawing.getByRole('button', { name: 'Küche bearbeiten', exact: true })).toHaveAttribute('data-origin-x', '4400');
+  await expect.poll(async () => (await stored(page)).rooms.map(room => room.placement)).toEqual([{ x: 0, y: 0 }, { x: 4400, y: 0 }]);
   await expect(overview(page)).toContainText('21,06 m²');
-  const first = overview(page).getByRole('checkbox', { name: 'Wohnzimmer', exact: true });
-  await first.press('Space');
-  await expect(cards).toHaveCount(1);
+  const before = await stored(page);
+  const viewBox = await drawing.getAttribute('viewBox');
+  await page.getByRole('button', { name: 'Etagenplan vergrößern', exact: true }).click();
+  await expect(drawing).not.toHaveAttribute('viewBox', viewBox!);
   expect(await stored(page)).toEqual(before);
-  await page.getByRole('button', { name: 'Küche bearbeiten', exact: true }).click();
-  await page.getByRole('button', { name: 'Projekt', exact: true }).click();
-  await expect(cards).toHaveCount(1);
-  await expect(first).not.toBeChecked();
-  await page.getByRole('button', { name: 'Alle anzeigen', exact: true }).click();
-  await expect(cards).toHaveCount(2);
-  await page.getByRole('button', { name: 'Auswahl aufheben', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Keine Räume ausgewählt' })).toBeVisible();
-  await expect(first).toBeFocused();
-  await page.getByRole('button', { name: 'Alle Räume anzeigen', exact: true }).click();
-  await expect(first).toBeFocused();
   await page.getByRole('button', { name: 'Zuschnitte', exact: true }).click();
-  await expect(overview(page).locator('[data-piece][fill^="url"]')).not.toHaveCount(0);
+  await expect(drawing.locator('[data-piece][fill^="url"]')).not.toHaveCount(0);
   await accessibility(page);
   await page.reload();
-  await expect(overview(page).getByRole('img', { name: 'Verlegeplan Küche', exact: true })).toBeVisible();
+  await expect(drawing.locator('[data-room-id]')).toHaveCount(2);
   expect((await stored(page)).rooms).toEqual(before.rooms);
 });
 
 test('Raum entfernen verlangt benannte Entscheidung; Abbrechen und Rückgängig erhalten den Plan', async ({ page }) => {
   await page.getByRole('button', { name: 'Raum hinzufügen', exact: true }).click();
   await input(page, 'Raumname', 'Bad');
-  await page.getByRole('button', { name: 'Projekt', exact: true }).click();
+  await page.getByRole('button', { name: 'Etage', exact: true }).click();
   await page.getByRole('button', { name: 'Bad entfernen', exact: true }).click();
   await expect(page.getByRole('dialog')).toContainText('„Bad“');
   await page.getByRole('button', { name: 'Abbrechen', exact: true }).click();
@@ -127,7 +117,7 @@ test('Raum entfernen verlangt benannte Entscheidung; Abbrechen und Rückgängig 
   await page.getByRole('button', { name: 'Bad entfernen', exact: true }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Raum entfernen', exact: true }).click();
   await expect(overview(page).getByRole('article')).toHaveCount(1);
-  await expect(page.getByRole('button', { name: 'Wohnzimmer entfernen', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Wohnzimmer entfernen', exact: true })).toBeEnabled();
   await page.getByRole('button', { name: 'Rückgängig', exact: true }).click();
   await expect(overview(page).getByRole('article')).toHaveCount(2);
 });
@@ -148,9 +138,9 @@ test('Wizard übernimmt zwei PDF-Räume ohne Ausstieg und ersetzt das Beispiel n
   expect(workspace.floorPlan!.pages[0].calibration!.lengthMm).toBe(4800);
   expect(workspace.rooms.map(room => room.source?.points)).toEqual(manifest.pages[0].rooms.map(room => room.points));
   await accessibility(page);
-  await page.getByRole('button', { name: 'Zur Projektansicht', exact: true }).click();
-  await expect(overview(page).getByRole('img', { name: /^Verlegeplan / })).toHaveCount(2);
-  await expect(overview(page)).toContainText('PDF · Seite 1');
+  await page.getByRole('button', { name: 'Zur Etagenansicht', exact: true }).click();
+  await expect(overview(page).locator('.floor-drawing-svg [data-room-id]')).toHaveCount(2);
+  await expect(overview(page).locator('.floor-template-name')).toHaveText('grundriss-drei-seiten.pdf · Seite 1');
 });
 
 test('Wizard erhält Markierungen beim Zurückgehen und schützt Seiten- sowie Ansichtswechsel', async ({ page }) => {
@@ -172,7 +162,7 @@ test('Wizard erhält Markierungen beim Zurückgehen und schützt Seiten- sowie A
   await page.getByRole('button', { name: 'Weiter markieren', exact: true }).click();
   await expect(page.getByRole('combobox', { name: 'PDF-Seite', exact: true })).toHaveValue('1');
   await expect(page.getByText('3 von 32 Eckpunkten', { exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Projekt', exact: true }).click();
+  await page.getByRole('button', { name: 'Etage', exact: true }).click();
   await expect(page.getByRole('dialog', { name: 'Markierung verwerfen?' })).toBeVisible();
   await page.getByRole('button', { name: 'Weiter markieren', exact: true }).click();
   await page.getByRole('button', { name: 'Raum übernehmen', exact: true }).click();
@@ -239,25 +229,22 @@ test('PDF ersetzen erklärt den Verlust der Zuordnung und erhält die Raumpläne
   expect(after.floorPlan!.pages.every(item => item.calibration === null)).toBe(true);
 });
 
-test('Mobile Projektansicht und Plan bleiben ohne Überlauf bedienbar', async ({ page }) => {
+test('Mobile Etagenansicht und Raumplan bleiben ohne Überlauf bedienbar', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.getByRole('button', { name: 'Raum hinzufügen', exact: true }).click();
-  await input(page, 'Raumname', 'Küche');
-  await page.getByRole('button', { name: 'Projekt', exact: true }).click();
-  const preview = overview(page).getByRole('img', { name: 'Verlegeplan Wohnzimmer', exact: true });
-  await expect(preview).toBeVisible();
+  await page.getByRole('button', { name: 'Position von Wohnzimmer festlegen', exact: true }).click();
+  await page.getByRole('button', { name: 'Position speichern', exact: true }).click();
+  const drawing = page.getByRole('group', { name: 'Etagenplan Etage 1', exact: true });
+  await expect(drawing).toBeVisible();
   await page.evaluate(() => window.scrollTo(0, 0));
-  const previewBounds = await preview.boundingBox();
-  expect(previewBounds!.y + previewBounds!.height).toBeLessThanOrEqual(844);
-  await page.getByRole('button', { name: 'Küche bearbeiten', exact: true }).click();
+  await expect(drawing).toBeInViewport();
+  await drawing.getByRole('button', { name: 'Wohnzimmer bearbeiten', exact: true }).press('Enter');
   await expect(page.getByRole('main')).toBeFocused();
-  await expect(page.getByRole('heading', { name: 'Küche', exact: true })).toBeInViewport({ ratio: 1 });
-  await expect(page.getByRole('button', { name: 'Raum und Belag einstellen', exact: true })).toBeInViewport({ ratio: 1 });
+  await expect(page.getByRole('heading', { name: 'Wohnzimmer', exact: true })).toBeInViewport({ ratio: 1 });
   await input(page, 'Raumname', 'Wohnzimmer mit angrenzendem Essbereich und sehr langem Namen');
-  await page.getByRole('button', { name: 'Projekt', exact: true }).click();
+  await page.getByRole('button', { name: 'Etage', exact: true }).click();
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
   await accessibility(page);
-  await page.getByRole('button', { name: 'Plan', exact: true }).click();
+  await page.getByRole('button', { name: 'Raumplan', exact: true }).click();
   const positions = await page.evaluate(() => ({ main: document.getElementById('workspace-main')!.getBoundingClientRect().top, settings: document.getElementById('room-settings')!.getBoundingClientRect().top }));
   expect(positions.main).toBeLessThan(positions.settings);
   await page.getByRole('button', { name: 'Raum und Belag einstellen', exact: true }).click();
@@ -279,7 +266,7 @@ test('Mobile Projektansicht und Plan bleiben ohne Überlauf bedienbar', async ({
   }
 });
 
-test('Projektübersicht zeigt auch 50 Räume; die Auswahl entfernt keine Räume', async ({ page }) => {
+test('Eine Etage zeigt 50 Räume und öffnet auch den letzten ohne Datenverlust', async ({ page }) => {
   test.setTimeout(60_000);
   const rooms = Array.from({ length: 50 }, (_, index) => ({ id: `test-room-${index}`, project: {
     ...structuredClone(DEFAULT_PROJECT), name: `Testraum ${index + 1}`,
@@ -288,14 +275,10 @@ test('Projektübersicht zeigt auch 50 Räume; die Auswahl entfernt keine Räume'
   await page.getByLabel('Projektdatei öffnen', { exact: true }).setInputFiles({ name: '50-raeume.fugenplan.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({
     format: 'fugenplan', version: 2, workspace: { version: 2, activeRoomId: rooms[0].id, rooms },
   })) });
-  await expect(page.getByRole('heading', { name: 'Testraum 1', exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Projekt', exact: true }).click();
-  await expect(overview(page).getByRole('img', { name: /^Verlegeplan / })).toHaveCount(50);
+  await expect(overview(page).getByRole('article')).toHaveCount(50);
   await expect(page.getByRole('button', { name: 'Raum hinzufügen', exact: true })).toBeDisabled();
-  await expect(overview(page)).toContainText('54 m²');
-  await page.getByRole('button', { name: 'Auswahl aufheben', exact: true }).click();
-  await overview(page).getByRole('checkbox', { name: 'Testraum 50', exact: true }).check();
-  await expect(overview(page).getByRole('article')).toHaveCount(1);
-  await expect(overview(page).getByRole('img', { name: 'Verlegeplan Testraum 50', exact: true })).toBeVisible();
+  await expect(overview(page).locator('.floor-overview-summary')).toContainText('54 m²');
+  await page.getByRole('button', { name: 'Testraum 50 bearbeiten', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Testraum 50', exact: true })).toBeVisible();
   expect((await stored(page)).rooms).toHaveLength(50);
 });

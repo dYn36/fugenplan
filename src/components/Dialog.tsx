@@ -7,6 +7,7 @@ export default function Dialog({title,onClose,children}:{title:string;onClose:()
     const dialog=ref.current;
     const trigger=document.activeElement instanceof HTMLElement?document.activeElement:null;
     dialog?.showModal();
+    dialog?.querySelector<HTMLElement>('form input:not([type="hidden"]), form select, form textarea')?.focus();
     return()=>{
       dialog?.close();
       if(trigger?.isConnected)trigger.focus({preventScroll:true});

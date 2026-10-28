@@ -2,17 +2,27 @@
 
 Installation und Schnellstart stehen in der [README](../README.md).
 
-## Projekt und Räume
+## Projekte, Etagen und Räume
 
-Die App beginnt in der **Projektübersicht**. Unter „Räume anzeigen“ wählst du mehrere Räume. Ihre Verlegepläne erscheinen gleichzeitig im gleichen Bildschirmmaßstab. Ausblenden löscht keinen Raum. „Zuschnitte“ markiert angeschnittene Elemente in allen sichtbaren Plänen.
+Unter **Projekte** legst du getrennte Planungen an. Benenne ein Projekt und füge seine Etagen hinzu, zum Beispiel Erdgeschoss und Obergeschoss. Jede Etage besitzt eigene Räume und einen eigenen PDF-Seitenbezug. Bereits gespeicherte Planungen werden übernommen. Alte Räume verschiedener PDF-Seiten erscheinen in getrennten Etagen mit Namen wie „Seite 1“. Benenne diese passend zu deinem Gebäude um.
 
-„Raum hinzufügen“ legt einen weiteren Raum an. Öffne eine Vorschau mit „Raum bearbeiten“. Im Einzelplan kannst du direkt über die Raumliste wechseln. „Projekt“ führt zurück zur Übersicht; deine Auswahl bleibt während der Sitzung erhalten. Vor dem Entfernen eines Raums erscheint eine Bestätigung mit dessen Namen. „Rückgängig“ stellt ihn wieder her.
+Die Etagenliste links wechselt zwischen den Geschossen. Auf dem Smartphone öffnet **Etagen** dieselbe Auswahl. Der Pfad oberhalb der Ansicht zeigt Projekt, Etage und gegebenenfalls den geöffneten Raum. **Projekte** führt zur Sammlung zurück.
 
-Auf dem Smartphone steht der Plan vor den Einstellungen. „Raum und Belag einstellen“ und „Zur Planvorschau“ verbinden beide Bereiche.
+Die Etagenansicht zeigt die Räume **an ihrer tatsächlichen Position in der PDF**. Die Verlegepläne verwenden gemeinsam einen Maßstab. Abstände zwischen den markierten Konturen bleiben erhalten. **Vorlage** blendet die Original-PDF ein oder aus. **Zuschnitte** markiert die angeschnittenen Elemente. Ziehen verschiebt die Ansicht; Plus, Minus und Einpassen ändern die Ansicht, nicht die Raummaße.
+
+Manuell angelegte Räume erscheinen zuerst unter **Noch nicht angeordnet**. Mit **Anordnen** öffnest du die Eingabe für X und Y in Zentimetern. X zählt nach rechts, Y nach unten. Die Position versetzt den lokalen Raumursprung. Bei einer PDF ist deren linke obere Ecke der gemeinsame Ursprung der Etage. **Position aufheben** entfernt nur die Platzierung. Die Kontur und der Verlegeplan bleiben erhalten.
+
+Mit **Räume anordnen** kannst du bereits platzierte manuelle Räume direkt in der Zeichnung verschieben. Erst beim Loslassen wird die neue Position gespeichert. Escape bricht die Verschiebung ab. **Rückgängig** stellt die vorige Position wieder her. Räume aus einer PDF behalten ihre gemessene Position. Über **Position ändern** kannst du die Koordinaten auch mit der Tastatur eingeben.
+
+Klicke einen Raum im Grundriss oder in der Raumliste an. **Etage** führt vom Einzelplan zurück zur gemeinsamen Zeichnung. Bei mehreren Etagen kannst du in den Raumeinstellungen **Raum in andere Etage verschieben** wählen. Die Raumgeometrie und der Belag bleiben erhalten. Die alte PDF-Zuordnung und Position werden dabei gelöst. Ordne den Raum anschließend auf der Zieletage an.
+
+Über das Menü neben einem Projekt oder einer Etage kannst du den Namen ändern oder den Eintrag entfernen. Vor dem Entfernen nennt die Bestätigung den Namen und die Zahl der betroffenen Räume. **Rückgängig** stellt die Änderung während der Sitzung wieder her. Auch leere Projekte und Etagen sind möglich.
+
+Auf dem Smartphone steht der Raumplan vor den Einstellungen. **Raum und Belag einstellen** und **Zur Planvorschau** verbinden beide Bereiche.
 
 ## Einen Boden planen
 
-Öffne zuerst einen Raum aus der Projektübersicht.
+Öffne zuerst einen Raum aus der Etagenansicht.
 
 1. **Raum:** Innenmaße in Zentimetern eingeben. Rechteck, L-Form oder eigene Eckpunkte wählen. Hindernisse bei Bedarf ergänzen.
 2. **Belag:** Das tatsächliche Werkmaß eingeben oder eine Formatvorgabe wählen, zum Beispiel **12 × 30 cm**. Fugenbreite und Randabstand in Millimetern festlegen. Fliesen und Dielen werden als Rechtecke gerechnet.
@@ -39,14 +49,14 @@ Dezimalkomma und Dezimalpunkt sind möglich. Enter oder ein Fokuswechsel überni
 
 ## Räume aus einer PDF übernehmen
 
-1. **Grundriss öffnen:** In der Projektübersicht „PDF-Grundriss übernehmen“ oder den Reiter „Grundriss“ wählen. Eine PDF auswählen oder in die Fläche ziehen. Die gewünschte PDF-Seite wählen und „Seite verwenden“ anklicken. Bei einem unveränderten Beispielraum kannst du wählen, ob der erste übernommene PDF-Raum ihn ersetzen soll.
+1. **Grundriss öffnen:** In der gewünschten Etage „PDF-Grundriss laden“ oder den Reiter „Grundriss“ wählen. Eine PDF auswählen oder in die Fläche ziehen. Die gewünschte PDF-Seite wählen und „Seite verwenden“ anklicken. Bei einem unveränderten Beispielraum kannst du wählen, ob der erste übernommene PDF-Raum ihn ersetzen soll.
 2. **Wand markieren:** „Wand markieren“ wählen. Den Anfang und das Ende einer bekannten Wand anklicken. Für genaue Punkte die Ansicht vergrößern. Ziehen verschiebt die Ansicht.
 3. **Maßstab speichern:** Die tatsächliche Wandlänge in **Zentimetern** eingeben. „Maßstab speichern“ wählen. Beispiel: Für eine 4,80 m lange Wand `480` eingeben.
 4. **Raum markieren:** „Raum markieren“ wählen. Die inneren Raumecken der Reihe nach anklicken. Einen Namen eingeben und „Raum übernehmen“ wählen. Die letzte Kante wird geschlossen. Der Assistent zeigt den gespeicherten Raum im Schritt „Prüfen“.
-5. **Prüfen oder weiterzeichnen:** „Raum prüfen“ öffnet den Einzelplan. „Weiteren Raum markieren“ beginnt die nächste Kontur im selben Grundriss. „Zur Projektansicht“ zeigt alle Räume zusammen. Jeder Raum hat eigene Belag- und Verlegeeinstellungen.
-6. **Projekt sichern:** „Exportieren“ → „Projektdatei“ speichert alle Räume, Maßstäbe und die Original-PDF. SVG, Druck und CSV beziehen sich auf den aktiven Raum.
+5. **Prüfen oder weiterzeichnen:** „Raum prüfen“ öffnet den Einzelplan. „Weiteren Raum markieren“ beginnt die nächste Kontur im selben Grundriss. „Zur Etagenansicht“ zeigt die Räume in ihrer tatsächlichen Anordnung. Jeder Raum hat eigene Belag- und Verlegeeinstellungen.
+6. **Projekt sichern:** „Exportieren“ → „Projektdatei“ speichert alle Etagen, Räume, Maßstäbe und Original-PDFs des Projekts. SVG, Druck und CSV beziehen sich auf den aktiven Raum.
 
-Jede PDF-Seite hat einen eigenen Maßstab. Eine neue Kalibrierung passt alle zugeordneten Räume dieser Seite sowie deren Hindernisse an. Produktmaße und Verlegeeinstellungen bleiben erhalten. Änderungen der Raumkontur in den normalen Raumfeldern erscheinen auch in der PDF. Rückgängig und Wiederholen umfassen diese Änderungen.
+Jede Etage hat einen eigenen PDF-Seitenbezug und Maßstab. Wenn die aktuelle Etage bereits PDF-Räume enthält, bietet eine andere PDF-Seite eine eigene Etage an. Beim Anlegen einer Etage kannst du auch eine vorhandene PDF und deren gewünschte Seite wählen. Eine neue Kalibrierung passt alle zugeordneten Räume dieser Seite sowie deren Hindernisse an. Produktmaße und Verlegeeinstellungen bleiben erhalten. Änderungen der Raumkontur in den normalen Raumfeldern erscheinen auch in der PDF. Rückgängig und Wiederholen umfassen diese Änderungen.
 
 Die Schrittleiste führt zurück zu vorherigen Eingaben. Ein ungespeicherter Entwurf bleibt beim Zurückgehen erhalten. Vor einem Seitenwechsel, Ansichtswechsel oder Abbruch fragt die App, ob die Markierung verworfen werden soll. Auch „Rückgängig“ und „Wiederholen“ in der Kopfzeile schützen einen offenen Entwurf durch diese Rückfrage.
 
@@ -54,7 +64,7 @@ Die PDF kann Vektoren oder ein gescanntes Bild enthalten. Die Anwendung erkennt 
 
 Tastatur: Im PDF-Zeichenbereich verschieben Pfeiltasten den Zeiger; Enter setzt einen Punkt. Umschalt vergrößert den Schritt. Plus und Minus ändern den Zoom. Unter „Punkte per Tastatur eingeben“ lassen sich Positionen als Prozentwerte der Seite eingeben. Nach dem zweiten Wandpunkt über diese Felder ist das Feld für die Wandlänge aktiv. Escape bricht die Markierung ab. „Letzten Punkt entfernen“ oder Strg/⌘ Z im fokussierten PDF-Zeichenbereich korrigiert einen Punkt.
 
-„Andere PDF“ erhält die bisherigen Raumpläne und löst nach deiner Bestätigung ihre Zuordnung zur alten PDF. Dieselbe PDF erneut zu öffnen erhält die Zuordnung. Das hilft auch, wenn die PDF aus dem Browserspeicher gelöscht wurde. „Neuer Plan“ beginnt ein neues Projekt mit einem Raum. Dieser Schritt kann rückgängig gemacht werden.
+„Andere PDF“ erhält die bisherigen Raumpläne und löst nach deiner Bestätigung ihre Zuordnung zur alten PDF. Dieselbe PDF erneut zu öffnen erhält die Zuordnung. Das hilft auch, wenn die PDF aus dem Browserspeicher gelöscht wurde. „Neues Projekt“ legt eine weitere Planung an. Die vorhandenen Projekte bleiben erhalten.
 
 ## Genauigkeit und Mengen
 
@@ -72,11 +82,13 @@ Der wilde Verband ist reproduzierbar. Er prüft keinen vom Hersteller geforderte
 
 ## Speicherung und Grenzen
 
-Räume, Maßstäbe und Varianten werden im lokalen Speicher dieses Browsers gespeichert. Original-PDFs liegen in IndexedDB. Andere Browser und andere Adressen haben einen eigenen Speicher. Das Löschen von Browserdaten löscht auch die gespeicherten Projekte. Sichere wichtige Stände als Projektdatei. Die Projektdatei enthält alle Räume und die PDF; separat gemerkte Varianten sind nicht enthalten. Alte Projektdateien mit einem Raum bleiben lesbar.
+Projekte, Etagen, Räume, Maßstäbe und Varianten werden im lokalen Speicher dieses Browsers gespeichert. Original-PDFs liegen in IndexedDB. Andere Browser und andere Adressen haben einen eigenen Speicher. Das Löschen von Browserdaten löscht auch die gespeicherten Projekte. Sichere wichtige Stände als Projektdatei. Die Projektdatei enthält alle Etagen, Räume und benötigten Original-PDFs; jede PDF ist nur einmal enthalten. Separat gemerkte Varianten sind nicht enthalten. Alte Projektdateien mit einem oder mehreren Räumen bleiben lesbar. Eine importierte Projektdatei wird als zusätzliches Projekt angelegt.
+
+Wenn ein anderer Tab die Projekte ändert, hält Fugenplan das automatische Speichern dieses Tabs an. **Beide Stände erhalten** übernimmt den aktuellen Speicherstand und ergänzt lokal geänderte Projekte als zusätzliche Fassungen. **Aktuellen Stand laden** zeigt den Stand aus dem anderen Tab. Vor der Auflösung bleibt der bisherige lokale Stand als Sicherung im Browserspeicher erhalten.
 
 Die Eingabe unterstützt Räume bis 50 m je Rechteckseite, bis zu 32 Eckpunkte und 24 rechteckige Hindernisse. Der Rechenkern begrenzt einen Plan auf 12.000 Elemente und 60.000 Rasterkandidaten. Bei einer Überschreitung erscheint ein Fehler; der Plan wird nicht still gekürzt. Flächen mit mehreren äußeren, voneinander getrennten Raumkonturen werden nicht als eigener Raumtyp eingegeben. Hindernisse können die nutzbare Fläche jedoch teilen.
 
-Ein Projekt unterstützt eine PDF mit bis zu 200 Seiten und 20 MiB sowie bis zu 50 Räume. Übernommene PDF-Räume müssen zwischen 10 cm und 50 m breit und tief sein. Verschlüsselte PDFs benötigen eine unverschlüsselte Kopie. Projektdateien dürfen höchstens 40 MiB groß sein. Fehlerhafte Importe erhalten das aktuelle Projekt.
+Die Sammlung unterstützt bis zu 20 Projekte. Ein Projekt kann bis zu 50 Etagen und jede Etage bis zu 50 Räume enthalten. Eine Etage verwendet eine Seite aus einer PDF mit bis zu 200 Seiten und 20 MiB. Verschiedene Etagen können verschiedene PDFs verwenden. Übernommene PDF-Räume müssen zwischen 10 cm und 50 m breit und tief sein. Verschlüsselte PDFs benötigen eine unverschlüsselte Kopie. Projektdateien dürfen höchstens 128 MiB groß sein; ihre Original-PDFs dürfen zusammen höchstens 80 MiB umfassen. Fehlerhafte Importe erhalten das aktuelle Projekt.
 
 Nicht enthalten: automatische Raumerkennung, Scan-Entzerrung, Preise, Kleber- und Fugenmörtelverbrauch, Reststückoptimierung, Klickprofilregeln sowie sechseckige oder speziell zugeschnittene Ausgangselemente.
 
@@ -100,3 +112,5 @@ PDF-Technik und Prüfnachweise: [docs/PDF-TECHNIK.md](PDF-TECHNIK.md) und [docs/
 Startpositionen und Prüfnachweise: [docs/START-PRUEFUNG.md](START-PRUEFUNG.md).
 
 Direkte Startwahl und UX-Prüfung: [docs/START-UX-PRUEFUNG.md](START-UX-PRUEFUNG.md).
+
+Projekte, Etagen und gemeinsame Grundrisse: [Funktionsprüfung](PROJEKTE-ETAGEN-PRUEFUNG.md) und [unabhängige UI-Prüfung](PROJEKTE-ETAGEN-REVIEW.md).

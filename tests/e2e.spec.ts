@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { libraryKey, seedLegacyProject, storedLibrary, storedRoom, storedWorkspace } from './helpers';
 
 const plan = (page: Page) => page.getByTestId('floor-plan');
 const pieces = (page: Page) => plan(page).locator('[data-piece]');
@@ -87,8 +88,9 @@ test.beforeEach(async ({ page }) => {
   page.on('pageerror', error => runtimeErrors.get(page)!.push(error.message));
   page.context().on('request', request => networkRequests.get(page)!.push(request.url()));
   page.on('websocket', socket => networkRequests.get(page)!.push(socket.url()));
+  await seedLegacyProject(page);
   await page.goto('/');
-  await page.getByRole('button', { name: 'Plan', exact: true }).click();
+  await page.getByRole('button', { name: 'Raumplan', exact: true }).click();
   await expect(plan(page)).toBeVisible();
   await expect.poll(() => pieces(page).count()).toBeGreaterThan(0);
 });
@@ -228,7 +230,7 @@ test('Regression: Escape verwirft Eingaben vor dem Abbruch der Startauswahl', as
   await expect(start).toBeFocused();
   await expect(page.getByRole('button', { name: 'Rückgängig', exact: true })).toBeDisabled();
   await page.reload();
-  await page.getByRole('button', { name: 'Plan', exact: true }).click();
+  await page.getByRole('button', { name: 'Raumplan', exact: true }).click();
   await expect(width).toHaveValue('420');
   await expect(name).toHaveValue('Wohnzimmer');
 });
@@ -242,7 +244,7 @@ test('Regression: Enter und Tab übernehmen Maße bei geöffneter Startauswahl',
     await width.fill(value);
     await width.press(key);
     await expect(picker).toBeHidden();
-    await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('fugenplan.project.v1') ?? '{}').room?.width)).toBe(Number(value) * 10);
+    await expect.poll(async () => (await storedRoom(page)).room.width).toBe(Number(value) * 10);
     await page.getByRole('button', { name: 'Rückgängig', exact: true }).click();
     await expect(width).toHaveValue('420');
   }
@@ -260,14 +262,11 @@ for (const kind of ['Ecke', 'Wandmitte']) {
     await setNumber(page, 'Punkt 4, Y', '0');
     await expect(plan(page)).toBeVisible();
     await expect(page.getByRole('button', { name: 'Start wählen', exact: true })).toBeEnabled();
-    await expect.poll(() => page.evaluate(() => {
-      const w = JSON.parse(localStorage.getItem('fugenplan.workspace.v2') ?? '{}');
-      return w.rooms?.find((room: { id: string }) => room.id === w.activeRoomId)?.project.room.points[3].y;
-    })).toBe(0);
+    await expect.poll(async () => (await storedRoom(page)).room.points[3].y).toBe(0);
     await page.reload();
-  await page.getByRole('button', { name: 'Plan', exact: true }).click();
+  await page.getByRole('button', { name: 'Raumplan', exact: true }).click();
     await expect(plan(page)).toBeVisible();
-    await expect(page.getByRole('navigation', { name: 'Räume im Projekt' }).getByRole('button')).toHaveText(['Wohnzimmer', 'Raum 2']);
+    await expect(page.getByRole('navigation', { name: 'Räume auf dieser Etage' }).getByRole('button')).toHaveText(['Wohnzimmer', 'Raum 2']);
     await expect(page.getByRole('textbox', { name: 'Punkt 4, Y', exact: true })).toHaveValue('0');
     await expect(page.getByRole('button', { name: 'Start wählen', exact: true })).toBeEnabled();
   });
@@ -284,9 +283,9 @@ test('Rückgängig, Wiederholen und lokales Speichern erhalten die Raummaße', a
   await expect(width).toHaveValue('420');
   await page.keyboard.press('Control+Shift+z');
   await expect(width).toHaveValue('480');
-  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('fugenplan.project.v1') ?? '{}').room?.width)).toBe(4800);
+  await expect.poll(async () => (await storedRoom(page)).room.width).toBe(4800);
   await page.reload();
-  await page.getByRole('button', { name: 'Plan', exact: true }).click();
+  await page.getByRole('button', { name: 'Raumplan', exact: true }).click();
   await expect(width).toHaveValue('480');
   await expect(plan(page).locator('polygon').first()).toHaveAttribute('points', '0,0 4800,0 4800,3600 0,3600');
 });
@@ -301,7 +300,7 @@ test('Varianten lassen sich speichern, laden und getrennt vom aktuellen Plan lö
   await page.getByRole('button', { name: /^Varianten/ }).click();
   await expect(page.getByRole('heading', { name: 'Ruhige Aufteilung', exact: true })).toBeVisible();
   await page.reload();
-  await page.getByRole('button', { name: 'Plan', exact: true }).click();
+  await page.getByRole('button', { name: 'Raumplan', exact: true }).click();
   await page.getByRole('button', { name: /^Varianten/ }).click();
   await page.getByRole('button', { name: 'Ruhige Aufteilung laden', exact: true }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Variante laden', exact: true }).click();
@@ -310,7 +309,7 @@ test('Varianten lassen sich speichern, laden und getrennt vom aktuellen Plan lö
   await page.getByRole('button', { name: /^Varianten/ }).click();
   await page.getByRole('button', { name: 'Ruhige Aufteilung löschen', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Noch keine Varianten', exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Plan', exact: true }).click();
+  await page.getByRole('button', { name: 'Raumplan', exact: true }).click();
   await expect(page.getByRole('textbox', { name: 'Breite', exact: true })).toHaveValue('360');
 });
 
@@ -321,8 +320,10 @@ test('Projektdatei lädt denselben Plan; eine defekte Datei erhält den aktuelle
   await projectName.press('Enter');
   await openExport(page);
   const saved = await download(page, page.getByRole('dialog').getByRole('button', { name: /^Projektdatei/ }));
-  expect(saved.name).toBe('Küche-Flur.fugenplan.json');
-  const project = JSON.parse(saved.content);
+  expect(saved.name).toBe('Mein-Projekt.fugenplan.json');
+  const file = JSON.parse(saved.content);
+  expect(file.version).toBe(3);
+  const project = file.building.floors[0].workspace.rooms[0].project;
   expect(project.name).toBe('Küche & Flur');
   expect(project.room.width).toBe(3333);
   expect(project.material.grout).toBe(3);
@@ -330,7 +331,9 @@ test('Projektdatei lädt denselben Plan; eine defekte Datei erhält den aktuelle
   await setNumber(page, 'Breite', '444');
   const fileInput = page.getByLabel('Projektdatei öffnen', { exact: true });
   await fileInput.setInputFiles({ name: saved.name, mimeType: 'application/json', buffer: Buffer.from(saved.content) });
+  await page.getByRole('button', { name: 'Raumplan', exact: true }).click();
   await expect(page.getByRole('textbox', { name: 'Breite', exact: true })).toHaveValue('333,3');
+  await expect.poll(async () => (await storedLibrary(page)).projects.length).toBe(2);
   await expect(page.getByRole('heading', { name: 'Küche & Flur', exact: true })).toBeVisible();
   await fileInput.setInputFiles({ name: 'defekt.json', mimeType: 'application/json', buffer: Buffer.from('{"version":999}') });
   await expect(page.getByRole('status')).toContainText('Diese Projektversion wird nicht unterstützt.');
@@ -467,7 +470,7 @@ test('Mobile Ansicht bleibt bei 390 × 844 px bedienbar', async ({ page }) => {
   await page.screenshot({ path: 'tests/screenshots/mobile-plan-390x844.png' });
 });
 
-test('Regression: Import und neuer Plan verwerfen einen begonnenen Zeichenentwurf', async ({ page }) => {
+test('Regression: Import und Projektwechsel schützen einen begonnenen Zeichenentwurf', async ({ page }) => {
   const original = await geometrySignature(page);
   await openExport(page);
   const saved = await download(page, page.getByRole('dialog').getByRole('button', { name: /^Projektdatei/ }));
@@ -476,61 +479,55 @@ test('Regression: Import und neuer Plan verwerfen einen begonnenen Zeichenentwur
   const beginDraft = async () => {
     await page.getByRole('button', { name: 'Frei', exact: true }).click();
     await page.getByRole('button', { name: 'Kontur zeichnen', exact: true }).click();
-    await expect(page.getByRole('button', { name: 'Letzten Punkt entfernen', exact: true })).toBeDisabled();
     const bounds = await plan(page).boundingBox();
-    expect(bounds).not.toBeNull();
     for (const [x, y] of [[0.32, 0.35], [0.66, 0.35], [0.66, 0.65]]) {
       await plan(page).click({ position: { x: bounds!.width * x, y: bounds!.height * y } });
     }
     await expect(plan(page).locator('circle')).toHaveCount(3);
-    await expect(page.getByRole('button', { name: 'Übernehmen', exact: true })).toBeEnabled();
   };
-
   await beginDraft();
-  await page.getByLabel('Projektdatei öffnen', { exact: true }).setInputFiles({
-    name: saved.name, mimeType: 'application/json', buffer: Buffer.from(saved.content),
-  });
-  await expect(page.getByRole('button', { name: 'Zeichnen abbrechen', exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Öffnen', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'Markierung verwerfen?' })).toBeVisible();
+  await page.getByRole('button', { name: 'Weiter markieren', exact: true }).click();
+  await expect(plan(page).locator('circle')).toHaveCount(3);
+  await page.getByRole('button', { name: 'Öffnen', exact: true }).click();
+  const choosing = page.waitForEvent('filechooser');
+  await page.getByRole('button', { name: 'Verwerfen und fortfahren', exact: true }).click();
+  await (await choosing).setFiles({ name: saved.name, mimeType: 'application/json', buffer: Buffer.from(saved.content) });
+  await page.getByRole('button', { name: 'Raumplan', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Rechteck', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect.poll(() => geometrySignature(page)).toBe(original);
-
   await beginDraft();
-  await page.getByRole('button', { name: 'Neuer Plan', exact: true }).click();
-  await page.getByRole('dialog').getByRole('button', { name: 'Neuen Plan beginnen', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Zeichnen abbrechen', exact: true })).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Rechteck', exact: true })).toHaveAttribute('aria-pressed', 'true');
-  await expect.poll(() => geometrySignature(page)).toBe(original);
-
-  await page.getByRole('button', { name: 'Frei', exact: true }).click();
-  await page.getByRole('button', { name: 'Kontur zeichnen', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Letzten Punkt entfernen', exact: true })).toBeDisabled();
-  await expect(plan(page).locator('circle')).toHaveCount(0);
+  await page.getByRole('link', { name: 'Fugenplan, zu den Projekten', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'Markierung verwerfen?' })).toBeVisible();
+  await page.getByRole('button', { name: 'Weiter markieren', exact: true }).click();
+  await expect(plan(page).locator('circle')).toHaveCount(3);
+  await page.getByRole('link', { name: 'Fugenplan, zu den Projekten', exact: true }).click();
+  await page.getByRole('button', { name: 'Verwerfen und fortfahren', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Deine Projekte', exact: true })).toBeVisible();
 });
 
-test('Regression: Neuer Plan repariert beschädigte Speicherung bei sichtbaren Ausgangswerten', async ({ page }) => {
-  await expect.poll(() => page.evaluate(() => localStorage.getItem('fugenplan.project.v1'))).not.toBeNull();
-  const original = await page.evaluate(() => JSON.parse(localStorage.getItem('fugenplan.project.v1')!));
-  await page.evaluate(() => localStorage.setItem('fugenplan.workspace.v2', '{beschädigt'));
+test('Beschädigte Sammlung bleibt erhalten, bis ein neues Projekt bewusst angelegt wird', async ({ page }) => {
+  await storedWorkspace(page);
+  await page.evaluate(key => localStorage.setItem(key, '{beschädigt'), libraryKey);
   await page.reload();
-  await page.getByRole('button', { name: 'Plan', exact: true }).click();
-  await expect(plan(page)).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Deine Projekte', exact: true })).toBeVisible();
   await expect(page.locator('.save-status')).toContainText('Nicht gespeichert');
-  await expect(page.getByRole('textbox', { name: 'Breite', exact: true })).toHaveValue('420');
-  await expect(page.getByRole('textbox', { name: 'Tiefe', exact: true })).toHaveValue('360');
-  expect(await page.evaluate(() => localStorage.getItem('fugenplan.workspace.v2'))).toBe('{beschädigt');
-
-  await page.getByRole('button', { name: 'Neuer Plan', exact: true }).click();
-  await page.getByRole('dialog').getByRole('button', { name: 'Neuen Plan beginnen', exact: true }).click();
-  await expect.poll(() => page.evaluate(() => {
-    try { return JSON.parse(localStorage.getItem('fugenplan.project.v1')!); }
-    catch { return null; }
-  })).toEqual(original);
+  expect(await page.evaluate(key => localStorage.getItem(key), libraryKey)).toBe('{beschädigt');
+  expect(await page.evaluate(key => Object.keys(localStorage).filter(item => item.startsWith(`${key}.recovery.`)), libraryKey)).toEqual([]);
+  await page.getByRole('button', { name: 'Projekt anlegen', exact: true }).click();
+  await page.getByRole('textbox', { name: 'Projektname', exact: true }).fill('Neustart');
+  await page.getByRole('dialog').getByRole('button', { name: 'Projekt anlegen', exact: true }).click();
+  await expect.poll(async () => (await storedLibrary(page)).projects.map(item => item.name)).toEqual(['Neustart']);
+  const recovery = await page.evaluate(key => Object.keys(localStorage).filter(item => item.startsWith(`${key}.recovery.`)).map(key => ({ key, value: localStorage.getItem(key) })), libraryKey);
+  expect(recovery).toHaveLength(1);
+  expect(recovery[0].key).toMatch(/^fugenplan\.library\.v3\.recovery\.\d+$/);
+  expect(recovery[0].value).toBe('{beschädigt');
   await expect(page.locator('.save-status')).toContainText('Lokal gespeichert');
   await page.reload();
-  await page.getByRole('button', { name: 'Plan', exact: true }).click();
-  await expect(plan(page)).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Neustart öffnen', exact: true })).toBeVisible();
   await expect(page.locator('.save-status')).toContainText('Lokal gespeichert');
-  await expect(page.getByText('Der gespeicherte Plan konnte nicht geladen werden.', { exact: false })).toHaveCount(0);
+  expect(await page.evaluate(key => localStorage.getItem(key), recovery[0].key)).toBe('{beschädigt');
 });
 
 test('Lokalbetrieb: Laden und Planänderungen lösen keine externen Netzwerkanfragen aus', async ({ page }) => {

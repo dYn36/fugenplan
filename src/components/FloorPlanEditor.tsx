@@ -470,21 +470,21 @@ export default function FloorPlanEditor({ document: floorPlan, pdfBytes, rooms, 
               <div className="fpdf-calibrated"><CheckCircle size={18} /><span>Maßstab gespeichert<small>Seite {activePage} · Wandmaß {calibration ? displayNumber(calibration.lengthMm / 10) : '–'} cm</small></span></div>
               <p>Markiere die Innenkontur eines Raumes. Für weitere Räume bleibst du anschließend im Grundriss.</p>
               <button type="button" className="button primary fpdf-full-button" disabled={!ready || !calibrated || locked || rooms.length >= MAX_ROOMS} onClick={() => startMode('room')}><Polygon size={17} />Raum markieren</button>
-              {rooms.length >= MAX_ROOMS && <p className="fpdf-small">Das Projekt enthält bereits {MAX_ROOMS} Räume. Entferne zuerst einen Raum in der Projektansicht.</p>}
+              {rooms.length >= MAX_ROOMS && <p className="fpdf-small">Die Etage enthält bereits {MAX_ROOMS} Räume. Entferne zuerst einen Raum in der Etagenansicht.</p>}
             </>}
             <button type="button" className="fpdf-back" disabled={locked} onClick={() => goToStep('scale')}><ArrowLeft size={15} />Zum Maßstab</button>
           </section>}
           {step === 'done' && <section className="fpdf-step is-current" aria-labelledby={`${fieldId}-done-title`}>
             <div className="fpdf-complete-title"><CheckCircle size={24} /><h2 ref={stepHeading} tabIndex={-1} id={`${fieldId}-done-title`}>{justSaved ? 'Raum übernommen' : 'Räume prüfen'}</h2></div>
-            <p className="fpdf-project-count">{rooms.length} {rooms.length === 1 ? 'Raum' : 'Räume'} im Projekt · {pageRooms.length} auf dieser Seite</p>
+            <p className="fpdf-project-count">{rooms.length} {rooms.length === 1 ? 'Raum' : 'Räume'} auf dieser Etage · {pageRooms.length} auf dieser Seite</p>
             {completedRoom ? <>
               <div className="fpdf-room-summary"><strong>{completedRoom.project.name}</strong><span>{displayNumber(completedRoom.project.room.width / 10)} × {displayNumber(completedRoom.project.room.height / 10)} cm</span><small>Außenmaße der markierten Kontur</small></div>
               <p>Prüfe im Raumplan ein zweites bekanntes Maß. Danach kannst du Belag und Verlegung einstellen.</p>
               <button type="button" className="button primary fpdf-full-button" disabled={locked} onClick={() => perform(() => onOpenRoom(completedRoom.id), 'Der Raum konnte nicht geöffnet werden.')}>Raum prüfen<ArrowRight size={16} /></button>
             </> : <p>Markiere einen Raum, um den Verlegeplan zu prüfen.</p>}
             <button type="button" className="button fpdf-full-button" disabled={!ready || !calibrated || locked || rooms.length >= MAX_ROOMS} onClick={() => startMode('room')}><Plus size={17} />Weiteren Raum markieren</button>
-            {rooms.length >= MAX_ROOMS && <p className="fpdf-small">Das Projekt enthält bereits {MAX_ROOMS} Räume.</p>}
-            {onShowProject && <button type="button" className="button fpdf-full-button" disabled={locked} onClick={onShowProject}><SquaresFour size={17} />Zur Projektansicht</button>}
+            {rooms.length >= MAX_ROOMS && <p className="fpdf-small">Die Etage enthält bereits {MAX_ROOMS} Räume.</p>}
+            {onShowProject && <button type="button" className="button fpdf-full-button" disabled={locked} onClick={onShowProject}><SquaresFour size={17} />Zur Etagenansicht</button>}
             <button type="button" className="fpdf-back" disabled={locked} onClick={() => goToStep('scale')}><Ruler size={15} />Maßstab prüfen</button>
           </section>}
           {mode !== 'view' && <details className="fpdf-precise"><summary>Punkte per Tastatur eingeben<CaretDown size={14} /></summary><p>X zählt von links, Y von oben. 100 % entspricht der ganzen Seite.</p><div className="fpdf-coordinate-fields">
@@ -495,7 +495,7 @@ export default function FloorPlanEditor({ document: floorPlan, pdfBytes, rooms, 
           </details>}
           {step === 'done' && <section className="fpdf-rooms" aria-label={`Räume auf Seite ${activePage}`}><div className="fpdf-rooms-heading"><h2>Räume auf dieser Seite</h2><span>{pageRooms.length}</span></div>
             {pageRooms.length ? <ul>{pageRooms.map(room => <li key={room.id} className={room.id === activeRoomId ? 'is-active' : ''}>
-              <div className="fpdf-room-row"><button type="button" className="fpdf-room-open" aria-label={`${room.project.name} öffnen`} onClick={() => perform(() => onOpenRoom(room.id), 'Der Raum konnte nicht geöffnet werden.')}><span>{room.project.name}</span><ArrowRight size={16} /></button><button type="button" className="fpdf-remove-room" aria-label={`${room.project.name} entfernen`} disabled={rooms.length === 1 || locked} onClick={() => setConfirmRemove(confirmRemove === room.id ? null : room.id)}><Trash size={16} /></button></div>
+              <div className="fpdf-room-row"><button type="button" className="fpdf-room-open" aria-label={`${room.project.name} öffnen`} onClick={() => perform(() => onOpenRoom(room.id), 'Der Raum konnte nicht geöffnet werden.')}><span>{room.project.name}</span><ArrowRight size={16} /></button><button type="button" className="fpdf-remove-room" aria-label={`${room.project.name} entfernen`} disabled={locked} onClick={() => setConfirmRemove(confirmRemove === room.id ? null : room.id)}><Trash size={16} /></button></div>
               {confirmRemove === room.id && <div className="fpdf-remove-confirm"><p>Raum und Verlegeplan entfernen?</p><button type="button" onClick={() => { if (perform(() => onRemoveRoom(room.id), 'Der Raum konnte nicht entfernt werden.')) setConfirmRemove(null); }}>Entfernen</button><button type="button" onClick={() => setConfirmRemove(null)}>Behalten</button></div>}
             </li>)}</ul> : <p>Hier erscheinen deine markierten Räume.</p>}
           </section>}
@@ -551,7 +551,11 @@ export default function FloorPlanEditor({ document: floorPlan, pdfBytes, rooms, 
       <p className="muted">{pendingAction.kind === 'file' ? 'Gespeicherte Raumpläne bleiben erhalten. Eine andere PDF löst ihre bisherige PDF-Zuordnung.' : 'Gespeicherte Räume und Maßstäbe bleiben erhalten.'}</p>
       <div className="dialog-actions"><button type="button" className="button" onClick={() => setPendingAction(null)}>Weiter markieren</button><button type="button" className="button primary" onClick={() => {
         const action = pendingAction; setPendingAction(null);
-        if (action.kind === 'page') perform(() => onPageChange(action.page), 'Die Seite konnte nicht gewechselt werden.');
+        if (action.kind === 'page') {
+          setDraft([]); setName(''); setClosed(false); setCalibrationPoints([]); setLengthInput('');
+          setMode('view'); setPanTool(false); setCursor(null); onDraftChange?.(false);
+          perform(() => onPageChange(action.page), 'Die Seite konnte nicht gewechselt werden.');
+        }
         else if (action.kind === 'file') void importFile(action.file, true);
         else discard();
       }}>{pendingAction.kind === 'page' ? 'Verwerfen und Seite wechseln' : pendingAction.kind === 'file' ? 'Verwerfen und PDF öffnen' : 'Markierung verwerfen'}</button></div>

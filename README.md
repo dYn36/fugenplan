@@ -13,7 +13,7 @@ Plane Fliesen und Dielen direkt im Browser. Übernimm deinen PDF-Grundriss,<br>p
 <a href="screenshots/demo-pdf.gif">
   <picture>
     <source media="(prefers-reduced-motion: reduce)" srcset="screenshots/demo-pdf-poster.jpg">
-    <img src="screenshots/demo-pdf.gif" alt="Demo der neuen Oberfläche: PDF laden, zwei Wandpunkte markieren, 480 cm als Länge speichern, die Räume Wohnen und Essen markieren und beide Verlegepläne mit Zuschnitten gemeinsam in der Projektansicht ansehen." width="1120">
+    <img src="screenshots/demo-pdf.gif" alt="Demo des PDF-Ablaufs: PDF laden, zwei Wandpunkte markieren, 480 cm als Länge speichern, die Räume Wohnen und Essen markieren und beide Verlegepläne mit Zuschnitten gemeinsam in der Projektansicht ansehen." width="1120">
   </picture>
 </a>
 
@@ -29,9 +29,9 @@ Demo mit einem synthetischen Beispielgrundriss. [Standbild ansehen](screenshots/
 
 **[Jetzt starten](#schnell-starten)** · **[PDF-Anleitung](#vom-grundriss-zum-verlegeplan)** · **[Funktionen entdecken](#dein-boden-bevor-er-liegt)** · **[Anleitung lesen](docs/ANLEITUNG.md)**
 
-| 7 Verlegemuster | Bis zu 50 Räume | Bis zu 12 Varianten |
+| Bis zu 20 Projekte | Bis zu 50 Etagen je Projekt | Bis zu 50 Räume je Etage |
 | :---: | :---: | :---: |
-| Für Fliesen und Dielen | In einem Projekt | Zum Merken und Wechseln |
+| Getrennte Planungen | Eigene Grundrisse und Maßstäbe | Gemeinsam im Etagenplan |
 
 **Ohne Konto. Ohne Backend. Deine Grundrisse bleiben in deinem Browser.**
 
@@ -48,7 +48,7 @@ Passt eine ganze Fliese an die Tür? Wie schmal wird der Streifen an der Wand? W
 | Deine Entscheidung | Das zeigt dir Fugenplan |
 | --- | --- |
 | **Wie sieht mein Raum aus?** | Rechteck, L-Form oder freie Kontur. Rechteckige Hindernisse wie Säulen bleiben frei. |
-| **Wie passen meine Räume zusammen?** | Mehrere Verlegepläne gleichzeitig in der Projektübersicht. Räume direkt öffnen und einzeln bearbeiten. |
+| **Wie passen meine Räume zusammen?** | Gemeinsame Etagenzeichnung mit den tatsächlichen PDF-Positionen. Projekte, Etagen und Räume getrennt verwalten. |
 | **Welches Muster passt?** | Sieben Verlegemuster mit eigenen Produktmaßen, Fugen, Randabständen und Drehung. |
 | **Wo fange ich an?** | Eine Ecke oder Wandmitte direkt im Plan wählen. Die Startfliese bleibt markiert. |
 | **Was muss ich schneiden?** | Zuschnitte hervorheben. Einzelne Schnittkonturen, Kantenlängen und Hüllmaße prüfen. |
@@ -68,7 +68,7 @@ npm start
 
 Der Browser öffnet **[Fugenplan auf deinem Rechner](http://127.0.0.1:5173)**. Lass das Terminal während der Nutzung geöffnet. Mit `Strg+C` beendest du den Server.
 
-**Dein erster Plan:** Raum in der Projektübersicht öffnen → Raummaße eingeben → Belag festlegen → Muster und Start wählen → Zuschnitte prüfen. Die Formatvorgaben enthalten auch **12 × 30 cm**.
+**Dein erster Plan:** Projekt anlegen → Etage anlegen → Raum hinzufügen → Raummaße eingeben → Belag festlegen → Muster und Start wählen → Zuschnitte prüfen. Die Formatvorgaben enthalten auch **12 × 30 cm**.
 
 > [!NOTE]
 > Das Repository ist derzeit privat. Zum Klonen brauchst du Zugriff und eine eingerichtete GitHub-Anmeldung. Mehr dazu steht unter [Projektstatus](#projektstatus-und-lizenz).
@@ -85,6 +85,14 @@ Die Anwendung braucht keine API-Schlüssel, keine `.env`-Datei und keine Datenba
 
 </details>
 
+## Dein Gebäude im Zusammenhang
+
+**Projekte → Etagen → Räume.** Lege mehrere Planungen an und wechsle zwischen Erdgeschoss, Obergeschoss und weiteren Etagen. Die Übersicht zeigt PDF-Räume dort, wo sie im Grundriss liegen, mit ihren jeweiligen Verlegeplänen.
+
+![Erdgeschoss mit zwei Verlegeplänen an ihren PDF-Positionen und direkter Auswahl des Obergeschosses.](screenshots/hierarchy/etagenprojekt-desktop.jpg)
+
+Jede Etage hat einen eigenen Grundriss und Maßstab. Verwende verschiedene PDFs oder mehrere Seiten derselben Datei. Manuelle Räume bleiben bis zur Eingabe ihrer Position als „Noch nicht angeordnet“ erkennbar. Eine Projektdatei sichert alle Etagen und Original-PDFs zusammen. [Projekte und Etagen bedienen](docs/ANLEITUNG.md#projekte-etagen-und-räume)
+
 ## Vom Grundriss zum Verlegeplan
 
 **Dein vorhandener Grundriss wird zur Grundlage deiner Planung.** Der Assistent führt dich durch vier Schritte: PDF und Seite wählen, Maßstab festlegen, Raum markieren und Ergebnis prüfen.
@@ -96,10 +104,10 @@ Die Anwendung braucht keine API-Schlüssel, keine `.env`-Datei und keine Datenba
 1. **Grundriss öffnen.** PDF auswählen, zur gewünschten Seite wechseln und „Seite verwenden“ wählen.
 2. **Eine Wand messen.** Die beiden Endpunkte markieren. Die bekannte Länge in Zentimetern eingeben, zum Beispiel `480` für 4,80 m.
 3. **Räume bestimmen.** Die inneren Raumecken der Reihe nach markieren und den Raum benennen.
-4. **Weitere Räume erfassen und gemeinsam ansehen.** Im Assistenten „Weiteren Raum markieren“ wählen. Die Projektübersicht zeigt die Verlegepläne nebeneinander. In jedem Raum Belag, Muster und Startposition festlegen.
-5. **Alles mitnehmen.** Die Projektdatei sichert alle Räume, Maßstäbe und die Original-PDF zusammen.
+4. **Weitere Räume erfassen und gemeinsam ansehen.** Im Assistenten „Weiteren Raum markieren“ wählen. Die Etagenansicht zeigt die Verlegepläne an ihren Positionen im Grundriss. In jedem Raum Belag, Muster und Startposition festlegen.
+5. **Alles mitnehmen.** Die Projektdatei sichert alle Etagen, Räume, Maßstäbe und Original-PDFs zusammen.
 
-Vektor-PDFs und gescannte Vorlagen sind möglich. Jede Seite hat einen eigenen Maßstab. Ein Projekt unterstützt bis zu **50 Räume** sowie eine PDF mit bis zu **200 Seiten und 20 MiB**.
+Vektor-PDFs und gescannte Vorlagen sind möglich. Jede Etage hat einen eigenen Maßstab und enthält bis zu **50 Räume**. Eine PDF darf bis zu **200 Seiten und 20 MiB** enthalten. Mehrere Etagen können verschiedene Seiten oder Dateien verwenden.
 
 Die Räume werden manuell markiert. Der Maßstab muss in beiden Richtungen gleich sein. Prüfe nach der Übernahme ein zweites bekanntes Maß. Weitere Hinweise stehen in der [PDF-Anleitung](docs/ANLEITUNG.md#räume-aus-einer-pdf-übernehmen).
 
@@ -138,7 +146,7 @@ Plane weiter, gib Maße weiter oder lege den Plan neben dein Material. Wähle di
 
 | Ausgabe | Dafür ist sie gedacht | Enthält |
 | --- | --- | --- |
-| **Projektdatei** | Sichern und später weiterarbeiten | Alle Räume, Einstellungen, Maßstäbe und die Original-PDF |
+| **Projektdatei** | Sichern und später weiterarbeiten | Alle Etagen, Räume, Einstellungen, Maßstäbe und Original-PDFs |
 | **SVG** | Einen Plan als Vektorgrafik weiterverwenden | Den aktiven Raum in einem gewählten Maßstab |
 | **Druck / PDF** | Einen Plan ausdrucken oder als PDF speichern | Einen A4-Bericht zum aktiven Raum über den Browser-Druckdialog |
 | **CSV** | Die Elementliste in einer Tabelle öffnen | Hüllmaße, Flächen und Schnittkonturen des aktiven Raums |

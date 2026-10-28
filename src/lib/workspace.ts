@@ -8,6 +8,11 @@ import { calibrationScale, recalibrateProject, roomToSource, sourceToRoom } from
 
 export const WORKSPACE_KEY = 'fugenplan.workspace.v2';
 export const MAX_ROOMS = 50;
+export const MAX_PLACEMENT_MM = 1_000_000;
+
+export function createEmptyWorkspace(): Workspace {
+  return { version: 2, activeRoomId: '', rooms: [] };
+}
 
 export function createWorkspace(project: Project = structuredClone(DEFAULT_PROJECT)): Workspace {
   const id = crypto.randomUUID();
@@ -65,17 +70,20 @@ function parseDocument(value: unknown): FloorPlanDocument {
 }
 
 /** Rebuild the imported schema and check the connection between PDF and room coordinates. */
-export function parseWorkspace(value: unknown, options: ProjectParseOptions = {}): Workspace {
+export function parseWorkspace(value: unknown, options: ProjectParseOptions & { allowEmpty?: boolean } = {}): Workspace {
   const w = object(value);
   if (w.version !== 2) throw new Error('Diese Projektversion wird nicht unterstützt.');
-  if (!Array.isArray(w.rooms) || w.rooms.length < 1 || w.rooms.length > MAX_ROOMS) throw new Error(`Ein Projekt braucht 1 bis ${MAX_ROOMS} Räume.`);
+  if (!Array.isArray(w.rooms) || w.rooms.length < (options.allowEmpty ? 0 : 1) || w.rooms.length > MAX_ROOMS) throw new Error(`Ein Projekt braucht ${options.allowEmpty ? 0 : 1} bis ${MAX_ROOMS} Räume.`);
   const floorPlan = w.floorPlan === undefined ? undefined : parseDocument(w.floorPlan);
   const ids = new Set<string>();
   const rooms = w.rooms.map((value): WorkspaceRoom => {
     const r = object(value), id = string(r.id, 100, 'Raumkennung'), project = parseProject(r.project, options);
     if (ids.has(id)) throw new Error('Eine Raumkennung kommt mehrfach vor.');
     ids.add(id);
-    if (r.source === undefined) return { id, project };
+    const placement = r.placement === undefined ? undefined : point(r.placement);
+    if (placement && (Math.abs(placement.x) > MAX_PLACEMENT_MM || Math.abs(placement.y) > MAX_PLACEMENT_MM)) throw new Error('Die Raumposition liegt außerhalb des gültigen Bereichs.');
+    const base = { id, project, ...(placement ? { placement } : {}) };
+    if (r.source === undefined) return base;
     const s = object(r.source);
     if (!floorPlan || s.documentId !== floorPlan.id) throw new Error('Die Raumkontur gehört zu einer anderen PDF.');
     const page = integer(s.page, 1, floorPlan.pageCount, 'Raumseite');
@@ -90,10 +98,10 @@ export function parseWorkspace(value: unknown, options: ProjectParseOptions = {}
     if (projected.length !== actual.length || projected.some((p, i) => Math.hypot(p.x - actual[i].x, p.y - actual[i].y) > 0.001)) {
       throw new Error('Die Raummaße stimmen nicht mit dem PDF-Maßstab überein.');
     }
-    return { id, project, source };
+    return { ...base, source };
   });
-  const activeRoomId = string(w.activeRoomId, 100, 'Aktiver Raum');
-  if (!ids.has(activeRoomId)) throw new Error('Der aktive Raum fehlt.');
+  const activeRoomId = !rooms.length && w.activeRoomId === '' ? '' : string(w.activeRoomId, 100, 'Aktiver Raum');
+  if (rooms.length ? !ids.has(activeRoomId) : activeRoomId !== '') throw new Error('Der aktive Raum fehlt.');
   return { version: 2, rooms, activeRoomId, ...(floorPlan ? { floorPlan } : {}) };
 }
 
@@ -120,7 +128,7 @@ export function currentRoom(workspace: Workspace): WorkspaceRoom {
 export function replaceRoomProject(workspace: Workspace, project: Project, detach = false): Workspace {
   return { ...workspace, rooms: workspace.rooms.map(room => {
     if (room.id !== workspace.activeRoomId) return room;
-    if (detach || !room.source) return { id: room.id, project };
+    if (detach || !room.source) return { id: room.id, project, ...(room.placement ? { placement: room.placement } : {}) };
     const calibration = workspace.floorPlan?.pages[room.source.page - 1]?.calibration;
     if (!calibration) throw new Error('Für diesen Raum fehlt der PDF-Maßstab.');
     return { ...room, project, source: { ...room.source, points: roomToSource(getRoomPolygon(project.room), calibration, room.source.origin) } };
@@ -130,7 +138,7 @@ export function replaceRoomProject(workspace: Workspace, project: Project, detac
 export function withPdf(workspace: Workspace, document: FloorPlanDocument): Workspace {
   if (workspace.floorPlan?.id === document.id) return workspace;
   // Retain the actual room plans when replacing the PDF; their old PDF mapping is no longer valid.
-  return { ...workspace, floorPlan: document, rooms: workspace.rooms.map(({ id, project }) => ({ id, project })) };
+  return { ...workspace, floorPlan: document, rooms: workspace.rooms.map(({ id, project, source, placement }) => ({ id, project, ...(!source && placement ? { placement } : {}) })) };
 }
 
 export function calibratePage(workspace: Workspace, calibration: Calibration): Workspace {
@@ -166,10 +174,11 @@ export function addPdfRoom(workspace: Workspace, name: string, sourcePoints: Poi
   return { ...workspace, activeRoomId: id, rooms: [...workspace.rooms, room] };
 }
 
-export function removeRoom(workspace: Workspace, id: string): Workspace {
-  if (workspace.rooms.length === 1) throw new Error('Ein Projekt braucht mindestens einen Raum.');
+export function removeRoom(workspace: Workspace, id: string, allowEmpty = false): Workspace {
+  if (!workspace.rooms.some(room => room.id === id)) throw new Error('Der Raum wurde nicht gefunden.');
+  if (workspace.rooms.length === 1 && !allowEmpty) throw new Error('Ein Projekt braucht mindestens einen Raum.');
   const rooms = workspace.rooms.filter(room => room.id !== id);
-  return { ...workspace, rooms, activeRoomId: id === workspace.activeRoomId ? rooms[0].id : workspace.activeRoomId };
+  return { ...workspace, rooms, activeRoomId: id === workspace.activeRoomId ? rooms[0]?.id ?? '' : workspace.activeRoomId };
 }
 
 export function addEmptyRoom(workspace: Workspace): Workspace {
