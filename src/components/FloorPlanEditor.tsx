@@ -426,7 +426,7 @@ export default function FloorPlanEditor({ document: floorPlan, pdfBytes, rooms, 
       <p className="fpdf-upload-note">Halte eine bekannte Wandlänge bereit, zum Beispiel 480 cm. Damit berechnet Fugenplan den Maßstab.</p>
     </section> : <>
       <div className="fpdf-document-bar">
-        <div className="fpdf-file-name"><FilePdf size={22} /><div><strong title={floorPlan.name}>{floorPlan.name}</strong><span>{floorPlan.pageCount === 1 ? '1 Seite' : `${floorPlan.pageCount} Seiten`} · PDF auf diesem Gerät</span></div></div>
+        <div className="fpdf-file-name"><FilePdf size={22} /><div><strong title={floorPlan.name}>{floorPlan.name}</strong><span>{floorPlan.pageCount === 1 ? '1 Seite' : `${floorPlan.pageCount} Seiten`} · {pdfBytes ? 'PDF auf diesem Gerät' : 'Original-PDF nicht geladen'}</span></div></div>
         <div className="fpdf-document-actions"><label htmlFor={`${fieldId}-page`}>PDF-Seite</label><select id={`${fieldId}-page`} aria-label="PDF-Seite" value={activePage} disabled={locked} onChange={event => changePage(Number(event.target.value))}>
           {Array.from({ length: floorPlan.pageCount }, (_, index) => <option value={index + 1} key={index + 1}>Seite {index + 1}</option>)}
         </select><button type="button" className="button" disabled={locked} aria-describedby={rooms.some(room => room.source) ? `${fieldId}-replace-help` : undefined} onClick={() => input.current?.click()}><UploadSimple size={16} /><span>{pdfBytes ? 'Andere PDF' : 'PDF erneut öffnen'}</span></button></div>

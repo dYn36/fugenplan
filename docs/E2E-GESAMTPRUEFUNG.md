@@ -4,19 +4,20 @@ Prüfdatum: 28. Oktober 2026.
 
 ## Umfang und Ausführung
 
-Die Prüfung gleicht die sichtbaren Funktionen aus Anwendung und Anleitung mit den Browserfällen ab. Die Sammlung enthält jetzt 69 unterschiedliche Fälle. Zwei neue Fälle prüfen nach dem gemeldeten Fehler eigene PDFs für mehrere Etagen, auch bei fehlenden Originaldaten. Jeder Fall wird in Chromium und WebKit ausgeführt. Die Tests verwenden getrennte Browserkontexte, synthetische Räume und die mitgelieferte Prüf-PDF.
+Die Prüfung gleicht die sichtbaren Funktionen aus Anwendung und Anleitung mit den Browserfällen ab. Die Sammlung enthält jetzt 72 unterschiedliche Fälle. Die ergänzten PDF-Fälle prüfen eigene PDFs für mehrere Etagen, fehlende Originaldaten, vollständige Browser-Neustarts und fehlerhafte Schreibvorgänge. Jeder Fall wird in Chromium und WebKit ausgeführt. Die Tests verwenden getrennte Browserkontexte bzw. eigene temporäre Browserprofile, synthetische Räume und die mitgelieferte Prüf-PDF.
 
 Das Testziel ist der fertige Produktionsbuild auf einer eigenen lokalen Adresse. Die Browser laden die gebündelte Anwendung, den Geometrie-Worker, PDF.js, Schriften und PDF-Decoder. Raumpläne und PDF-Vorschauen werden tatsächlich berechnet und gezeichnet. Die Prüfungen vergleichen zusätzlich gespeicherte Daten und heruntergeladene Dateien.
 
 | Prüfung | Ergebnis |
 | --- | --- |
-| Fachtests | 225 Tests in 7 Dateien bestanden. |
+| Fachtests | 230 Tests in 8 Dateien bestanden. |
 | TypeScript und Produktionsbuild | Erfolgreich. |
-| Chromium | 69 von 69 Fällen bestanden. |
-| WebKit | 69 von 69 Fällen bestanden. |
-| Gesamt | 138 von 138 Fällen bestanden, ohne Wiederholung oder übersprungene Fälle. Laufzeit: 188,5 Sekunden. |
+| Chromium | 72 von 72 Fällen bestanden. |
+| WebKit | 72 von 72 Fällen bestanden. |
+| Gesamtlauf Chromium und WebKit | 144 von 144 Fällen bestanden, ohne Wiederholung oder übersprungene Fälle. Laufzeit: 220,2 Sekunden. |
+| Zusätzliche Edge-Prüfung | 3 von 3 gezielten PDF-Speicherfällen bestanden. Laufzeit: 21,2 Sekunden. |
 
-Ausgeführt mit Playwright 1.64.1, Chromium 156.0.8078.4 und WebKit 27.2. Die maschinenlesbaren Ergebnisse melden 0 fehlgeschlagene, 0 übersprungene und 0 instabile Fälle.
+Ausgeführt mit Playwright 1.64.1, Chromium 156.0.8078.4, WebKit 27.2 und Microsoft Edge 156.0.4314.42. Die maschinenlesbaren Ergebnisse melden 0 fehlgeschlagene, 0 übersprungene und 0 instabile Fälle.
 
 ## Geprüfte Funktionen
 
@@ -44,12 +45,12 @@ Ausgeführt mit Playwright 1.64.1, Chromium 156.0.8078.4 und WebKit 27.2. Die ma
 | SVG und CSV | Sichtbare Geometrie, Materialmaße, Konturen, Elementzahl und Startfliese vergleichen. Alle sieben SVG-Maßstäbe werden heruntergeladen und anhand der mm-Abmessungen geprüft. | e2e, features |
 | Druck / PDF | A4-Grenze und Maßstabswahl, Druckaufruf und Druckdarstellung prüfen. Chromium erzeugt eine echte einseitige A4-PDF mit passendem Papiermaß. Startfliese, Mengen und 50-mm-Kontrollmaß stehen im Bericht. | e2e, features |
 | Lokale Speicherung | Neuladen, Rückgängig und Wiederholen. Beschädigte Daten bleiben als Sicherung erhalten. Bei simuliert vollem Speicher kann das Projekt weiterbearbeitet, exportiert und in einem neuen Browserkontext wiederhergestellt werden. | e2e, workflows |
-| PDF-Speicher | Original-Bytes in IndexedDB mit der Prüfdatei vergleichen. Fehlende PDF wiederherstellen, auch nach dem Laden einer anderen PDF in einer neuen Etage. Beide Etagen bleiben erhalten. Unvollständiger Export zeigt einen Fehler; nach der Wiederherstellung enthält er beide Originaldateien. Defekte Importe erhalten die vorhandenen Projekte. | floorplan, library |
+| PDF-Speicher | Original-Bytes in IndexedDB mit der Prüfdatei vergleichen. Zwei Original-PDFs nach vollständigem Browser-Neustart mit demselben Profil und nach Übernahme aus Version 2 prüfen. Einen fehlerhaften Schreibvorgang vor der Modellübernahme zurückweisen und erneut versuchen. Fehlende PDF wiederherstellen, auch nach dem Laden einer anderen PDF in einer neuen Etage. Unvollständigen Export zurückweisen; nach Wiederherstellung beide Originaldateien exportieren. | floorplan, library, pdf-storage |
 | Mehrere Tabs | Reine Navigation erzeugt keine Warnung. Echte Änderungen lösen den Konflikthinweis aus. Beide Fassungen bleiben beim Zusammenführen erhalten. Das Laden des anderen Stands sichert zuvor die lokale Fassung. | conflict |
 | Bedienung und Hilfe | Desktop, 390 und 320 px, mobile Rückwege, Dialoge, Fokus und Tastaturbedienung. Hilfe über beide Einstiege öffnen und schließen. Axe-Prüfungen und Überlaufmessung sind enthalten. | e2e, features, library, arrangement |
 | Lokaler Betrieb | HTTP- und WebSocket-Anfragen einschließlich PDF-Renderer, Worker und Schriften beobachten. Die geprüften Abläufe verwenden lokale Ziele. Ein fehlerhafter Raum blockiert andere Räume nicht. | e2e, floorplan, library |
 
-Die Kurzbezeichnungen verweisen auf die entsprechenden Dateien in [tests/](../tests/). Die ergänzten Fälle stehen in [features.e2e.spec.ts](../tests/features.e2e.spec.ts), [workflows.e2e.spec.ts](../tests/workflows.e2e.spec.ts) und [library.e2e.spec.ts](../tests/library.e2e.spec.ts).
+Die Kurzbezeichnungen verweisen auf die entsprechenden Dateien in [tests/](../tests/). Die ergänzten Fälle stehen in [features.e2e.spec.ts](../tests/features.e2e.spec.ts), [workflows.e2e.spec.ts](../tests/workflows.e2e.spec.ts), [library.e2e.spec.ts](../tests/library.e2e.spec.ts) und [pdf-storage.e2e.spec.ts](../tests/pdf-storage.e2e.spec.ts). Die [PDF-Speicherprüfung](PDF-SPEICHER-PRUEFUNG.md) dokumentiert den konkreten Verlustbefund, die Wiederherstellung und die weiterhin offene historische Ursache. Die drei Speicherfälle laufen außerdem bei Push und Pull Request automatisch in Chromium und WebKit.
 
 ## Nachtrag: Neue PDF in einer weiteren Etage
 
@@ -61,7 +62,7 @@ Die Größenprüfung beim Import zählt jetzt verfügbare PDF-Bytes und blockier
 
 Die neuen Fälle prüfen Dateiauswahl, PDF-Vorschau, Maßstab, Raumübernahme, getrennte Etagen, Neuladen, Export beider Originaldateien und erneuten Projektimport. Der Fehlerfall prüft zusätzlich den abgewiesenen unvollständigen Export und die Wiederherstellung der früheren PDF ohne Verlust der beiden Etagen. Der eingegebene Raumname wird sofort im Feld und anschließend in den gespeicherten Daten geprüft. Die verzögerte Fokussetzung im PDF-Editor lässt ein bereits aktives Eingabefeld jetzt unberührt.
 
-Ein zusätzlicher Prüflauf führte beide neuen Abläufe dreimal pro Engine aus: 12 von 12 Läufen bestanden. Der anschließende Gesamtlauf mit 138 Prüfungen führt jeden Fall einmal pro Engine aus.
+Ein zusätzlicher Prüflauf führte beide neuen Abläufe dreimal pro Engine aus: 12 von 12 Läufen bestanden. Der damalige Gesamtlauf mit 138 Prüfungen bestand. Die aktuelle Sammlung umfasst mit den drei zusätzlichen Speicherfällen 144 Prüfungen und führt jeden Fall einmal pro Engine aus.
 
 ## Weitere gefundene und behobene Anwendungsfehler
 
@@ -96,7 +97,7 @@ Danach in einem zweiten Terminal:
 
 ~~~sh
 PLAYWRIGHT_BASE_URL=http://127.0.0.1:52501 \
-PLAYWRIGHT_RESULTS_DIR=test-results/pdf-floor-all \
+PLAYWRIGHT_RESULTS_DIR=test-results/pdf-storage-all \
 npm run test:e2e:all
 ~~~
 
@@ -106,13 +107,14 @@ npm run test:e2e:all
 
 Die Ausgabedateien werden beim Test erzeugt und nicht in Git gespeichert:
 
-- [HTML-Bericht mit einzelnen Testfällen und Anhängen](../test-results/pdf-floor-all/report/index.html)
-- [Maschinenlesbare Ergebnisse](../test-results/pdf-floor-all/results.json)
+- [HTML-Bericht mit einzelnen Testfällen und Anhängen](../test-results/pdf-storage-all/report/index.html)
+- [Maschinenlesbare Ergebnisse](../test-results/pdf-storage-all/results.json)
+- [Gezielte Speicherprüfung in Microsoft Edge](../test-results/pdf-storage-edge/report/index.html)
 - [Reproduktion vor der Korrektur](../test-results/pdf-floor-before/report/index.html)
 - [Zusätzlicher Prüflauf der beiden neuen Abläufe](../test-results/pdf-floor-regression/report/index.html)
 - [Erzeugter A4-Verlegeplan](../test-results/e2e-evidence/verlegeplan-a4.pdf)
-- [Druckdarstellung in Chromium](../test-results/pdf-floor-all/screenshots/druck-chromium.png)
-- [Druckdarstellung in WebKit](../test-results/pdf-floor-all/screenshots/druck-webkit.png)
+- [Druckdarstellung in Chromium](../test-results/pdf-storage-all/screenshots/druck-chromium.png)
+- [Druckdarstellung in WebKit](../test-results/pdf-storage-all/screenshots/druck-webkit.png)
 
 ## Grenzen
 

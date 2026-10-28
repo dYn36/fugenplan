@@ -84,6 +84,8 @@ Der wilde Verband ist reproduzierbar. Er prüft keinen vom Hersteller geforderte
 
 Projekte, Etagen, Räume, Maßstäbe und Varianten werden im lokalen Speicher dieses Browsers gespeichert. Original-PDFs liegen in IndexedDB. Andere Browser und andere Adressen haben einen eigenen Speicher. Das Löschen von Browserdaten löscht auch die gespeicherten Projekte. Sichere wichtige Stände als Projektdatei. Die Projektdatei enthält alle Etagen, Räume und benötigten Original-PDFs; jede PDF ist nur einmal enthalten. Separat gemerkte Varianten sind nicht enthalten. Alte Projektdateien mit einem oder mehreren Räumen bleiben lesbar. Eine importierte Projektdatei wird als zusätzliches Projekt angelegt.
 
+Ein Neuladen oder ein normaler Browser-Neustart soll die PDFs erhalten. Beim PDF-Import fordert Fugenplan Schutz vor automatischer Speicherbereinigung an. Der Browser entscheidet über diese Freigabe. Fugenplan wartet auf den Schreibabschluss und vergleicht danach die zurückgelesenen Bytes mit der Originaldatei. Erst dann wird der neue Grundriss übernommen. Eine Projektdatei sichert die Daten zusätzlich außerhalb des Browsers.
+
 Fehlt die Original-PDF einer Etage, bleiben ihre Räume und Maßstäbe erhalten. Du kannst in einer anderen Etage eine neue PDF laden und weiterarbeiten. Für den Export des vollständigen Projekts musst du die fehlende Original-PDF in ihrer Etage erneut öffnen.
 
 Wenn ein anderer Tab die Projekte ändert, hält Fugenplan das automatische Speichern dieses Tabs an. **Beide Stände erhalten** übernimmt den aktuellen Speicherstand und ergänzt lokal geänderte Projekte als zusätzliche Fassungen. **Aktuellen Stand laden** zeigt den Stand aus dem anderen Tab. Vor der Auflösung bleibt der bisherige lokale Stand als Sicherung im Browserspeicher erhalten.
@@ -102,11 +104,14 @@ npm run build     # TypeScript prüfen und statische Anwendung bauen
 npm test          # Geometrie, Projektdaten und Export prüfen
 npm run test:e2e  # Browserfunktionen, Maßverhältnisse und Zugänglichkeit prüfen
 npm run test:e2e:all # dieselben Abläufe in Chromium und WebKit prüfen
+npm run test:e2e:edge # installiertes Microsoft Edge prüfen
 ```
 
 Für Browserprüfungen auf einem neuen Gerät einmal `npx playwright install chromium` ausführen. `dist/` enthält nach dem Build die statische Anwendung. Ein HTTP-Server ist erforderlich, da die Berechnung in einem Web Worker läuft.
 
 Für die Prüfung in beiden Browser-Engines einmal `npx playwright install chromium webkit` ausführen. Die [Gesamtprüfung](E2E-GESAMTPRUEFUNG.md) nennt die geprüften Funktionen, Ergebnisse und Befehle für den Produktionsbuild.
+
+Die [PDF-Speicherprüfung](PDF-SPEICHER-PRUEFUNG.md) dokumentiert vollständige Browser-Neustarts mit demselben Testprofil, die Übernahme aus Version 2 und die Behandlung fehlerhaft geschriebener PDF-Daten. Diese Fälle laufen im Repository bei Push und Pull Request in Chromium und WebKit.
 
 Technik: React, TypeScript, Vite, SVG, Web Worker, PDF.js, IndexedDB, Clipper und polygon-clipping. Es gibt kein Backend. Der lokale Server bindet nur an `127.0.0.1`. Die npm-Skripte kopieren PDF-Schriften und Decoder aus der installierten PDF.js-Version nach `public/pdfjs/`; der Build enthält diese Dateien.
 

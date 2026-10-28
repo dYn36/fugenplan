@@ -450,6 +450,7 @@ test('Fehlende PDF in IndexedDB lässt sich ohne Verlust der Räume und Maßstä
   await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Grundriss', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'PDF-Datei erneut öffnen', exact: true })).toBeVisible();
+  await expect(page.locator('.fpdf-file-name')).toContainText('Original-PDF nicht geladen');
   await expect(page.getByRole('button', { name: 'Weiteren Raum markieren', exact: true })).toBeDisabled();
   await page.getByLabel('PDF-Grundriss öffnen', { exact: true }).setInputFiles(fixture);
   await readyPdf(page, 2);

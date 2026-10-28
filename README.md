@@ -253,6 +253,8 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
+`npm run test:e2e:all` prüft Chromium und WebKit. Für ein installiertes Microsoft Edge gibt es zusätzlich `npm run test:e2e:edge`. Die [PDF-Speicherprüfung](docs/PDF-SPEICHER-PRUEFUNG.md) prüft zwei Original-PDFs nach einem vollständigen Browser-Neustart, nach Neuladen und nach der Übernahme älterer Projekte. Diese Speicherfälle laufen auch automatisch bei Push und Pull Request.
+
 Unter Linux kann `npx playwright install --with-deps chromium` zusätzliche Systempakete installieren. Die Test-PDF lässt sich mit `node tests/fixtures/create-floorplan-fixture.mjs` neu erzeugen.
 
 ```text

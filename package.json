@@ -14,6 +14,7 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "test:e2e:all": "playwright test -c playwright.all.config.ts",
+    "test:e2e:edge": "playwright test -c playwright.edge.config.ts",
     "check": "npm test && npm run build",
     "start": "vite --host 127.0.0.1 --open",
     "predev": "node scripts/copy-pdf-assets.mjs",
