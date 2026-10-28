@@ -35,7 +35,8 @@ async function dragStart(page: Page, roomId: string) {
   const target = page.locator(`[data-room-id="${roomId}"]`);
   const box = await target.boundingBox();
   if (!box) throw new Error('Raum fehlt in der Etagenzeichnung.');
-  const start = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  // Integer screen coordinates are delivered consistently by Chromium and WebKit.
+  const start = { x: Math.round(box.x + box.width / 2), y: Math.round(box.y + box.height / 2) };
   await page.mouse.move(start.x, start.y);
   await page.mouse.down();
   return { target, start };
@@ -128,16 +129,20 @@ test('Positionsdialog bleibt bei 320 px vollständig bedienbar und zeigt nach Dr
   await room.scrollIntoViewIfNeeded();
   const unit = await page.locator('.floor-drawing-svg').evaluate(element => (element as SVGSVGElement).viewBox.baseVal.width / element.getBoundingClientRect().width);
   const { start } = await dragStart(page, 'manual-room');
-  await page.mouse.move(start.x, start.y + (2167.1 - 1400) / unit, { steps: 5 });
+  const endY = Math.round(start.y + (2167.1 - 1400) / unit);
+  await page.mouse.move(start.x, endY, { steps: 5 });
   await page.mouse.up();
-  await expect(room).toHaveAttribute('data-origin-y', '2167.1');
+  const expectedY = Math.round((1400 + (endY - start.y) * unit) * 10) / 10;
+  await expect(room).toHaveAttribute('data-origin-y', String(expectedY));
   await room.press('Enter');
 
   const dialog = page.getByRole('dialog', { name: 'Position von „Flur“' });
   const x = dialog.getByRole('textbox', { name: 'X in cm', exact: true });
   const y = dialog.getByRole('textbox', { name: 'Y in cm', exact: true });
   await expect(x).toHaveValue('700');
-  await expect(y).toHaveValue('216.71');
+  await expect(y).toHaveValue(/^\d+(?:\.\d{1,2})?$/);
+  expect(Number(await y.inputValue()) * 10).toBeCloseTo(expectedY, 8);
+  const displayY = await y.inputValue();
   const dialogBox = await dialog.boundingBox();
   if (!dialogBox) throw new Error('Positionsdialog fehlt.');
   const controls = [x, y, ...['Position aufheben', 'Abbrechen', 'Position speichern'].map(name => dialog.getByRole('button', { name, exact: true }))];
@@ -163,5 +168,5 @@ test('Positionsdialog bleibt bei 320 px vollständig bedienbar und zeigt nach Dr
   await dialog.getByRole('button', { name: 'Position speichern', exact: true }).click();
   await page.getByRole('button', { name: 'Position von Flur festlegen', exact: true }).click();
   await expect(x).toHaveValue('700.123456789012');
-  await expect(y).toHaveValue('216.71');
+  await expect(y).toHaveValue(displayY);
 });

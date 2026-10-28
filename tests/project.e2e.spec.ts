@@ -45,6 +45,8 @@ async function calibrate(page: Page) {
   await page.getByRole('textbox', { name: 'Länge der Wand', exact: true }).fill('480');
   await page.getByRole('button', { name: 'Maßstab speichern', exact: true }).click();
   await expect(steps(page).getByRole('button', { name: 'Raum', exact: true })).toHaveAttribute('aria-current', 'step');
+  const { start, end, lengthMm } = manifest.pages[0].calibration;
+  await expect.poll(async () => (await stored(page)).floorPlan?.pages[0].calibration).toEqual({ start, end, lengthMm });
 }
 
 async function markRoom(page: Page, name: string, index: number, next = false) {
@@ -278,7 +280,14 @@ test('Eine Etage zeigt 50 Räume und öffnet auch den letzten ohne Datenverlust'
   await expect(overview(page).getByRole('article')).toHaveCount(50);
   await expect(page.getByRole('button', { name: 'Raum hinzufügen', exact: true })).toBeDisabled();
   await expect(overview(page).locator('.floor-overview-summary')).toContainText('54 m²');
+  const closeNotice = page.getByRole('button', { name: 'Meldung schließen', exact: true });
+  if (await closeNotice.isVisible()) await closeNotice.click();
   await page.getByRole('button', { name: 'Testraum 50 bearbeiten', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Testraum 50', exact: true })).toBeVisible();
+  await expect.poll(async () => {
+    const workspace = await stored(page);
+    return workspace.rooms.find(room => room.id === workspace.activeRoomId)?.project.name;
+  }).toBe('Testraum 50');
   expect((await stored(page)).rooms).toHaveLength(50);
+  expect((await stored(page)).rooms.map(room => room.project)).toEqual(rooms.map(room => room.project));
 });

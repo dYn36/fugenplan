@@ -5,7 +5,7 @@ export default function Dialog({title,onClose,children}:{title:string;onClose:()
   const ref=useRef<HTMLDialogElement>(null);
   useLayoutEffect(()=>{
     const dialog=ref.current;
-    const trigger=document.activeElement instanceof HTMLElement?document.activeElement:null;
+    const trigger=document.activeElement instanceof HTMLElement||document.activeElement instanceof SVGElement?document.activeElement:null;
     dialog?.showModal();
     dialog?.querySelector<HTMLElement>('form input:not([type="hidden"]), form select, form textarea')?.focus();
     return()=>{

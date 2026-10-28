@@ -1,21 +1,25 @@
 import { defineConfig } from '@playwright/test';
 
+const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const resultsDir = process.env.PLAYWRIGHT_RESULTS_DIR || 'test-results';
+
 export default defineConfig({
   testDir: './tests',
-  testMatch: ['e2e.spec.ts', 'floorplan.e2e.spec.ts', 'project.e2e.spec.ts', 'library.e2e.spec.ts', 'arrangement.e2e.spec.ts', 'conflict.e2e.spec.ts'],
+  testMatch: '**/*.spec.ts',
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: 0,
   workers: 2,
   timeout: 30_000,
   expect: { timeout: 8_000 },
-  outputDir: 'test-results/artifacts',
+  outputDir: resultsDir + '/artifacts',
   reporter: [
     ['list'],
-    ['html', { outputFolder: 'test-results/report', open: 'never' }],
+    ['html', { outputFolder: resultsDir + '/report', open: 'never' }],
+    ['json', { outputFile: resultsDir + '/results.json' }],
   ],
   use: {
-    baseURL: 'http://127.0.0.1:5173',
+    baseURL,
     browserName: 'chromium',
     viewport: { width: 1440, height: 1000 },
     locale: 'de-DE',
@@ -26,7 +30,7 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
   },
-  webServer: {
+  webServer: process.env.PLAYWRIGHT_BASE_URL ? undefined : {
     command: 'npm run dev',
     url: 'http://127.0.0.1:5173',
     reuseExistingServer: true,

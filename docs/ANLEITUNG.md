@@ -99,9 +99,12 @@ npm run dev       # lokaler Entwicklungsserver
 npm run build     # TypeScript prüfen und statische Anwendung bauen
 npm test          # Geometrie, Projektdaten und Export prüfen
 npm run test:e2e  # Browserfunktionen, Maßverhältnisse und Zugänglichkeit prüfen
+npm run test:e2e:all # dieselben Abläufe in Chromium und WebKit prüfen
 ```
 
 Für Browserprüfungen auf einem neuen Gerät einmal `npx playwright install chromium` ausführen. `dist/` enthält nach dem Build die statische Anwendung. Ein HTTP-Server ist erforderlich, da die Berechnung in einem Web Worker läuft.
+
+Für die Prüfung in beiden Browser-Engines einmal `npx playwright install chromium webkit` ausführen. Die [Gesamtprüfung](E2E-GESAMTPRUEFUNG.md) nennt die geprüften Funktionen, Ergebnisse und Befehle für den Produktionsbuild.
 
 Technik: React, TypeScript, Vite, SVG, Web Worker, PDF.js, IndexedDB, Clipper und polygon-clipping. Es gibt kein Backend. Der lokale Server bindet nur an `127.0.0.1`. Die npm-Skripte kopieren PDF-Schriften und Decoder aus der installierten PDF.js-Version nach `public/pdfjs/`; der Build enthält diese Dateien.
 

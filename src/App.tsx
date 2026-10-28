@@ -392,7 +392,11 @@ export default function App() {
   const entityRoomCount=entityBuilding?entityBuilding.floors.reduce((count,item)=>count+item.workspace.rooms.length,0):entityFloor?.workspace.rooms.length??0;
   const templateDocument=building?.floors.find(item=>item.id===floorTemplate)?.workspace.floorPlan;
   return <>
-    <div className="app-shell">
+    <div className="app-shell" onClickCapture={event=>{
+      // Keep the activating control as the return target for dialogs and pickers.
+      const control=event.target instanceof Element?event.target.closest<HTMLElement|SVGElement>('button, [role="button"], a[href]'):null;
+      control?.focus({preventScroll:true});
+    }}>
       <header className="app-header">
         <a className="brand" href="#" onClick={event=>{event.preventDefault();switchView('library');}} aria-label="Fugenplan, zu den Projekten"><SquaresFour size={28} weight="fill"/><span>fugenplan<span className="brand-dot">.</span></span></a>
         <span className="brand-description">Dein Boden im Plan</span>

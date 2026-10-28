@@ -17,6 +17,7 @@ const pdfBytes = await readFile(fixture);
 const evidence = 'test-results/pdf-evidence';
 const errors = new WeakMap<Page, string[]>();
 const requests = new WeakMap<Page, string[]>();
+const pointerSamples = new WeakMap<Page, unknown[]>();
 const overlay = (page: Page) => page.getByTestId('pdf-overlay');
 const floorPlan = (page: Page) => page.getByTestId('floor-plan');
 
@@ -64,6 +65,7 @@ async function precisePoint(page: Page, point: Point, number: number) {
   await page.getByRole('textbox', { name: 'X auf Seite', exact: true }).fill(String(point.x / expected.width * 100).replace('.', ','));
   await page.getByRole('textbox', { name: 'Y auf Seite', exact: true }).fill(String(point.y / expected.height * 100).replace('.', ','));
   await page.getByRole('button', { name: 'Punkt setzen', exact: true }).click();
+  return point;
 }
 
 async function pointerPoint(page: Page, point: Point, number: number) {
@@ -71,13 +73,27 @@ async function pointerPoint(page: Page, point: Point, number: number) {
   const box = (await overlay(page).boundingBox())!;
   const stage = (await page.getByTestId('pdf-stage').boundingBox())!;
   const natural = manifest.pages[number - 1];
-  const x = box.x + point.x / natural.width * box.width;
-  const y = box.y + point.y / natural.height * box.height;
+  const x = Math.round(box.x + point.x / natural.width * box.width);
+  const y = Math.round(box.y + point.y / natural.height * box.height);
   expect(x, 'Testpunkt muss in der sichtbaren PDF-Bühne liegen').toBeGreaterThan(stage.x);
   expect(x).toBeLessThan(stage.x + stage.width);
   expect(y).toBeGreaterThan(stage.y);
   expect(y).toBeLessThan(stage.y + stage.height);
+  await overlay(page).evaluate(element => {
+    window.addEventListener('pointerup', event => {
+      const svg = element as SVGSVGElement;
+      const screen = svg.createSVGPoint();
+      screen.x = event.clientX; screen.y = event.clientY;
+      const local = screen.matrixTransform(svg.getScreenCTM()!.inverse());
+      element.setAttribute('data-test-pointer', JSON.stringify({
+        screen: { x: event.clientX, y: event.clientY }, source: { x: local.x, y: local.y },
+      }));
+    }, { once: true, capture: true });
+  });
   await page.mouse.click(x, y);
+  const observed = JSON.parse((await overlay(page).getAttribute('data-test-pointer'))!);
+  pointerSamples.set(page, [...(pointerSamples.get(page) ?? []), { requested: { x, y }, ...observed }]);
+  return observed.source as Point;
 }
 
 async function calibrate(page: Page, number = 1, method: 'precise' | 'pointer' = 'precise', lengthMm?: number) {
@@ -85,12 +101,18 @@ async function calibrate(page: Page, number = 1, method: 'precise' | 'pointer' =
   await page.getByRole('navigation', { name: 'Schritte zum Verlegeplan' }).getByRole('button', { name: 'Maßstab', exact: true }).click();
   await page.getByRole('button', { name: /^(Wand markieren|Maßstab neu setzen)$/ }).click();
   const point = method === 'pointer' ? pointerPoint : precisePoint;
-  await point(page, expected.start, number);
-  await point(page, expected.end, number);
+  const start = await point(page, expected.start, number);
+  const end = await point(page, expected.end, number);
   await page.getByRole('textbox', { name: 'Länge der Wand', exact: true }).fill(String((lengthMm ?? expected.lengthMm) / 10).replace('.', ','));
   await page.getByRole('button', { name: 'Maßstab speichern', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Raum markieren', exact: true })).toBeEnabled();
-  await expect.poll(async () => (await storedWorkspace(page)).floorPlan?.pages[number - 1].calibration?.lengthMm).toBe(lengthMm ?? expected.lengthMm);
+  await expect.poll(async () => {
+    const saved = (await storedWorkspace(page)).floorPlan?.pages[number - 1].calibration;
+    return !!saved && saved.lengthMm === (lengthMm ?? expected.lengthMm)
+      && Math.abs(saved.start.x - start.x) < .0001 && Math.abs(saved.start.y - start.y) < .0001
+      && Math.abs(saved.end.x - end.x) < .0001 && Math.abs(saved.end.y - end.y) < .0001;
+  }).toBe(true);
+  return { start, end, lengthMm: lengthMm ?? expected.lengthMm };
 }
 
 async function drawRoom(page: Page, name: string, number = 1, index = 0, method: 'precise' | 'pointer' = 'precise') {
@@ -98,13 +120,15 @@ async function drawRoom(page: Page, name: string, number = 1, index = 0, method:
   await page.getByRole('button', { name: 'Raum markieren', exact: true }).click();
   await page.getByRole('textbox', { name: 'Raumname', exact: true }).fill(name);
   const point = method === 'pointer' ? pointerPoint : precisePoint;
-  for (const coordinate of manifest.pages[number - 1].rooms[index].points) await point(page, coordinate, number);
+  const sourcePoints: Point[] = [];
+  for (const coordinate of manifest.pages[number - 1].rooms[index].points) sourcePoints.push(await point(page, coordinate, number));
   await page.getByRole('button', { name: 'Raum übernehmen', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Raum übernommen', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Raum prüfen', exact: true }).click();
   await expect(floorPlan(page)).toBeVisible();
   await expect(page.getByRole('heading', { name, exact: true }).first()).toBeVisible();
   await expect.poll(async () => (await storedWorkspace(page)).rooms.some(room => room.project.name === name)).toBe(true);
+  return sourcePoints;
 }
 
 async function setNumber(page: Page, label: string, value: string) {
@@ -191,21 +215,33 @@ test.afterEach(async ({ page }) => {
   expect(errors.get(page), 'Keine unbehandelten JavaScript-Fehler').toEqual([]);
 });
 
-test('Echte PDF: Wandmaß und Raum bleiben bei Zeiger-Eingabe unabhängig vom Zoom', async ({ page }) => {
+test('Echte PDF: Wandmaß und Raum bleiben bei Zeiger-Eingabe unabhängig vom Zoom', async ({ page }, testInfo) => {
   await upload(page);
   await expect(page.getByRole('navigation', { name: 'Schritte zum Verlegeplan' }).getByRole('button', { name: 'Raum', exact: true })).toBeDisabled();
-  await calibrate(page, 1, 'pointer');
+  const originalInput = await calibrate(page, 1, 'pointer');
   const original = (await storedWorkspace(page)).floorPlan!.pages[0].calibration!;
   await page.getByRole('button', { name: 'PDF vergrößern', exact: true }).click();
   await expect(page.getByLabel('PDF-Zoom', { exact: true })).toHaveText('125 %');
-  await calibrate(page, 1, 'pointer');
+  const zoomedInput = await calibrate(page, 1, 'pointer');
   const zoomed = (await storedWorkspace(page)).floorPlan!.pages[0].calibration!;
   for (const key of ['start', 'end'] as const) {
-    expect(Math.abs(zoomed[key].x - original[key].x)).toBeLessThan(0.02);
-    expect(Math.abs(zoomed[key].y - original[key].y)).toBeLessThan(0.02);
+    expect(Math.abs(original[key].x - originalInput[key].x)).toBeLessThan(0.0001);
+    expect(Math.abs(original[key].y - originalInput[key].y)).toBeLessThan(0.0001);
+    expect(Math.abs(zoomed[key].x - zoomedInput[key].x), JSON.stringify(pointerSamples.get(page))).toBeLessThan(0.0001);
+    expect(Math.abs(zoomed[key].y - zoomedInput[key].y)).toBeLessThan(0.0001);
   }
-  await drawRoom(page, 'PDF Küche', 1, 0, 'pointer');
-  assertRoom(roomNamed(await storedWorkspace(page), 'PDF Küche'), manifest.pages[0].rooms[0], 1);
+  // Use the delivered integer pointer coordinates as the independent oracle.
+  // Rounding one screen pixel can represent several mm at this document zoom.
+  const marked = await drawRoom(page, 'PDF Küche', 1, 0, 'pointer');
+  const mmPerPoint = 4800 / Math.hypot(zoomedInput.end.x - zoomedInput.start.x, zoomedInput.end.y - zoomedInput.start.y);
+  const widthMm = (Math.max(...marked.map(p => p.x)) - Math.min(...marked.map(p => p.x))) * mmPerPoint;
+  const heightMm = (Math.max(...marked.map(p => p.y)) - Math.min(...marked.map(p => p.y))) * mmPerPoint;
+  const areaM2 = Math.abs(marked.reduce((sum, p, index) => {
+    const next = marked[(index + 1) % marked.length];
+    return sum + p.x * next.y - p.y * next.x;
+  }, 0)) / 2 * mmPerPoint ** 2 / 1e6;
+  assertRoom(roomNamed(await storedWorkspace(page), 'PDF Küche'), { widthMm, heightMm, areaM2 });
+  await testInfo.attach('Gemessene Zeigereingaben', { body: JSON.stringify(pointerSamples.get(page), null, 2), contentType: 'application/json' });
   await openFloorPlan(page, 1);
   await page.getByRole('button', { name: 'PDF einpassen', exact: true }).click();
   if (await page.getByRole('button', { name: 'Meldung schließen', exact: true }).count()) await page.getByRole('button', { name: 'Meldung schließen', exact: true }).click();
@@ -285,6 +321,10 @@ test('IndexedDB und vollständiger JSON-Roundtrip erhalten Original-PDF, Räume 
   await page.getByRole('button', { name: 'Verlegung', exact: true }).click();
   await page.getByRole('button', { name: 'Diagonalverband', exact: true }).click();
   await openFloorPlan(page, 2);
+  await expect.poll(async () => {
+    const workspace = await storedWorkspace(page);
+    return workspace.rooms.find(room => room.id === workspace.activeRoomId)!.project.layout.pattern;
+  }).toBe('diagonal');
   const before = await storedWorkspace(page);
   const beforeBuilding = await storedBuilding(page);
   expect(await indexedPdf(page, before.floorPlan!.id)).toEqual(Array.from(pdfBytes));
