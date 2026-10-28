@@ -270,6 +270,8 @@ export default function FloorPlanEditor({ document: floorPlan, pdfBytes, rooms, 
     if (next === 'room' && !draft.length) { setClosed(false); if (!name) setName(`Raum ${rooms.length + 1}`); }
     setAnnouncement(next === 'calibrate' ? 'Start und Ende einer bekannten Wand markieren.' : 'Die inneren Raumecken der Reihe nach markieren.');
     window.requestAnimationFrame(() => {
+      // A field can receive focus before this frame. Do not interrupt an input already in progress.
+      if (window.document.activeElement?.matches('input, textarea, select, [contenteditable="true"]')) return;
       stage.current?.scrollIntoView({ block: 'center', behavior: 'instant' });
       overlay.current?.focus({ preventScroll: true });
     });

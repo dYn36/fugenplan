@@ -332,8 +332,8 @@ export default function App() {
         for(const id of ids){
           const asset=id===document.id?bytes:assetRef.current?.id===id?assetRef.current.bytes:await getPdf(id);
           if(sequence!==importSequence.current)return false;
-          if(!asset)throw new Error('Eine vorhandene PDF fehlt. Öffne sie in ihrer Etage erneut, bevor du eine weitere PDF hinzufügst.');
-          total+=asset.byteLength;
+          // Missing originals must not block another floor. Export checks completeness and the full size.
+          total+=asset?.byteLength??0;
           if(total>MAX_EMBEDDED_PDF_BYTES)throw new Error('Die Original-PDFs dieses Projekts dürfen zusammen höchstens 80 MiB groß sein. Verwende eine kleinere PDF oder ein separates Projekt.');
         }
       }

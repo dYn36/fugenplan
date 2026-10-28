@@ -51,6 +51,7 @@ async function calibrate(page: Page, number = 1) {
 async function markRoom(page: Page, name: string, number = 1, index = 0, next = false) {
   await page.getByRole('button', { name: next ? 'Weiteren Raum markieren' : 'Raum markieren', exact: true }).click();
   await page.getByRole('textbox', { name: 'Raumname', exact: true }).fill(name);
+  await expect(page.getByRole('textbox', { name: 'Raumname', exact: true })).toHaveValue(name);
   for (const point of manifest.pages[number - 1].rooms[index].points) await precisePoint(page, point, number);
   await page.getByRole('button', { name: 'Raum übernehmen', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Raum übernommen', exact: true })).toBeVisible();
@@ -188,6 +189,97 @@ test('PDF-Räume stehen in einer gemeinsamen Zeichnung; zweite Etage und Export 
   await page.getByRole('navigation', { name: 'Etagen', exact: true }).getByRole('button', { name: 'Erdgeschoss öffnen', exact: true }).click();
   await expect(drawing(page, 'Erdgeschoss').locator('[data-room-id]')).toHaveCount(2);
 });
+
+for (const missingOriginal of [false, true]) {
+  test(`Neue Etage erhält eine eigene PDF bei ${missingOriginal ? 'fehlender' : 'vorhandener'} Original-PDF der ersten Etage`, async ({ page }) => {
+    test.setTimeout(90_000);
+    await createProject(page, 'Getrennte Grundrisse');
+    await createFloor(page, 'Erdgeschoss');
+    await page.getByRole('button', { name: 'PDF-Grundriss laden', exact: true }).click();
+    await page.getByLabel('PDF-Grundriss öffnen', { exact: true }).setInputFiles(fixture);
+    await expect(page.getByTestId('pdf-overlay')).toBeVisible();
+    await calibrate(page);
+    await markRoom(page, 'Küche unten');
+    await page.getByRole('button', { name: 'Zur Etagenansicht', exact: true }).click();
+    const ground = await storedWorkspace(page);
+
+    if (missingOriginal) {
+      // Remove only the original bytes, as with storage eviction. Keep the real project and renderer.
+      await page.evaluate(async id => {
+        const db = await new Promise<IDBDatabase>((resolve, reject) => {
+          const request = indexedDB.open('fugenplan-pdf-v1');
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        });
+        try {
+          await new Promise<void>((resolve, reject) => {
+            const transaction = db.transaction('documents', 'readwrite');
+            transaction.objectStore('documents').delete(id);
+            transaction.oncomplete = () => resolve();
+            transaction.onerror = () => reject(transaction.error);
+            transaction.onabort = () => reject(transaction.error);
+          });
+        } finally { db.close(); }
+      }, ground.floorPlan!.id);
+      await page.reload();
+      await expect(page.locator('.save-status')).toContainText('PDF fehlt');
+    }
+
+    await createFloor(page, 'Obergeschoss');
+    await page.getByRole('button', { name: 'PDF-Grundriss laden', exact: true }).click();
+    // A trailing PDF comment makes this a second valid file with a different content hash.
+    const upperPdf = Buffer.concat([pdfBytes, Buffer.from('\n% Eigenstaendiger Grundriss Obergeschoss\n')]);
+    const chooser = page.waitForEvent('filechooser');
+    await page.getByRole('button', { name: 'PDF auswählen', exact: true }).click();
+    await (await chooser).setFiles({ name: 'obergeschoss.pdf', mimeType: 'application/pdf', buffer: upperPdf });
+    await expect(page.getByTestId('pdf-overlay')).toBeVisible();
+    await expect(page.locator('.fpdf-error')).toHaveCount(0);
+    await calibrate(page);
+    await markRoom(page, 'Zimmer oben');
+    await page.getByRole('button', { name: 'Zur Etagenansicht', exact: true }).click();
+    await expect(drawing(page, 'Obergeschoss').locator('[data-room-id]')).toHaveCount(1);
+    await expect(drawing(page, 'Obergeschoss').locator('[data-piece]')).not.toHaveCount(0);
+    await expect.poll(async () => (await storedBuilding(page)).floors[1]?.workspace.rooms[0]?.project.name).toBe('Zimmer oben');
+    const before = await storedBuilding(page);
+    expect(before.floors[0].workspace).toEqual(ground);
+    expect(before.floors[1].workspace.floorPlan!.id).not.toBe(ground.floorPlan!.id);
+    await page.reload();
+    await expect(drawing(page, 'Obergeschoss').locator('[data-room-id]')).toHaveCount(1);
+    await expect(drawing(page, 'Obergeschoss').locator('[data-piece]')).not.toHaveCount(0);
+    expect(await storedBuilding(page)).toEqual(before);
+
+    if (missingOriginal) {
+      await page.getByRole('button', { name: 'Exportieren', exact: true }).click();
+      const dialog = page.getByRole('dialog', { name: 'Plan mitnehmen', exact: true });
+      const downloads: string[] = [];
+      page.on('download', download => downloads.push(download.suggestedFilename()));
+      await dialog.getByRole('button', { name: /^Projektdatei/ }).click();
+      await expect(dialog.getByRole('alert')).toContainText('Eine Original-PDF fehlt.');
+      expect(downloads).toEqual([]);
+      await page.keyboard.press('Escape');
+      await page.getByRole('navigation', { name: 'Etagen', exact: true }).getByRole('button', { name: 'Erdgeschoss öffnen', exact: true }).click();
+      await page.getByRole('button', { name: 'Grundriss bearbeiten', exact: true }).click();
+      await expect(page.getByRole('heading', { name: 'PDF-Datei erneut öffnen', exact: true })).toBeVisible();
+      await page.getByLabel('PDF-Grundriss öffnen', { exact: true }).setInputFiles(fixture);
+      await expect(page.getByTestId('pdf-overlay')).toBeVisible();
+      await expect(page.locator('.save-status')).not.toContainText('PDF fehlt');
+      await page.getByRole('button', { name: 'Etage', exact: true }).click();
+      await expect(drawing(page, 'Erdgeschoss').locator('[data-room-id]')).toHaveCount(1);
+      await expect(drawing(page, 'Erdgeschoss').locator('[data-piece]')).not.toHaveCount(0);
+      expect((await storedBuilding(page)).floors.map(floor => floor.workspace)).toEqual(before.floors.map(floor => floor.workspace));
+    }
+
+    const saved = await exportProject(page);
+    expect(saved.data.assets).toHaveLength(2);
+    const originals = new Map(saved.data.assets.map(asset => [asset.id, Buffer.from(asset.pdfBase64, 'base64')]));
+    expect(originals.get(ground.floorPlan!.id)).toEqual(pdfBytes);
+    expect(originals.get(before.floors[1].workspace.floorPlan!.id)).toEqual(upperPdf);
+    expect(saved.data.building.floors).toEqual(before.floors);
+    await page.getByLabel('Projektdatei öffnen', { exact: true }).setInputFiles({ name: saved.name, mimeType: 'application/json', buffer: Buffer.from(saved.contents) });
+    await expect.poll(async () => (await storedLibrary(page)).projects.length).toBe(2);
+    expect(buildingContents(await storedBuilding(page))).toEqual(buildingContents(saved.data.building));
+  });
+}
 
 test('Raum verschieben, Namen ändern und Etage oder Projekt entfernen sind nachvollziehbar und rückgängig', async ({ page }) => {
   await createProject(page, 'Haus');
