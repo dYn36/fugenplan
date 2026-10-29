@@ -289,6 +289,7 @@ test('Freie Eckpunkte lassen sich ergänzen, ändern und bis zum Dreieck entfern
 
 test('Zeichenmodus entfernt den letzten Punkt, bricht ab und übernimmt eine durch den ersten Punkt geschlossene Kontur', async ({ page }) => {
   await panel(page, 'Frei');
+  await expect.poll(async () => (await storedRoom(page)).room.shape).toBe('custom');
   const before = await storedRoom(page);
   await panel(page, 'Kontur zeichnen');
   let box = (await plan(page).boundingBox())!;
