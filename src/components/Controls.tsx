@@ -1,4 +1,4 @@
-import { memo, useEffect, useId, useRef, useState } from 'react';
+import { memo, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { CaretDown, Check, Crosshair, PencilSimple, Plus, Trash } from '@phosphor-icons/react';
 import type { LayoutConfig, MaterialConfig, Pattern, Point, Project, RoomConfig } from '../types';
 import { updateRoom } from '../lib/project';
@@ -45,7 +45,8 @@ function NumericField({ label, value, onCommit, unit, divisor = 1, min, max, ste
   const focused = useRef(false);
   const cancelBlur = useRef(false);
 
-  useEffect(() => {
+  // Apply presets before the next interaction can select or edit the old value.
+  useLayoutEffect(() => {
     if (!focused.current) {
       setDraft(format(value / divisor));
       setError('');

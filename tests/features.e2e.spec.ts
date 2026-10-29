@@ -106,6 +106,35 @@ test('Alle elf Formatvorgaben und vier Oberflächen ändern den sichtbaren Belag
   await expect(page.getByRole('button', { name: 'Kalkstein', exact: true })).toHaveAttribute('aria-pressed', 'true');
 });
 
+test('Sofortige Maßeingabe nach Material- und Formatwechsel ersetzt die Vorgabe vollständig', async ({ page }) => {
+  await panel(page, 'Belag');
+  const length = page.getByRole('textbox', { name: 'Länge', exact: true });
+  for (const [button, kind, value] of [
+    ['Diele', 'wood', '180'], ['Fliese', 'tile', '45'],
+    ['Diele', 'wood', '220'], ['Fliese', 'tile', '30'],
+  ]) {
+    await panel(page, button);
+    // No readiness assertion between the switch and input: the visible field must be editable immediately.
+    await length.fill(value);
+    await length.press('Enter');
+    await expect(length).toHaveValue(value);
+    await expect(length).not.toHaveAttribute('aria-invalid', 'true');
+    await expect.poll(async () => (await storedRoom(page)).material).toMatchObject({ kind, width: Number(value) * 10 });
+  }
+  for (const [preset, value] of [['60 × 60 cm', '90'], ['120 × 60 cm', '37,5']]) {
+    await page.getByRole('combobox', { name: 'Formatvorgabe' }).selectOption({ label: preset });
+    await length.fill(value);
+    await length.press('Enter');
+    await expect(length).toHaveValue(value);
+    await expect(length).not.toHaveAttribute('aria-invalid', 'true');
+    await expect.poll(async () => (await storedRoom(page)).material.width).toBe(Number(value.replace(',', '.')) * 10);
+  }
+  await page.reload();
+  await panel(page, 'Raumplan');
+  await panel(page, 'Belag');
+  await expect(length).toHaveValue('37,5');
+});
+
 test('Reserve, Paketinhalt und Warnschwelle ergeben nachvollziehbare Mengen und prüfbare Zuschnitte', async ({ page }) => {
   await exactGrid(page);
   await panel(page, 'Belag');
