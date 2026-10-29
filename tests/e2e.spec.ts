@@ -540,7 +540,8 @@ test('Lokalbetrieb: Laden und Planänderungen lösen keine externen Netzwerkanfr
   await setNumber(page, 'Versatz X', '5');
   await expect(page.locator('.canvas-frame')).toHaveAttribute('aria-busy', 'false');
   await expect(page.locator('.save-status')).toContainText('Lokal gespeichert');
-  await page.waitForLoadState('networkidle');
+  // Worker replacement can keep Chromium's network-idle counter open after rendering.
+  await page.evaluate(() => document.fonts.ready.then(() => undefined));
 
   const observed = networkRequests.get(page)!;
   expect(observed.length, 'Der Test muss die echten Ladeanfragen beobachten.').toBeGreaterThan(0);

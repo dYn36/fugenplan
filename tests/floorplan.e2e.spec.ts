@@ -406,7 +406,8 @@ test('PDF-Renderer, Worker, Schriften und Eingaben verwenden nur lokale Requests
   await openFloorPlan(page, 3); await calibrate(page, 3);
   await page.getByRole('button', { name: 'PDF vergrößern', exact: true }).click();
   await readyPdf(page, 3);
-  await page.waitForLoadState('networkidle');
+  // readyPdf checks rendered pixels; await fonts instead of disposed worker requests.
+  await page.evaluate(() => document.fonts.ready.then(() => undefined));
   const urls = requests.get(page)!;
   expect(urls.some(url => url.includes('pdf.worker'))).toBe(true);
   const external = urls.filter(url => /^(https?|wss?):/.test(url)).filter(url => new URL(url).host !== new URL(page.url()).host);
