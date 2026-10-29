@@ -6,7 +6,7 @@ Stand: 29. Oktober 2026. Die Sichtbarkeit des GitHub-Repositorys bleibt privat. 
 
 - Gitleaks hat die gesamte vorhandene Git-Historie geprüft, nicht nur den aktuellen Stand. Die Prüfung meldete keine Zugangsdaten.
 - Die versionierten Textdateien und historischen Textobjekte wurden auf persönliche Dateipfade, private Grundrissnamen und die im Arbeitskontext bekannten privaten Angaben geprüft. Es gab keine Treffer.
-- Die 92 versionierten Bilder wurden als Kontaktbögen gesichtet. Sie zeigen Beispielräume und synthetische Grundrisse. Die einzige versionierte PDF wird aus `tests/fixtures/create-floorplan-fixture.mjs` erzeugt. Die Historie enthält keine inzwischen entfernten PDF- oder Bildpfade.
+- Die 92 versionierten Bilder und zwölf ältere Bildfassungen aus der Historie wurden als Kontaktbögen gesichtet. Bei der älteren GIF-Fassung wurden Anfang, Mitte und Ende geprüft. Die Bilder zeigen Beispielräume und synthetische Grundrisse. Die einzige versionierte PDF wird aus `tests/fixtures/create-floorplan-fixture.mjs` erzeugt; auch die Historie enthält nur diesen PDF-Inhalt. Die Historie enthält keine inzwischen entfernten PDF- oder Bildpfade.
 - Git-Commits verwenden die GitHub-Noreply-Adresse des Repository-Eigentümers.
 - Persönliche Projektdateien, PDFs, lokale Diagnoseberichte, `.env`-Dateien und `.netlify/` sind ausgeschlossen. Die lokalen Wiederherstellungsdateien sind nicht Teil des Repositorys und nicht Teil von `dist/`.
 - README, Anleitung, Sicherheitsregeln, Hinweise zur Mitarbeit und ein Fehlerformular sind vorhanden. Dependabot prüft npm und GitHub Actions.

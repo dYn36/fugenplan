@@ -6,6 +6,8 @@ Die Webanwendung ist unter [fugenplan.netlify.app](https://fugenplan.netlify.app
 
 `netlify.toml` legt Node.js 24, `npm run check`, den Ausgabeordner und die HTTP-Header fest. `scripts/netlify-ignore.mjs` verhindert automatische Produktionsbuilds bei Git-Pushes. Ohne Vergleichsstand wird eine Vorschau gebaut. Reine Dokumentationsänderungen lösen keinen Netlify-Build aus.
 
+Das private GitHub-Repository `dYn36/fugenplan` ist mit Netlify verbunden. `main` ist der Produktionsbranch; `netlify-preview` ist für Branch-Deploys freigegeben. Änderungen an der Anwendung auf diesem Vorschau-Branch werden gebaut. Reine Teständerungen prüft GitHub, ohne den unveränderten Web-Build erneut zu veröffentlichen.
+
 Der Produktionsschutz ist absichtlich strenger als die Dateiprüfung: Auch ein geänderter Anwendungscode auf `main` veröffentlicht noch keine neue Version. Ein ausdrücklicher CLI-Deploy oder die Veröffentlichung eines geprüften Deploys im Netlify-Dashboard ist erforderlich.
 
 Für einen neuen Rechner:
@@ -57,6 +59,10 @@ Bei Netlifys Credit-Tarifen kostet ein erfolgreicher Produktions-Deploy derzeit 
 Prüfe in Netlify den fehlgeschlagenen Deploy und dessen Build-Log. Korrigiere den Fehler zuerst in einer Vorschau. Veröffentliche keine Folge von Produktionsversionen zum Ausprobieren.
 
 Ein zuvor funktionierender Produktions-Deploy lässt sich im Dashboard wieder veröffentlichen. Netlify beschreibt diese Rückkehr als kostenfrei. Lokale Projektdaten gehören weiterhin zum Browser und zur Webadresse; ein Deployment setzt sie nicht zurück.
+
+Der Codex-Auftrag „Fugenplan-Builds prüfen“ prüft stündlich neue Netlify-Builds und GitHub-Ergebnisse. Belegte Fehler werden zuerst in einer Vorschau korrigiert. Die absichtliche Meldung „Canceled build due to no content change“ gilt dabei als übersprungener Build. Die Automatisierung läuft über die Codex-App und gehört nicht zum Netlify-Build.
+
+Beim ersten Verbinden des Repositorys wurde ein Produktionsbuild ausgelöst. Die nachfolgenden Git-Pushes wurden durch den Schutzbefehl beendet. Ein manuell gestarteter Build oder Build-Hook kann die normale Änderungserkennung umgehen; die [Netlify-Dokumentation zum Überspringen von Builds](https://docs.netlify.com/build/configure-builds/ignore-builds/) beschreibt diese Grenzen. Solche Auslöser nicht für Probeänderungen verwenden.
 
 ## Daten und Schutzregeln
 
