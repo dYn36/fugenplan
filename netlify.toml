@@ -1,0 +1,45 @@
+[build]
+  command = "npm run check"
+  publish = "dist"
+  ignore = "node scripts/netlify-ignore.mjs"
+
+[build.environment]
+  NODE_VERSION = "24"
+  NPM_FLAGS = "--no-audit --no-fund"
+
+# Production is released explicitly from a tested build. Git pushes create previews.
+[context.production]
+  ignore = "node scripts/netlify-ignore.mjs"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Safari needs style attributes for numeric zoom/pan sizes. Scripts and style elements remain restricted.
+    Content-Security-Policy = "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' blob:; connect-src 'self'; worker-src 'self'; form-action 'none'; upgrade-insecure-requests"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "no-referrer"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+
+[[headers]]
+  for = "/"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/pdfjs/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# There is no URL router. Unknown files must return 404, including missing workers.

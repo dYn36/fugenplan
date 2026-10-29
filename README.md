@@ -4,11 +4,9 @@
 
 # Fugenplan
 
-### Erst planen. Dann verlegen.
+Verlegepläne für Fliesen und Dielen.
 
-**Dein Raum. Dein Muster. Jede Fliese im Blick.**
-
-Plane Fliesen und Dielen direkt im Browser. Übernimm deinen PDF-Grundriss,<br>probiere Verlegemuster aus und prüfe die Zuschnitte vor dem ersten Schnitt.
+Lade deinen PDF-Grundriss, markiere die Räume und vergleiche die Verlegung.<br>Du siehst, welche Stücke an den Wänden übrig bleiben und wie viel Material du brauchst.
 
 <a href="screenshots/demo-pdf.gif">
   <picture>
@@ -27,13 +25,13 @@ Demo mit einem synthetischen Beispielgrundriss. [Standbild ansehen](screenshots/
   <a href="#selbst-hosten"><img src="https://img.shields.io/badge/Hosting-statisch-245d4a?style=flat-square&amp;labelColor=20382e" alt="Hosting: statisch"></a>
 </p>
 
-**[Jetzt starten](#schnell-starten)** · **[PDF-Anleitung](#vom-grundriss-zum-verlegeplan)** · **[Funktionen entdecken](#dein-boden-bevor-er-liegt)** · **[Anleitung lesen](docs/ANLEITUNG.md)**
+[Im Browser ausprobieren](https://fugenplan.netlify.app) · [PDF-Anleitung](#vom-grundriss-zum-verlegeplan) · [Funktionen entdecken](#dein-boden-bevor-er-liegt) · [Anleitung lesen](docs/ANLEITUNG.md)
 
 | Bis zu 20 Projekte | Bis zu 50 Etagen je Projekt | Bis zu 50 Räume je Etage |
 | :---: | :---: | :---: |
 | Getrennte Planungen | Eigene Grundrisse und Maßstäbe | Gemeinsam im Etagenplan |
 
-**Ohne Konto. Ohne Backend. Deine Grundrisse bleiben in deinem Browser.**
+Du brauchst kein Konto. Die Planung und die PDF-Verarbeitung laufen auf deinem Gerät.
 
 </div>
 
@@ -41,23 +39,26 @@ Demo mit einem synthetischen Beispielgrundriss. [Standbild ansehen](screenshots/
 
 ## Dein Boden, bevor er liegt
 
-Passt eine ganze Fliese an die Tür? Wie schmal wird der Streifen an der Wand? Wo soll die erste Reihe beginnen?
+Eine schmale Fliese an der Tür fällt im Plan auf, bevor du sie schneidest. Ändere das Format, verschiebe den Verband oder wähle einen anderen Startpunkt. Fugenplan berechnet die Zuschnitte und Mengen neu. Verschiedene Aufteilungen kannst du als Varianten speichern und später wieder öffnen.
 
-**Fugenplan macht diese Entscheidungen sichtbar.** Ändere das Format, verschiebe den Verband oder wähle einen anderen Startpunkt. Der Plan berechnet Zuschnitte und Mengen neu. Speichere verschiedene Aufteilungen und entscheide, welche zu deinem Raum passt.
-
-| Deine Entscheidung | Das zeigt dir Fugenplan |
+| Funktion | Was du damit planen kannst |
 | --- | --- |
-| **Wie sieht mein Raum aus?** | Rechteck, L-Form oder freie Kontur. Rechteckige Hindernisse wie Säulen bleiben frei. |
-| **Wie passen meine Räume zusammen?** | Gemeinsame Etagenzeichnung mit den tatsächlichen PDF-Positionen. Projekte, Etagen und Räume getrennt verwalten. |
-| **Welches Muster passt?** | Sieben Verlegemuster mit eigenen Produktmaßen, Fugen, Randabständen und Drehung. |
-| **Wo fange ich an?** | Eine Ecke oder Wandmitte direkt im Plan wählen. Die Startfliese bleibt markiert. |
-| **Was muss ich schneiden?** | Zuschnitte hervorheben. Einzelne Schnittkonturen, Kantenlängen und Hüllmaße prüfen. |
-| **Wie viel Material brauche ich?** | Ganze Elemente, Zuschnitte und Verschnitt sehen. Reserve ergänzen und Pakete aufrunden. |
-| **Welche Aufteilung gefällt mir?** | Bis zu zwölf Varianten merken. Änderungen rückgängig machen und wiederholen. |
+| PDF-Grundriss | Eine bekannte Wandlänge legt den Maßstab fest. Markierte Räume erscheinen mit ihrem Verlegeplan an der richtigen Position. |
+| Raumkontur | Rechteck, L-Form oder freie Kontur. Rechteckige Hindernisse wie Säulen bleiben frei. |
+| Gebäudeübersicht | Gemeinsame Etagenzeichnung mit den tatsächlichen PDF-Positionen. Projekte, Etagen und Räume getrennt verwalten. |
+| Verlegemuster | Sieben Verlegemuster mit eigenen Produktmaßen, Fugen, Randabständen und Drehung. |
+| Startpunkt | Eine Ecke oder Wandmitte direkt im Plan wählen. Die Startfliese bleibt markiert. |
+| Zuschnitte | Zuschnitte hervorheben. Einzelne Schnittkonturen, Kantenlängen und Hüllmaße prüfen. |
+| Materialbedarf | Ganze Elemente, Zuschnitte und Verschnitt sehen. Reserve ergänzen und Pakete aufrunden. |
+| Varianten | Bis zu zwölf Varianten merken. Änderungen rückgängig machen und wiederholen. |
 
 ## Schnell starten
 
-**Git und Node.js 24 mit npm installieren. Dann diese vier Befehle ausführen:**
+Öffne [fugenplan.netlify.app](https://fugenplan.netlify.app). Lege ein Projekt und eine Etage an. Danach kannst du einen PDF-Grundriss laden oder die Raummaße eingeben.
+
+Wenn du bereits lokal geplant hast, exportiere dein Projekt dort als Datei und öffne diese auf der Netlify-Seite. Beide Webadressen haben getrennte Browserspeicher.
+
+Für den Betrieb auf deinem Rechner brauchst du Git und Node.js 24 mit npm:
 
 ```sh
 git clone https://github.com/dYn36/fugenplan.git
@@ -66,20 +67,19 @@ npm ci
 npm start
 ```
 
-Der Browser öffnet **[Fugenplan auf deinem Rechner](http://127.0.0.1:5173)**. Lass das Terminal während der Nutzung geöffnet. Mit `Strg+C` beendest du den Server.
+Der Browser öffnet [Fugenplan auf deinem Rechner](http://127.0.0.1:5173). Lass das Terminal während der Nutzung geöffnet. Mit `Strg+C` beendest du den Server.
 
-**Dein erster Plan:** Projekt anlegen → Etage anlegen → Raum hinzufügen → Raummaße eingeben → Belag festlegen → Muster und Start wählen → Zuschnitte prüfen. Die Formatvorgaben enthalten auch **12 × 30 cm**.
+Für einen manuell erfassten Raum: „Raum hinzufügen“ wählen, Maße eingeben, Belag und Startpunkt festlegen. Die Formatvorgaben enthalten auch 12 × 30 cm.
 
-> [!NOTE]
-> Das Repository ist derzeit privat. Zum Klonen brauchst du Zugriff und eine eingerichtete GitHub-Anmeldung. Mehr dazu steht unter [Projektstatus](#projektstatus-und-lizenz).
+Solange das Repository privat ist, brauchst du zum Klonen Zugriff und eine GitHub-Anmeldung. Die Webanwendung ist davon unabhängig erreichbar. Hinweise zur Nutzung des Quellcodes stehen unter [Lizenz](#projektstatus-und-lizenz).
 
 <details>
 <summary><strong>macOS, Windows, Linux und weitere Hinweise zum Start</strong></summary>
 
-- **macOS:** Nach der Installation kannst du auch [`Starten.command`](Starten.command) doppelt anklicken.
-- **Windows und Linux:** Nutze die Befehle oben im Terminal.
-- **Mit nvm:** Führe vor `npm ci` einmal `nvm install` und `nvm use` aus. [`.nvmrc`](.nvmrc) wählt Node.js 24.
-- **Andere Node-Versionen:** Die unterstützten Versionen stehen in [`package.json`](package.json).
+- macOS: Nach der Installation kannst du auch [`Starten.command`](Starten.command) doppelt anklicken.
+- Windows und Linux: Nutze die Befehle oben im Terminal.
+- Mit nvm: Führe vor `npm ci` einmal `nvm install` und `nvm use` aus. [`.nvmrc`](.nvmrc) wählt Node.js 24.
+- Andere Node-Versionen: Die unterstützten Versionen stehen in [`package.json`](package.json).
 
 Die Anwendung braucht keine API-Schlüssel, keine `.env`-Datei und keine Datenbank. Die erste Installation lädt Pakete aus npm. Danach arbeitet die lokal installierte Anwendung auch ohne Internetverbindung. Schriften, Symbole und PDF-Decoder werden lokal bereitgestellt.
 
@@ -87,7 +87,7 @@ Die Anwendung braucht keine API-Schlüssel, keine `.env`-Datei und keine Datenba
 
 ## Dein Gebäude im Zusammenhang
 
-**Projekte → Etagen → Räume.** Lege mehrere Planungen an und wechsle zwischen Erdgeschoss, Obergeschoss und weiteren Etagen. Die Übersicht zeigt PDF-Räume dort, wo sie im Grundriss liegen, mit ihren jeweiligen Verlegeplänen.
+Lege mehrere Projekte mit eigenen Etagen und Räumen an. Du kannst zwischen Erdgeschoss, Obergeschoss und weiteren Etagen wechseln. Die Übersicht zeigt PDF-Räume dort, wo sie im Grundriss liegen, mit ihren jeweiligen Verlegeplänen.
 
 ![Erdgeschoss mit zwei Verlegeplänen an ihren PDF-Positionen und direkter Auswahl des Obergeschosses.](screenshots/hierarchy/etagenprojekt-desktop.jpg)
 
@@ -95,29 +95,29 @@ Jede Etage hat einen eigenen Grundriss und Maßstab. Verwende verschiedene PDFs 
 
 ## Vom Grundriss zum Verlegeplan
 
-**Dein vorhandener Grundriss wird zur Grundlage deiner Planung.** Der Assistent führt dich durch vier Schritte: PDF und Seite wählen, Maßstab festlegen, Raum markieren und Ergebnis prüfen.
+Der Assistent führt dich durch vier Schritte: PDF und Seite wählen, Maßstab festlegen, Raum markieren und Ergebnis prüfen.
 
 <a href="screenshots/readme/grundriss-assistent.jpg">
   <img src="screenshots/readme/grundriss-assistent.jpg" alt="PDF-Assistent im Schritt Räume prüfen: Die Räume Wohnen und Essen sind markiert. Die bekannte Wandlänge beträgt 480 cm." width="1280" loading="lazy">
 </a>
 
-1. **Grundriss öffnen.** PDF auswählen, zur gewünschten Seite wechseln und „Seite verwenden“ wählen.
-2. **Eine Wand messen.** Die beiden Endpunkte markieren. Die bekannte Länge in Zentimetern eingeben, zum Beispiel `480` für 4,80 m.
-3. **Räume bestimmen.** Die inneren Raumecken der Reihe nach markieren und den Raum benennen.
-4. **Weitere Räume erfassen und gemeinsam ansehen.** Im Assistenten „Weiteren Raum markieren“ wählen. Die Etagenansicht zeigt die Verlegepläne an ihren Positionen im Grundriss. In jedem Raum Belag, Muster und Startposition festlegen.
-5. **Alles mitnehmen.** Die Projektdatei sichert alle Etagen, Räume, Maßstäbe und Original-PDFs zusammen.
+1. Grundriss öffnen. PDF auswählen, zur gewünschten Seite wechseln und „Seite verwenden“ wählen.
+2. Eine Wand messen. Die beiden Endpunkte markieren. Die bekannte Länge in Zentimetern eingeben, zum Beispiel `480` für 4,80 m.
+3. Räume bestimmen. Die inneren Raumecken der Reihe nach markieren und den Raum benennen.
+4. Weitere Räume erfassen und gemeinsam ansehen. Im Assistenten „Weiteren Raum markieren“ wählen. Die Etagenansicht zeigt die Verlegepläne an ihren Positionen im Grundriss. In jedem Raum Belag, Muster und Startposition festlegen.
+5. Alles mitnehmen. Die Projektdatei sichert alle Etagen, Räume, Maßstäbe und Original-PDFs zusammen.
 
-Vektor-PDFs und gescannte Vorlagen sind möglich. Jede Etage hat einen eigenen Maßstab und enthält bis zu **50 Räume**. Eine PDF darf bis zu **200 Seiten und 20 MiB** enthalten. Mehrere Etagen können verschiedene Seiten oder Dateien verwenden.
+Vektor-PDFs und gescannte Vorlagen sind möglich. Jede Etage hat einen eigenen Maßstab und enthält bis zu 50 Räume. Eine PDF darf bis zu 200 Seiten und 20 MiB enthalten. Mehrere Etagen können verschiedene Seiten oder Dateien verwenden.
 
 Die Räume werden manuell markiert. Der Maßstab muss in beiden Richtungen gleich sein. Prüfe nach der Übernahme ein zweites bekanntes Maß. Weitere Hinweise stehen in der [PDF-Anleitung](docs/ANLEITUNG.md#räume-aus-einer-pdf-übernehmen).
 
 ## Muster, Start und Zuschnitte
 
-### Sieben Muster. Dein eigenes Format.
+### Sieben Muster mit eigenen Produktmaßen
 
-Vom ruhigen Kreuzverband bis zum Fischgrät: Sieh, wie sich dein Belag im Raum verteilt. Stelle Länge, Breite, Fuge und Randabstand passend zum Produkt ein.
+Wähle ein Muster und prüfe seine Randstücke im Raum. Stelle Länge, Breite, Fuge und Randabstand passend zum Produkt ein.
 
-**Kreuzverband · Halbverband · Drittelverband · Viertelverband · Wilder Verband · Diagonalverband · Fischgrät**
+Kreuzverband · Halbverband · Drittelverband · Viertelverband · Wilder Verband · Diagonalverband · Fischgrät
 
 <details>
 <summary><strong>Musterwahl und Schnittkontur ansehen</strong></summary>
@@ -126,30 +126,30 @@ Vom ruhigen Kreuzverband bis zum Fischgrät: Sieh, wie sich dein Belag im Raum v
 
 </details>
 
-### Der Anfang verändert das Ergebnis.
+### Startfliese festlegen
 
-Wähle eine **Ecke oder Wandmitte direkt im Plan**. Fugenplan richtet das Raster dort aus und markiert das erste verlegbare Element. Mit dem Versatz passt du die Aufteilung weiter an. So kannst du die Randstücke an den anderen Wänden prüfen.
+Wähle eine Ecke oder Wandmitte direkt im Plan. Fugenplan richtet das Raster dort aus und markiert das erste verlegbare Element. Mit dem Versatz passt du die Aufteilung weiter an. So kannst du die Randstücke an den anderen Wänden prüfen.
 
 <a href="screenshots/readme/startwahl-desktop.jpg">
   <img src="screenshots/readme/startwahl-desktop.jpg" alt="Startwahl im Raum Wohnen mit der Raumliste Wohnen und Essen. Die vier Raumecken sind nummeriert. Ecke 3 unten rechts ist als Start gewählt." width="1280" loading="lazy">
 </a>
 
-### Schau dir den Schnitt an.
+### Schnittkonturen prüfen
 
-Ein Klick auf ein Element zeigt seine **Schnittkontur, Kantenlängen und Hüllmaße**. Die Materialübersicht zählt ganze und angeschnittene Elemente. Reserve und Paketzahl ergänzen deine Mengenplanung.
+Ein Klick auf ein Element zeigt seine Schnittkontur, Kantenlängen und Hüllmaße. Die Materialübersicht zählt ganze und angeschnittene Elemente. Reserve und Paketzahl ergänzen deine Mengenplanung.
 
-**Die Rechenregeln sind dokumentiert:** Jedes angeschnittene Element zählt als ein neues Ausgangsstück. Reststücke werden nicht automatisch an anderer Stelle verwendet. Details stehen unter [Mengen und Genauigkeit](#mengen-und-genauigkeit).
+Jedes angeschnittene Element zählt als ein neues Ausgangsstück. Reststücke werden nicht automatisch an anderer Stelle verwendet. Details stehen unter [Mengen und Genauigkeit](#mengen-und-genauigkeit).
 
 ## Dein Plan zum Mitnehmen
 
-Plane weiter, gib Maße weiter oder lege den Plan neben dein Material. Wähle die Ausgabe, die du dafür brauchst.
+Die Projektdatei enthält die gesamte Planung. Für den aktiven Raum gibt es außerdem diese Ausgaben:
 
 | Ausgabe | Dafür ist sie gedacht | Enthält |
 | --- | --- | --- |
-| **Projektdatei** | Sichern und später weiterarbeiten | Alle Etagen, Räume, Einstellungen, Maßstäbe und Original-PDFs |
-| **SVG** | Einen Plan als Vektorgrafik weiterverwenden | Den aktiven Raum in einem gewählten Maßstab |
-| **Druck / PDF** | Einen Plan ausdrucken oder als PDF speichern | Einen A4-Bericht zum aktiven Raum über den Browser-Druckdialog |
-| **CSV** | Die Elementliste in einer Tabelle öffnen | Hüllmaße, Flächen und Schnittkonturen des aktiven Raums |
+| Projektdatei | Sichern und später weiterarbeiten | Alle Etagen, Räume, Einstellungen, Maßstäbe und Original-PDFs |
+| SVG | Einen Plan als Vektorgrafik weiterverwenden | Den aktiven Raum in einem gewählten Maßstab |
+| Druck / PDF | Einen Plan ausdrucken oder als PDF speichern | Einen A4-Bericht zum aktiven Raum über den Browser-Druckdialog |
+| CSV | Die Elementliste in einer Tabelle öffnen | Hüllmaße, Flächen und Schnittkonturen des aktiven Raums |
 
 Separat gemerkte Varianten bleiben im Browser und sind nicht Teil der Projektdatei. Hinweise zum Druckmaßstab stehen in der [Anleitung](docs/ANLEITUNG.md#genauigkeit-und-mengen).
 
@@ -166,12 +166,12 @@ Die Oberfläche passt sich an die Bildschirmbreite an. Für große Grundrisse bi
 
 ## Daten unter deiner Kontrolle
 
-**Dein Grundriss wird auf deinem Gerät verarbeitet.** Die Anwendung benötigt keinen Server für Projektdaten und kein Benutzerkonto. Sie enthält keine Analyse- oder Werbedienste.
+Dein Grundriss wird auf deinem Gerät verarbeitet. Die Anwendung sendet keine Projektdaten an Netlify und enthält keine Analyse- oder Werbedienste. Der Hoster erhält die üblichen Anfragen zum Laden der Website.
 
-- **Lokal rechnen:** Geometrie und PDF-Verarbeitung laufen im Browser.
-- **Lokal speichern:** Räume und Varianten liegen im Browserspeicher. Original-PDFs liegen in IndexedDB.
-- **Selbst sichern:** Exportiere wichtige Stände als Projektdatei.
-- **Selbst betreiben:** Nutze den lokalen Server oder stelle den Build auf einem statischen Webhost bereit.
+- Lokal rechnen: Geometrie und PDF-Verarbeitung laufen im Browser.
+- Lokal speichern: Räume und Varianten liegen im Browserspeicher. Original-PDFs liegen in IndexedDB.
+- Selbst sichern: Exportiere wichtige Stände als Projektdatei.
+- Selbst betreiben: Nutze den lokalen Server oder stelle den Build auf einem statischen Webhost bereit.
 
 > [!IMPORTANT]
 > Der Browserspeicher gehört zu diesem Browser und dieser Webadresse. Ein anderer Browser oder eine andere Adresse hat einen eigenen Speicher. Das Löschen von Browserdaten entfernt auch die dort gespeicherten Pläne. Sichere wichtige Projekte als Datei.
@@ -185,7 +185,7 @@ Fugenplan hilft bei der Aufteilung und Mengenplanung. Die Ergebnisse hängen von
 <details>
 <summary><strong>Wie werden Materialbedarf und Verschnitt berechnet?</strong></summary>
 
-Jedes angeschnittene Element zählt als ein neues Ausgangsstück. Reststücke werden nicht automatisch für andere Stellen verwendet. Der Materialbedarf ist deshalb eine Berechnung **ohne Reststückoptimierung**.
+Jedes angeschnittene Element zählt als ein neues Ausgangsstück. Reststücke werden nicht automatisch für andere Stellen verwendet. Der Materialbedarf ist deshalb eine Berechnung ohne Reststückoptimierung.
 
 Verschnitt ist die nicht verlegte Fläche der gezählten Ausgangsstücke, geteilt durch deren volle Fläche. Reserve wird zusätzlich auf die Stückzahl aufgeschlagen. Pakete werden aufgerundet.
 
@@ -210,14 +210,14 @@ Alle Rechenregeln und Eingabegrenzen stehen in der [Bedienungsanleitung](docs/AN
 
 ## Selbst hosten
 
-**Ein statischer Build reicht.** Es gibt keinen Anwendungsserver und keine Datenbank einzurichten.
+Fugenplan besteht aus statischen Dateien. Ein Anwendungsserver und eine Datenbank sind nicht nötig.
 
 ```sh
 npm ci
 npm run build
 ```
 
-Stelle den Ordner **`dist/`** über einen statischen Webhost bereit. Für die PDF-Verarbeitung braucht die Anwendung **HTTPS oder localhost**. Web Worker benötigen einen Webserver; öffne `index.html` nicht direkt als Datei.
+Stelle den Ordner `dist/` über einen statischen Webhost bereit. Für die PDF-Verarbeitung braucht die Anwendung HTTPS oder localhost. Web Worker benötigen einen Webserver; öffne `index.html` nicht direkt als Datei.
 
 | Einstellung beim Hoster | Wert |
 | --- | --- |
@@ -227,11 +227,13 @@ Stelle den Ordner **`dist/`** über einen statischen Webhost bereit. Für die PD
 | Ausgabeordner | `dist` |
 | Umgebungsvariablen | Keine erforderlich |
 
-Auch bei gehostetem Betrieb bleiben die Projekte im jeweiligen Browser. Der Hosting-Dienst stellt die Anwendung bereit. Er synchronisiert keine Pläne.
+Die [Netlify-Konfiguration](netlify.toml) enthält Sicherheitsheader und Cache-Regeln. Git-Pushes veröffentlichen keine neue Produktionsversion. Prüfe Änderungen zuerst als Vorschau und veröffentliche danach den geprüften Build. Der Ablauf steht in [Deployment und Betrieb](docs/DEPLOYMENT.md).
+
+Auch bei gehostetem Betrieb bleiben die Projekte im jeweiligen Browser. Der Hosting-Dienst synchronisiert keine Pläne.
 
 ## Entwicklung
 
-**React · TypeScript · Vite · SVG · Web Worker · PDF.js**
+React · TypeScript · Vite · SVG · Web Worker · PDF.js
 
 React bildet die Oberfläche ab. SVG zeigt die Pläne. Web Worker berechnen die Verlegung. PDF.js verarbeitet Grundrisse; Clipper und polygon-clipping berechnen Konturen.
 
@@ -283,18 +285,8 @@ docs/            Bedienung, Rechenregeln und Prüfnachweise
 
 ## Projektstatus und Lizenz
 
-Fugenplan wird derzeit als **privates Projekt** geführt. Ob und unter welcher Lizenz der Code später öffentlich freigegeben wird, ist noch offen. Es ist noch keine Open-Source-Lizenz festgelegt.
+Für den eigenen Quellcode ist noch keine Open-Source-Lizenz festgelegt. Eine öffentliche GitHub-Sichtbarkeit allein würde diese Lizenzfrage nicht klären.
 
-`private: true` verhindert eine versehentliche Veröffentlichung des npm-Pakets. Es steuert nicht die Sichtbarkeit des GitHub-Repositorys. Abhängigkeiten behalten ihre jeweiligen Lizenzen.
+Hinweise zur Mitarbeit stehen in [CONTRIBUTING.md](CONTRIBUTING.md). Die [Prüfung vor öffentlicher Freigabe](docs/OEFFENTLICHE-FREIGABE.md) beschreibt den geprüften Stand und die verbleibende Lizenzentscheidung.
 
----
-
-<div align="center">
-
-### Dein nächster Boden beginnt mit einem Plan.
-
-**[Fugenplan starten](#schnell-starten)** · [Bedienungsanleitung](docs/ANLEITUNG.md) · [Zurück nach oben](#fugenplan)
-
-*Erst planen. Dann verlegen.*
-
-</div>
+`private: true` verhindert eine versehentliche Veröffentlichung des npm-Pakets. Es steuert nicht die Sichtbarkeit des GitHub-Repositorys. Abhängigkeiten behalten ihre jeweiligen Lizenzen; siehe [Drittanbieter](THIRD_PARTY_NOTICES.md).

@@ -20,7 +20,8 @@
     "predev": "node scripts/copy-pdf-assets.mjs",
     "prestart": "node scripts/copy-pdf-assets.mjs",
     "prebuild": "node scripts/copy-pdf-assets.mjs",
-    "postinstall": "node scripts/copy-pdf-assets.mjs"
+    "postinstall": "node scripts/copy-pdf-assets.mjs",
+    "test:hosting": "playwright test -c playwright.hosting.config.ts"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "^5.3.0",

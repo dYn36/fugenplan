@@ -2,7 +2,7 @@ name: Tests und Build
 
 on:
   push:
-    branches: [main]
+    branches: [main, netlify-preview]
   pull_request:
 
 permissions:
@@ -28,10 +28,12 @@ jobs:
           cache: npm
       - name: Abhängigkeiten installieren
         run: npm ci
+      - name: Bekannte Schwachstellen prüfen
+        run: npm audit --audit-level=moderate
       - name: Tests und Produktionsbuild
         run: npm run check
-  pdf-storage:
-    name: PDF-Speicherung nach Browser-Neustart
+  browser:
+    name: Browserabläufe und PDF-Speicherung
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -50,12 +52,12 @@ jobs:
         run: npx playwright install --with-deps chromium webkit
       - name: Produktionsbuild
         run: npm run build
-      - name: PDF-Speicherung in beiden Browsern prüfen
-        run: npm run test:e2e:all -- tests/pdf-storage.e2e.spec.ts
+      - name: Alle Abläufe in Chromium und WebKit prüfen
+        run: npm run test:e2e:all
       - name: Browserbericht sichern
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: pdf-speicher-pruefung
+          name: browser-pruefung
           path: test-results/
           retention-days: 14

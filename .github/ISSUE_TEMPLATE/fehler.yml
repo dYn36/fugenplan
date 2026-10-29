@@ -1,0 +1,24 @@
+name: Fehler melden
+description: Einen reproduzierbaren Fehler beschreiben
+body:
+  - type: markdown
+    attributes:
+      value: "Bitte keine privaten Grundrisse, Projektdateien oder Zugangsdaten anhängen. Für Sicherheitsprobleme zuerst SECURITY.md lesen."
+  - type: textarea
+    id: steps
+    attributes:
+      label: Schritte und Ergebnis
+      description: Wie lässt sich der Fehler mit einem neuen Beispielprojekt auslösen? Was hast du erwartet, was ist passiert?
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser und Gerät
+      placeholder: "Zum Beispiel Edge unter Windows, Version …"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Verwendete Version oder Webadresse

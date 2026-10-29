@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowCounterClockwise, ArrowClockwise, ArrowDown, CheckCircle, DownloadSimple, FloppyDisk, FolderOpen, Info, Plus, Printer, SquaresFour, Stack, Trash, X, WarningCircle, Ruler, Scissors, Crosshair, FileArrowDown, CaretRight, Buildings, CaretDown } from '@phosphor-icons/react';
 import type { LayoutStart, Point, Project, SavedVariant } from './types';
 import type { ProjectLibrary as Library, Workspace } from './floorplan-types';
 import Controls from './components/Controls';
-import FloorPlanEditor from './components/FloorPlanEditor';
 import ProjectOverview from './components/ProjectOverview';
 import ProjectLibrary, { ProjectNavigator } from './components/ProjectLibrary';
 import PlanCanvas, { FloorDrawing } from './components/PlanCanvas';
@@ -20,6 +19,8 @@ import { getPdf, putPdf } from './lib/pdf-storage';
 import { addBuilding, addFloor, createLibrary, currentBuilding, currentFloor, insertBuilding, LIBRARY_KEY, loadLibrary, moveRoomToFloor, parseLibrary, removeBuilding, removeFloor, renameBuilding, renameFloor, replaceCurrentWorkspace, selectBuilding, selectFloor } from './lib/library';
 import { MAX_BUILDING_BYTES, MAX_EMBEDDED_PDF_BYTES, readBuildingFile, writeBuildingFile } from './lib/library-file';
 import { mergeLibraryConflict, sameLibraryContents } from './lib/library-conflict';
+
+const FloorPlanEditor = lazy(() => import('./components/FloorPlanEditor'));
 
 type ViewMode = 'library' | 'project' | 'plan' | 'floorplan' | 'variants';
 type EntityAction = { kind: 'create-project' | 'edit-project' | 'create-floor' | 'edit-floor' | 'choose-floor' | 'move-room' | 'page-floor'; id?: string; page?: number };
@@ -433,7 +434,7 @@ export default function App() {
           <div className="workspace-heading"><div><h1>{mode==='project'?floor.name:mode==='floorplan'?'Grundriss erfassen':project.name||'Mein Raum'}</h1></div>
             <nav className="view-tabs" aria-label="Ansicht"><button aria-pressed={mode==='project'} className={mode==='project'?'active':''} onClick={()=>switchView('project')}><SquaresFour size={16}/>Etage</button><button disabled={!activeRoom.id} aria-pressed={mode==='plan'} className={mode==='plan'?'active':''} onClick={()=>switchView('plan')}>Raumplan</button><button aria-pressed={mode==='floorplan'} className={mode==='floorplan'?'active':''} onClick={()=>switchView('floorplan')}><FolderOpen size={16}/>Grundriss</button><button disabled={!activeRoom.id} aria-pressed={mode==='variants'} className={mode==='variants'?'active':''} onClick={()=>switchView('variants')}><Stack size={16}/>Varianten{variants.length>0&&<span className="tab-count">{variants.length}</span>}</button></nav>
           </div>
-          {mode==='project'?<ProjectOverview workspace={workspace} floorName={floor.name} pdfBytes={pdfBytes} onOpenRoom={openRoom} onAddRoom={addRoom} onRemoveRoom={askRemoveRoom} onFloorPlan={()=>switchView('floorplan')} onPlaceRoom={placeRoom} showCuts={showCuts} onToggleCuts={()=>setShowCuts(value=>!value)}/>:mode==='floorplan'?<FloorPlanEditor key={`${floor.id}-${editorEpoch}`} document={workspace.floorPlan} pdfBytes={pdfBytes} rooms={workspace.rooms} activeRoomId={workspace.activeRoomId} busy={pdfBusy} onDraftChange={setPdfDraftDirty} onShowProject={()=>switchView('project')}
+          {mode==='project'?<ProjectOverview workspace={workspace} floorName={floor.name} pdfBytes={pdfBytes} onOpenRoom={openRoom} onAddRoom={addRoom} onRemoveRoom={askRemoveRoom} onFloorPlan={()=>switchView('floorplan')} onPlaceRoom={placeRoom} showCuts={showCuts} onToggleCuts={()=>setShowCuts(value=>!value)}/>:mode==='floorplan'?<Suspense fallback={<p role="status">Grundriss-Werkzeug wird geladen …</p>}><FloorPlanEditor key={`${floor.id}-${editorEpoch}`} document={workspace.floorPlan} pdfBytes={pdfBytes} rooms={workspace.rooms} activeRoomId={workspace.activeRoomId} busy={pdfBusy} onDraftChange={setPdfDraftDirty} onShowProject={()=>switchView('project')}
             onImport={importPdf} onPageChange={changePdfPage}
             onCalibrate={calibration=>{commit(calibratePage(workspace,calibration));setNotice('Maßstab gespeichert. Die Räume auf dieser Seite wurden angepasst.');}}
             onAddRoom={(name,points,replaceExample)=>{
@@ -442,7 +443,7 @@ export default function App() {
               if(replaceExample&&workspace.rooms.length===1&&!example.source&&isUnchangedExampleProject(example.project))next=removeRoom(next,example.id);
               commit(next);setDrawing(false);setNotice('Raum übernommen. Du kannst weitere Räume markieren oder den Verlegeplan prüfen.');
             }}
-            onOpenRoom={openRoom} onRemoveRoom={deleteRoom}/>:mode==='plan'?<>
+            onOpenRoom={openRoom} onRemoveRoom={deleteRoom}/></Suspense>:mode==='plan'?<>
             <button className="button mobile-settings-link" onClick={()=>document.getElementById('room-settings')?.focus()}>Raum und Belag einstellen</button>
             <div className="plan-toolbar">
               <span className="pattern-description">{PATTERN_NAMES[displayProject.layout.pattern]}<span>·</span>{formatNumber(displayProject.material.width/10)} × {formatNumber(displayProject.material.height/10)} cm</span>

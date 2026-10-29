@@ -1,5 +1,6 @@
 import type { PDFDocumentLoadingTask, PDFDocumentProxy } from 'pdfjs-dist';
 import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import { version as pdfVersion } from 'pdfjs-dist/package.json';
 import type { FloorPlanDocument, FloorPlanPage } from '../floorplan-types';
 
 export const MAX_PDF_BYTES = 20 * 1024 * 1024;
@@ -27,7 +28,7 @@ function pdfError(error: unknown): Error {
 }
 
 function assetUrl(folder: string): string {
-  return new URL(`${import.meta.env.BASE_URL}pdfjs/${folder}/`, document.baseURI).href;
+  return new URL(`${import.meta.env.BASE_URL}pdfjs/${pdfVersion}/${folder}/`, document.baseURI).href;
 }
 
 /** The caller must call pdf.loadingTask.destroy() when its preview is no longer needed. */

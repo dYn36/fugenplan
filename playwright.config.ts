@@ -6,6 +6,7 @@ const resultsDir = process.env.PLAYWRIGHT_RESULTS_DIR || 'test-results';
 export default defineConfig({
   testDir: './tests',
   testMatch: '**/*.spec.ts',
+  testIgnore: '**/hosting.e2e.spec.ts',
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: 0,
