@@ -41,8 +41,9 @@ Die vollständige Browsersammlung umfasst PDF-Import, Maßstab, mehrere Etagen u
 2. WebKit blockierte berechnete Style-Attribute für Größen und Positionen. Die CSP erlaubt diese Attribute gezielt. Inline-Skripte und Inline-Stylesheets bleiben gesperrt. Die Ausnahme und ihre spätere Prüfung sind in [Deployment und Betrieb](DEPLOYMENT.md) beschrieben.
 3. Ein Zeichentest las direkt nach dem Wechsel zu „Frei“ noch den vorherigen gespeicherten Modus. Er wartet jetzt auf den tatsächlichen Speicherinhalt, bevor er den Zustand für den Abbruchvergleich erfasst.
 4. Zwei Netztests warteten trotz fertiger Darstellung auf `networkidle`. Die Traces zeigten einen noch offenen Eintrag für einen ersetzten Geometrie-Worker. Die Tests prüfen jetzt den berechneten Plan bzw. echte PDF-Pixel und warten auf die Schriften. Die Prüfung aller beobachteten Zieladressen bleibt bestehen. Dies entspricht der [Playwright-Empfehlung für Bereitschaftsprüfungen](https://playwright.dev/docs/api/class-page#page-wait-for-load-state).
+5. Der Linux-Lauf zeigte denselben verfrühten Speicherzugriff beim Raumnamen, beim Paketinhalt und beim Startpunkt einer Variante. Die Tests warten nun auf diese konkreten Werte, bevor sie den Vergleichsstand erfassen oder eine ungültige Folgeeingabe prüfen. Chromium und WebKit laufen in GitHub als getrennte Jobs mit jeweils allen 72 Fällen.
 
-Die letzten beiden Punkte waren Fehler in den Test-Wartebedingungen. Es wurden keine Wiederholungsversuche oder übersprungenen Fälle eingerichtet, um fehlgeschlagene Prüfungen zu verdecken.
+Die Punkte 3 bis 5 waren Fehler in den Test-Wartebedingungen. Es wurden keine Wiederholungsversuche oder übersprungenen Fälle eingerichtet, um fehlgeschlagene Prüfungen zu verdecken.
 
 ## Sicherheitsprüfung und Repository
 
@@ -62,4 +63,4 @@ React und Geometriebibliotheken liegen in getrennten Dateien. Der Hauptblock san
 
 Die stündliche Build-Prüfung in Codex ist eingerichtet. Git-Pushes veröffentlichen keine neue Produktion. Die genaue Bedienung, der Umgang mit übersprungenen Builds und die getrennten Browserspeicher für lokale und gehostete Nutzung stehen in [DEPLOYMENT.md](DEPLOYMENT.md).
 
-Lokale Rohberichte liegen unter `test-results/public-release/` und bleiben aus Git ausgeschlossen. Die GitHub-Prüfung bewahrt Browserberichte als Artefakt `browser-pruefung` auf. Alle Browserfälle verwenden synthetische Daten und getrennte Testprofile.
+Lokale Rohberichte liegen unter `test-results/public-release/` und bleiben aus Git ausgeschlossen. Die GitHub-Prüfung bewahrt Browserberichte als `browser-pruefung-chromium` und `browser-pruefung-webkit` auf. Alle Browserfälle verwenden synthetische Daten und getrennte Testprofile.

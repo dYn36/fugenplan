@@ -33,9 +33,13 @@ jobs:
       - name: Tests und Produktionsbuild
         run: npm run check
   browser:
-    name: Browserabläufe und PDF-Speicherung
+    name: Browserabläufe und PDF-Speicherung (${{ matrix.browser }})
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, webkit]
     steps:
       - name: Quellcode auschecken
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -48,16 +52,16 @@ jobs:
           cache: npm
       - name: Abhängigkeiten installieren
         run: npm ci
-      - name: Chromium und WebKit bereitstellen
-        run: npx playwright install --with-deps chromium webkit
+      - name: Browser bereitstellen
+        run: npx playwright install --with-deps ${{ matrix.browser }}
       - name: Produktionsbuild
         run: npm run build
-      - name: Alle Abläufe in Chromium und WebKit prüfen
-        run: npm run test:e2e:all
+      - name: Alle Abläufe prüfen
+        run: npm run test:e2e:all -- --project=${{ matrix.browser }}
       - name: Browserbericht sichern
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: browser-pruefung
+          name: browser-pruefung-${{ matrix.browser }}
           path: test-results/
           retention-days: 14

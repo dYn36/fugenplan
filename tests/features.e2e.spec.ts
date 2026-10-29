@@ -55,6 +55,7 @@ test.beforeEach(async ({ page, browser }, testInfo) => {
   await createFloor(page, 'Erdgeschoss');
   await page.getByRole('button', { name: 'Raum hinzufügen', exact: true }).click();
   await setField(page, 'Raumname', 'Prüfraum');
+  await expect.poll(async () => (await storedRoom(page)).name).toBe('Prüfraum');
   await ready(page);
 });
 test.afterEach(({ page }) => expect(errors.get(page), 'Keine unbehandelten Browserfehler').toEqual([]));
@@ -112,6 +113,7 @@ test('Reserve, Paketinhalt und Warnschwelle ergeben nachvollziehbare Mengen und 
   await number(page, 'Stück je Paket', '5');
   // Neun ganze Elemente; ceil(9 * 1,25) = 12, ceil(12 / 5) = 3.
   await expect(page.locator('.plan-footnotes')).toContainText('12 Elemente inkl. 25 % Reserve · 3 Pakete à 5 Stück');
+  await expect.poll(async () => (await storedRoom(page)).material.piecesPerPack).toBe(5);
   const packages = page.getByRole('textbox', { name: 'Stück je Paket', exact: true });
   await packages.fill('2,5');
   await packages.press('Enter');
@@ -364,6 +366,7 @@ test('Varianten übernehmen den vollständigen Stand, schützen den Zielraum und
   await panel(page, 'Schiefer');
   await pick(page);
   await plan(page).getByRole('button', { name: /^Ecke 3:/ }).press('Enter');
+  await expect.poll(async () => (await storedRoom(page)).layout.start).toEqual({ kind: 'corner', index: 2 });
   const saved = await storedRoom(page);
   await panel(page, 'Variante merken');
   await page.getByRole('textbox', { name: 'Name der Variante' }).fill('Stand A');
