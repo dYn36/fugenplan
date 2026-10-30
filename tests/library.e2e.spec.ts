@@ -191,7 +191,7 @@ test('PDF-Räume stehen in einer gemeinsamen Zeichnung; zweite Etage und Export 
 });
 
 for (const missingOriginal of [false, true]) {
-  test(`Neue Etage erhält eine eigene PDF bei ${missingOriginal ? 'fehlender' : 'vorhandener'} Original-PDF der ersten Etage`, async ({ page }) => {
+  test(`Neue Etage erhält eine eigene PDF bei ${missingOriginal ? 'fehlender' : 'vorhandener'} Original-PDF der ersten Etage`, { tag: '@smoke' }, async ({ page }) => {
     test.setTimeout(90_000);
     await createProject(page, 'Getrennte Grundrisse');
     await createFloor(page, 'Erdgeschoss');

@@ -99,7 +99,7 @@ test.afterEach(async ({ page }) => {
   expect(runtimeErrors.get(page), 'Keine unbehandelten JavaScript-Fehler').toEqual([]);
 });
 
-test('Maße, Dezimalkomma, Fugen und Randabstand stimmen im gezeichneten Plan', async ({ page }) => {
+test('Maße, Dezimalkomma, Fugen und Randabstand stimmen im gezeichneten Plan', { tag: '@smoke' }, async ({ page }) => {
   await configureExactGrid(page);
   const boxes = await pieceBoxes(page);
   expect([...new Set(boxes.map(box => box.x))].sort((a, b) => a - b)).toEqual([3, 404, 805]);
@@ -313,7 +313,7 @@ test('Varianten lassen sich speichern, laden und getrennt vom aktuellen Plan lö
   await expect(page.getByRole('textbox', { name: 'Breite', exact: true })).toHaveValue('360');
 });
 
-test('Projektdatei lädt denselben Plan; eine defekte Datei erhält den aktuellen Stand', async ({ page }) => {
+test('Projektdatei lädt denselben Plan; eine defekte Datei erhält den aktuellen Stand', { tag: '@smoke' }, async ({ page }) => {
   await setNumber(page, 'Breite', '333,3');
   const projectName = page.getByRole('textbox', { name: 'Raumname', exact: true });
   await projectName.fill('Küche & Flur');

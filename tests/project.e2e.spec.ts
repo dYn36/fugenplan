@@ -231,7 +231,7 @@ test('PDF ersetzen erklärt den Verlust der Zuordnung und erhält die Raumpläne
   expect(after.floorPlan!.pages.every(item => item.calibration === null)).toBe(true);
 });
 
-test('Mobile Etagenansicht und Raumplan bleiben ohne Überlauf bedienbar', async ({ page }) => {
+test('Mobile Etagenansicht und Raumplan bleiben ohne Überlauf bedienbar', { tag: '@smoke' }, async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole('button', { name: 'Position von Wohnzimmer festlegen', exact: true }).click();
   await page.getByRole('button', { name: 'Position speichern', exact: true }).click();

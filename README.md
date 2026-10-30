@@ -248,14 +248,16 @@ npm run preview      # Produktionsbuild lokal ansehen
 npm run check        # Tests und Produktionsbuild zusammen
 ```
 
-Für die Browser-Tests wird Chromium benötigt:
+Für die kurze Browserprüfung wird Chromium benötigt:
 
 ```sh
-npx playwright install chromium
-npm run test:e2e
+npx playwright install --only-shell chromium
+npm run test:e2e:smoke
 ```
 
-`npm run test:e2e:all` prüft Chromium und WebKit. Für ein installiertes Microsoft Edge gibt es zusätzlich `npm run test:e2e:edge`. Die [PDF-Speicherprüfung](docs/PDF-SPEICHER-PRUEFUNG.md) prüft zwei Original-PDFs nach einem vollständigen Browser-Neustart, nach Neuladen und nach der Übernahme älterer Projekte. Diese Speicherfälle laufen auch automatisch bei Push und Pull Request.
+Die automatische GitHub-Prüfung führt Fachtests, TypeScript, Build und acht wichtige Browserabläufe in Chromium aus. Dazu gehören PDF-Import, Maßstab, neue Etagen, PDF-Erhalt nach Browser-Neustart, Maßeingabe, Export und mobile Bedienung. Reine Dokumentations- und Screenshotänderungen starten keinen Lauf.
+
+`npm run test:e2e` führt alle Chromium-Fälle aus. `npm run test:e2e:all` prüft nach Installation beider Browser zusätzlich WebKit. Diese vollständige Sammlung ist in GitHub nur manuell startbar. Für ein installiertes Microsoft Edge gibt es `npm run test:e2e:edge`. Die [PDF-Speicherprüfung](docs/PDF-SPEICHER-PRUEFUNG.md) beschreibt auch die Übernahme älterer Projekte. Testauswahl und Bedienung stehen in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Unter Linux kann `npx playwright install --with-deps chromium` zusätzliche Systempakete installieren. Die Test-PDF lässt sich mit `node tests/fixtures/create-floorplan-fixture.mjs` neu erzeugen.
 

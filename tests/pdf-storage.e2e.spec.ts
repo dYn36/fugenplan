@@ -63,7 +63,7 @@ async function storedPdf(page: Page, id: string) {
 }
 
 for (const migrateLegacy of [false, true]) {
-  test(`Original-PDFs überstehen Neuladen und vollständigen Browser-Neustart ${migrateLegacy ? 'mit Übernahme aus Version 2' : 'mit zwei Etagen'}`, async ({ playwright, browserName, baseURL }, info) => {
+  test(`Original-PDFs überstehen Neuladen und vollständigen Browser-Neustart ${migrateLegacy ? 'mit Übernahme aus Version 2' : 'mit zwei Etagen'}`, { tag: migrateLegacy ? [] : ['@smoke'] }, async ({ playwright, browserName, baseURL }, info) => {
     test.setTimeout(90_000);
     const profile = await mkdtemp(join(tmpdir(), `fugenplan-pdf-${info.project.name}-`));
     const errors: string[] = [];
@@ -150,7 +150,7 @@ for (const migrateLegacy of [false, true]) {
   });
 }
 
-test('Eine fehlerhafte PDF-Speicherung wird vor der Übernahme erkannt und lässt sich erneut versuchen', async ({ page }) => {
+test('Eine fehlerhafte PDF-Speicherung wird vor der Übernahme erkannt und lässt sich erneut versuchen', { tag: '@smoke' }, async ({ page }) => {
   test.setTimeout(60_000);
   await page.goto('/');
   await createProject(page, 'Speicherung prüfen');

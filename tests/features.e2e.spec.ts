@@ -106,7 +106,7 @@ test('Alle elf Formatvorgaben und vier Oberflächen ändern den sichtbaren Belag
   await expect(page.getByRole('button', { name: 'Kalkstein', exact: true })).toHaveAttribute('aria-pressed', 'true');
 });
 
-test('Sofortige Maßeingabe nach Material- und Formatwechsel ersetzt die Vorgabe vollständig', async ({ page }) => {
+test('Sofortige Maßeingabe nach Material- und Formatwechsel ersetzt die Vorgabe vollständig', { tag: '@smoke' }, async ({ page }) => {
   await panel(page, 'Belag');
   const length = page.getByRole('textbox', { name: 'Länge', exact: true });
   for (const [button, kind, value] of [

@@ -2,8 +2,21 @@ name: Tests und Build
 
 on:
   push:
-    branches: [main, netlify-preview]
+    branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'screenshots/**'
+      - 'tests/screenshots/**'
+      - 'LICENSE'
   pull_request:
+    branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'screenshots/**'
+      - 'tests/screenshots/**'
+      - 'LICENSE'
 
 permissions:
   contents: read
@@ -14,8 +27,8 @@ concurrency:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
     steps:
       - name: Quellcode auschecken
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -32,36 +45,15 @@ jobs:
         run: npm audit --audit-level=moderate
       - name: Tests und Produktionsbuild
         run: npm run check
-  browser:
-    name: Browserabläufe und PDF-Speicherung (${{ matrix.browser }})
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        browser: [chromium, webkit]
-    steps:
-      - name: Quellcode auschecken
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - name: Node.js einrichten
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-      - name: Abhängigkeiten installieren
-        run: npm ci
       - name: Browser bereitstellen
-        run: npx playwright install --with-deps ${{ matrix.browser }}
-      - name: Produktionsbuild
-        run: npm run build
-      - name: Alle Abläufe prüfen
-        run: npm run test:e2e:all -- --project=${{ matrix.browser }}
-      - name: Browserbericht sichern
-        if: always()
+        run: npx playwright install --with-deps --only-shell chromium
+      - name: Wichtige Browserabläufe prüfen
+        run: npm run test:e2e:smoke
+      - name: Fehlerbericht sichern
+        if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: browser-pruefung-${{ matrix.browser }}
+          name: browser-fehler
           path: test-results/
-          retention-days: 14
+          if-no-files-found: ignore
+          retention-days: 7

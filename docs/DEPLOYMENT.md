@@ -6,7 +6,7 @@ Die Webanwendung ist unter [fugenplan.netlify.app](https://fugenplan.netlify.app
 
 `netlify.toml` legt Node.js 24, `npm run check`, den Ausgabeordner und die HTTP-Header fest. `scripts/netlify-ignore.mjs` verhindert automatische Produktionsbuilds bei Git-Pushes. Ohne Vergleichsstand wird eine Vorschau gebaut. Reine Dokumentationsänderungen lösen keinen Netlify-Build aus.
 
-Das private GitHub-Repository `dYn36/fugenplan` ist mit Netlify verbunden. `main` ist der Produktionsbranch; `netlify-preview` ist für Branch-Deploys freigegeben. Änderungen an der Anwendung auf diesem Vorschau-Branch werden gebaut. Reine Teständerungen prüft GitHub, ohne den unveränderten Web-Build erneut zu veröffentlichen.
+Das private GitHub-Repository `dYn36/fugenplan` ist mit Netlify verbunden. `main` ist der Produktionsbranch; `netlify-preview` ist für Branch-Deploys freigegeben. Änderungen an der Anwendung auf diesem Vorschau-Branch werden gebaut. Reine Teständerungen prüft GitHub bei Push auf `main` oder in einem Pull Request nach `main`, ohne den unveränderten Web-Build erneut zu veröffentlichen. Ein zusätzlicher Push desselben Stands auf `netlify-preview` startet keine weitere GitHub-Prüfung. Die [Testauswahl](../CONTRIBUTING.md#änderungen-prüfen) unterscheidet den kurzen Standardlauf von der manuell startbaren vollständigen Browserprüfung.
 
 Der Produktionsschutz ist absichtlich strenger als die Dateiprüfung: Auch ein geänderter Anwendungscode auf `main` veröffentlicht noch keine neue Version. Ein ausdrücklicher CLI-Deploy oder die Veröffentlichung eines geprüften Deploys im Netlify-Dashboard ist erforderlich.
 
