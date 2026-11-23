@@ -12,9 +12,11 @@ Vom PDF-Grundriss zum Verlegeplan – direkt in deinem Browser.
 [**Jetzt im Browser ausprobieren**](https://fugenplan.netlify.app) · [Anleitung lesen](docs/ANLEITUNG.md)
 
 <p>
+  <a href="https://fugenplan.netlify.app"><img src="https://img.shields.io/website?url=https%3A%2F%2Ffugenplan.netlify.app&amp;label=Web-App&amp;up_message=erreichbar&amp;down_message=nicht%20erreichbar&amp;up_color=245d4a&amp;down_color=963b32&amp;style=flat-square&amp;labelColor=20382e" alt="Erreichbarkeit der Web-App – Fugenplan öffnen"></a>
   <a href="#daten-unter-deiner-kontrolle"><img src="https://img.shields.io/badge/Planung-lokal_im_Browser-245d4a?style=flat-square&amp;labelColor=20382e" alt="Planung: lokal im Browser"></a>
   <a href="#grundriss-und-gebäude"><img src="https://img.shields.io/badge/Grundriss-PDF--Import-245d4a?style=flat-square&amp;labelColor=20382e" alt="Grundriss: PDF-Import"></a>
   <a href="#belag-und-zuschnitte"><img src="https://img.shields.io/badge/Verlegung-7_Muster-245d4a?style=flat-square&amp;labelColor=20382e" alt="Verlegung: sieben Muster"></a>
+  <a href="#varianten-und-exporte"><img src="https://img.shields.io/badge/Ausgabe-SVG_%C2%B7_CSV_%C2%B7_PDF-245d4a?style=flat-square&amp;labelColor=20382e" alt="Ausgabe als SVG, als CSV oder über den Druckdialog als PDF"></a>
 </p>
 
 <a href="screenshots/demo-pdf.gif">
@@ -207,7 +209,9 @@ React bildet die Oberfläche ab. SVG zeigt die Pläne. Web Worker berechnen die 
 
 ### Lokal starten
 
-Voraussetzungen: Git und Node.js 24 mit npm.
+[![Node.js 24 für die lokale Entwicklung](https://img.shields.io/badge/Node.js-24-245d4a?style=flat-square&labelColor=20382e&logo=nodedotjs&logoColor=white)](.nvmrc)
+
+Für den lokalen Start brauchst du Git und Node.js mit npm.
 
 ```sh
 git clone https://github.com/dYn36/fugenplan.git
