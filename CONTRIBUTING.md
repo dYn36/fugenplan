@@ -18,7 +18,7 @@ Beschreibe die Schritte, das erwartete und das tatsächliche Ergebnis. Nenne Bro
 ## Pull Request einreichen
 
 1. Besprich größere Änderungen vorab mit dem Inhaber. Arbeite auf einem eigenen Branch. Externe Beiträge kommen über einen Fork. [GitHub-Anleitung für Beiträge aus einem Fork](https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project)
-2. Öffne einen Pull Request mit Ziel `dYn36/fugenplan:main`. Beschreibe das Problem und die Wirkung der Änderung. Verlinke das zugehörige Issue, falls es eines gibt. Zeige Änderungen an der Oberfläche bei Bedarf mit synthetischen Beispieldaten.
+2. Öffne einen Pull Request mit Ziel `dYn36/fugenplan:main`. Beschreibe in der [PR-Vorlage](.github/pull_request_template.md) das Problem und die Wirkung der Änderung. Verlinke das zugehörige Issue, falls es eines gibt. Zeige Änderungen an der Oberfläche bei Bedarf mit synthetischen Beispieldaten.
 3. Nenne die ausgeführten Prüfungen und ihre Ergebnisse. Kennzeichne offene Prüfungen und Auswirkungen auf vorhandene Projekte. Für Beiträge mit Coding-Agenten gelten dieselben Kriterien.
 
 Der Repository-Inhaber `@dYn36` prüft Beiträge und führt den Merge nach `main` durch. Die technischen Einstellungen dazu stehen in der [Vorbereitung für die öffentliche Freigabe](docs/OEFFENTLICHE-FREIGABE.md#merge-rechte-für-main).
