@@ -50,7 +50,7 @@ Dezimalkomma und Dezimalpunkt sind möglich. Enter oder ein Fokuswechsel überni
 ## Räume aus einer PDF übernehmen
 
 1. **Grundriss öffnen:** In der gewünschten Etage „PDF-Grundriss laden“ oder den Reiter „Grundriss“ wählen. Eine PDF auswählen oder in die Fläche ziehen. Die gewünschte PDF-Seite wählen und „Seite verwenden“ anklicken. Bei einem unveränderten Beispielraum kannst du wählen, ob der erste übernommene PDF-Raum ihn ersetzen soll.
-2. **Wand markieren:** „Wand markieren“ wählen. Den Anfang und das Ende einer bekannten Wand anklicken. Für genaue Punkte die Ansicht vergrößern. Ziehen verschiebt die Ansicht.
+2. Wähle **„Wand markieren“** und klicke die beiden Endpunkte einer Wand mit bekannter Länge an. „Seitenbreite“ vergrößert Hochkantpläne für die Markierung. Ziehe die Seite zum gewünschten Ausschnitt. „Einpassen“ zeigt wieder das ganze Blatt.
 3. **Maßstab speichern:** Die tatsächliche Wandlänge in **Zentimetern** eingeben. „Maßstab speichern“ wählen. Beispiel: Für eine 4,80 m lange Wand `480` eingeben.
 4. **Raum markieren:** „Raum markieren“ wählen. Die inneren Raumecken der Reihe nach anklicken. Einen Namen eingeben und „Raum übernehmen“ wählen. Die letzte Kante wird geschlossen. Der Assistent zeigt den gespeicherten Raum im Schritt „Prüfen“.
 5. **Prüfen oder weiterzeichnen:** „Raum prüfen“ öffnet den Einzelplan. „Weiteren Raum markieren“ beginnt die nächste Kontur im selben Grundriss. „Zur Etagenansicht“ zeigt die Räume in ihrer tatsächlichen Anordnung. Jeder Raum hat eigene Belag- und Verlegeeinstellungen.
