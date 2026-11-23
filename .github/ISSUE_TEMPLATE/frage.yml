@@ -1,0 +1,11 @@
+name: Frage stellen
+description: Hilfe zur Bedienung oder zu einem Planungsergebnis erhalten
+labels: ["question"]
+body:
+  - type: textarea
+    id: frage
+    attributes:
+      label: Wobei brauchst du Hilfe?
+      description: Nenne den Arbeitsschritt oder das Ergebnis, zu dem du eine Frage hast. Verwende für Beispiele nur erfundene Projektdaten.
+    validations:
+      required: true

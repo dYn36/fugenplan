@@ -11,7 +11,11 @@ npm ci
 npm run dev
 ```
 
-## Fehler melden
+## Issues eröffnen
+
+Beim Absenden vergibt GitHub das Label passend zum Formular. Fehlermeldungen erhalten `bug`, Verbesserungsvorschläge `enhancement` und Fragen `question`. [Formular auswählen](https://github.com/dYn36/fugenplan/issues/new/choose)
+
+### Fehler melden
 
 Beschreibe die Schritte, das erwartete und das tatsächliche Ergebnis. Nenne Browser, Bildschirmgröße und die verwendete Version oder Webadresse. Verwende einen synthetischen Grundriss. Melde Sicherheitsprobleme privat an den Inhaber. [Fehlerformular](.github/ISSUE_TEMPLATE/fehler.yml) · [Umgang mit privaten Daten](SECURITY.md)
 
