@@ -1,6 +1,6 @@
 # Vorbereitung für ein öffentliches Repository
 
-Stand: 29. Oktober 2026. Die Sichtbarkeit des GitHub-Repositorys bleibt privat. Die Veröffentlichung der Webanwendung auf Netlify ändert diese Einstellung nicht.
+Die Inhaltsprüfung stammt vom 29. Oktober 2026. Die Prüfung der Merge-Rechte stammt vom 23. November 2026.
 
 ## Geprüfte Inhalte
 
@@ -18,9 +18,35 @@ Es wurde keine neue Nutzungslizenz vergeben. `package.json` bleibt bei `UNLICENS
 
 `private: true` verhindert eine versehentliche npm-Veröffentlichung. Es verhindert keine Änderung der GitHub-Sichtbarkeit.
 
+## Merge-Rechte für `main`
+
+Am 23. November 2026 meldete GitHub für `dYn36/fugenplan` ein privates Repository im persönlichen Konto `dYn36`. Die Liste der Mitarbeitenden enthielt nur `dYn36` mit der Rolle `admin`. Der Standardbranch `main` war ungeschützt. Die Ruleset-API verwies mit HTTP 403 auf GitHub Pro oder ein öffentliches Repository. Der Inhaber kann den aktuellen Stand mit den folgenden Leseabfragen prüfen. [Verfügbarkeit von Rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository)
+
+```sh
+gh api repos/dYn36/fugenplan --jq '{owner: .owner.login, visibility, default_branch}'
+gh api --paginate repos/dYn36/fugenplan/collaborators --jq '.[] | {login, role_name}'
+gh api repos/dYn36/fugenplan/branches/main --jq .protected
+```
+
+Nach der Umstellung auf öffentlich können Außenstehende aus einem Fork einen Pull Request stellen. Zum Mergen brauchen sie Schreibzugriff auf das Zielrepository. Eine Action mit `github.actor` prüft, wer den Workflow ausgelöst hat. Die Person, die später den Merge ausführt, steht erst beim Aktualisieren des Zielbranches fest. [GitHub-Berechtigungen](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/repository-access-and-collaboration/permission-levels-for-a-personal-account-repository) · [GitHub-Actions-Kontext](https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#github-context)
+
+Nach der Aktivierung darf nur `dYn36` den Branch `main` aktualisieren. Das Konto darf Pull Requests mergen und direkt auf `main` pushen. Für andere Zielbranches gelten die jeweiligen Repository-Berechtigungen und Branchregeln. [Ruleset-Vorlage](rulesets/main-owner.json) · [Regel für Branch-Aktualisierungen](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets#restrict-updates) · [Einzelne Benutzer als Ausnahme](https://github.blog/changelog/2026-05-07-repository-rulesets-user-bypass-and-branch-renaming/)
+
+Ein persönliches Zugriffstoken handelt mit den erteilten Rechten seines Kontos. Nutzt ein Agent ein schreibberechtigtes Token von `dYn36`, erkennt GitHub denselben Benutzer. Deshalb übergibt der Agent den Merge an den Inhaber. [Agentenanleitung](../AGENTS.md#prüfen-und-übergeben) · [Persönliche Zugriffstoken](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
+
+**Bei der öffentlichen Freigabe aktivieren und prüfen**
+
+1. Öffne die [Ruleset-Einstellungen von Fugenplan](https://github.com/dYn36/fugenplan/settings/rules). Wähle **New ruleset → Import a ruleset** und lade die JSON-Vorlage. [Anleitung zum Import](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/managing-rulesets-for-a-repository#importing-a-ruleset)
+2. Prüfe vor **Create** das Ziel `refs/heads/main`, die Regel **Restrict updates** und den Status **Active**. Die Ausnahmeliste soll genau den Benutzer `dYn36` mit **Always allow** enthalten. Die GitHub-Benutzer-ID in der Vorlage lässt sich mit `gh api users/dYn36 --jq .id` abgleichen.
+3. Prüfe nach dem Speichern, dass GitHub für `main` die Regel `update` aus diesem Ruleset nennt. Öffne das gespeicherte Ruleset und kontrolliere die Ausnahmeliste erneut. Erst mit der Aktivierung in GitHub greift der Schutz.
+
+```sh
+gh api repos/dYn36/fugenplan/rules/branches/main --jq '.[] | select(.type == "update") | {ruleset_id, ruleset_source}'
+```
+
 ## Prüfung vor einer späteren Freigabe
 
-Seit diesem Stand neu hinzugefügte Dateien und Commits erneut prüfen:
+Prüfe vor der Veröffentlichung die Dateien und Commits, die seit der Inhaltsprüfung vom 29. Oktober 2026 hinzugekommen sind.
 
 ```sh
 git status --short

@@ -1,0 +1,17 @@
+{
+  "name": "main – nur dYn36",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "include": ["refs/heads/main"],
+      "exclude": []
+    }
+  },
+  "bypass_actors": [
+    { "actor_type": "User", "actor_id": 10081215, "bypass_mode": "always" }
+  ],
+  "rules": [
+    { "type": "update", "parameters": { "update_allows_fetch_and_merge": false } }
+  ]
+}
