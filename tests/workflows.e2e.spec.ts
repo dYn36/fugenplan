@@ -110,13 +110,15 @@ test('Alte Einzelraum- und Mehrraumdateien werden über die Oberfläche migriert
 });
 
 test('Bei vollem Browserspeicher bleiben Bearbeitung und vollständige Sicherung in einem neuen Browserkontext nutzbar', async ({ page, browser }) => {
-  await page.addInitScript(() => {
+  await page.addInitScript(libraryKey => {
+    // Start with an empty store even if the first visit already saved the empty library.
+    localStorage.removeItem(libraryKey);
     const original = Storage.prototype.setItem;
     Storage.prototype.setItem = function(key: string, value: string) {
-      if (key === 'fugenplan.library.v3') throw new DOMException('Simuliertes Speicherlimit', 'QuotaExceededError');
+      if (key === libraryKey) throw new DOMException('Simuliertes Speicherlimit', 'QuotaExceededError');
       return original.call(this, key, value);
     };
-  });
+  }, libraryKey);
   await page.reload();
   await createProject(page, 'Sicherbares Haus');
   await createFloor(page, 'Erdgeschoss');

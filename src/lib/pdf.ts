@@ -6,6 +6,8 @@ import type { FloorPlanDocument, FloorPlanPage } from '../floorplan-types';
 export const MAX_PDF_BYTES = 20 * 1024 * 1024;
 const MAX_PDF_PAGES = 200;
 const MAX_PAGE_SIZE = 10_000_000;
+const MAX_EMBEDDED_IMAGE_PIXELS = 64_000_000;
+export const MAX_PREVIEW_PIXELS = 16_000_000;
 
 class PdfImportError extends Error {}
 
@@ -48,6 +50,8 @@ export async function openPdf(bytes: Uint8Array): Promise<PDFDocumentProxy> {
       wasmUrl: assetUrl('wasm'), iccUrl: assetUrl('iccs'),
       useWorkerFetch: true, useSystemFonts: false,
       enableXfa: false, stopAtErrors: true,
+      maxImageSize: MAX_EMBEDDED_IMAGE_PIXELS,
+      canvasMaxAreaInBytes: MAX_PREVIEW_PIXELS * 4,
       disableRange: true, disableStream: true, disableAutoFetch: true,
       verbosity: VerbosityLevel.ERRORS,
     });

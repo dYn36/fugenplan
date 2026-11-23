@@ -142,8 +142,11 @@ export function replaceCurrentWorkspace(library: ProjectLibrary, workspace: Work
     return { ...building, floors: building.floors.map(item => item.id === floor.id ? { ...item, workspace } : item) };
   });
 }
-export function addBuilding(library: ProjectLibrary, name: string): ProjectLibrary {
+export function ensureBuildingCapacity(library: ProjectLibrary): void {
   if (library.projects.length >= MAX_BUILDINGS) throw new Error(`Es sind höchstens ${MAX_BUILDINGS} Projekte möglich.`);
+}
+export function addBuilding(library: ProjectLibrary, name: string): ProjectLibrary {
+  ensureBuildingCapacity(library);
   const building: BuildingProject = { id: crypto.randomUUID(), name: text(name, 'Projektname'), activeFloorId: '', floors: [] };
   return { ...library, activeProjectId: building.id, projects: [...library.projects, building] };
 }
@@ -209,7 +212,7 @@ export function moveRoomToFloor(library: ProjectLibrary, roomId: string, targetF
 
 /** File imports are additional projects. Fresh IDs prevent reference collisions. */
 export function insertBuilding(library: ProjectLibrary, input: BuildingProject): ProjectLibrary {
-  if (library.projects.length >= MAX_BUILDINGS) throw new Error(`Es sind höchstens ${MAX_BUILDINGS} Projekte möglich.`);
+  ensureBuildingCapacity(library);
   const checked = parseBuilding(input);
   const floorIds = new Map(checked.floors.map(floor => [floor.id, crypto.randomUUID()]));
   const building: BuildingProject = { ...checked, id: crypto.randomUUID(), activeFloorId: floorIds.get(checked.activeFloorId) ?? '', floors: checked.floors.map(floor => {

@@ -263,6 +263,7 @@ describe('Dateien mit mehreren Etagen', () => {
     room.project.room.points = [{ x: 0, y: 0 }, { x: 1000, y: 1000 }, { x: 0, y: 1000 }, { x: 1000, y: 0 }];
     expect(() => writeBuildingFile(building, { [id]: bytes })).toThrow('Wohnzimmer');
     await expect(readBuildingFile({ format: 'fugenplan', version: 3, building, assets: [] })).rejects.toThrow('Wohnzimmer');
+    await expect(readBuildingFile(room.project)).rejects.toThrow('Wohnzimmer');
   });
 
   it('weist falsche Formatversion und ungültige Projektstruktur zurück', async () => {

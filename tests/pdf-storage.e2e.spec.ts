@@ -3,7 +3,7 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { expect, test, type BrowserContext, type Page } from '@playwright/test';
-import type { BuildingFile } from '../src/floorplan-types';
+import type { BuildingFile, FloorPlanPage } from '../src/floorplan-types';
 import { createFloor, createProject, storedBuilding, storedWorkspace } from './helpers';
 
 const groundPdf = await readFile(new URL('./fixtures/grundriss-drei-seiten.pdf', import.meta.url));
@@ -150,6 +150,39 @@ for (const migrateLegacy of [false, true]) {
   });
 }
 
+test('Bei einem Speicherfehler hinterlässt ein Projektimport keine seiner PDFs im Browser', async ({ page }) => {
+  const manifest = JSON.parse(await readFile(new URL('./fixtures/grundriss-erwartungen.json', import.meta.url), 'utf8')) as { pages: FloorPlanPage[] };
+  const pages = manifest.pages.map(({ number, width, height, rotation }) => ({ number, width, height, rotation, calibration: null }));
+  const assets = [groundPdf, upperPdf].map(bytes => ({ id: digest(bytes), pdfBase64: bytes.toString('base64') }));
+  const floors = assets.map(({ id }, index) => ({
+    id: String(index), name: `Etage ${index + 1}`,
+    workspace: {
+      version: 2 as const, activeRoomId: '', rooms: [],
+      floorPlan: { id, name: 'Beispiel.pdf', pageCount: pages.length, activePage: 1, pages },
+    },
+  }));
+  const project: BuildingFile = {
+    format: 'fugenplan', version: 3, assets, building: { id: 'beispiel', name: 'Speicherprüfung', activeFloorId: '0', floors },
+  };
+  const file = { name: 'Beispiel.fugenplan.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(project)) };
+  await page.goto('/');
+  await page.evaluate(secondId => {
+    const put = IDBObjectStore.prototype.put;
+    IDBObjectStore.prototype.put = function(value: unknown, key?: IDBValidKey) {
+      if (this.name === 'documents' && key === secondId) throw new DOMException('Speicher voll', 'QuotaExceededError');
+      return put.call(this, value, key);
+    };
+  }, assets[1].id);
+  await page.getByLabel('Projektdatei öffnen', { exact: true }).setInputFiles(file);
+  await expect(page.getByText(/Für die PDF-Datei ist nicht genügend Browserspeicher frei/)).toBeVisible();
+  for (const asset of assets) expect(await storedPdf(page, asset.id)).toBeNull();
+
+  await page.reload();
+  await page.getByLabel('Projektdatei öffnen', { exact: true }).setInputFiles(file);
+  await expect.poll(async () => (await storedBuilding(page)).name).toBe('Speicherprüfung');
+  for (const bytes of [groundPdf, upperPdf]) expect(await storedPdf(page, digest(bytes))).toEqual({ length: bytes.length, hash: digest(bytes) });
+});
+
 test('Eine fehlerhafte PDF-Speicherung wird vor der Übernahme erkannt und lässt sich erneut versuchen', { tag: '@smoke' }, async ({ page }) => {
   test.setTimeout(60_000);
   await page.goto('/');
@@ -177,6 +210,7 @@ test('Eine fehlerhafte PDF-Speicherung wird vor der Übernahme erkannt und läss
   await page.getByRole('button', { name: 'PDF-Grundriss laden', exact: true }).click();
   await page.getByLabel('PDF-Grundriss öffnen', { exact: true }).setInputFiles({ name: 'obergeschoss.pdf', mimeType: 'application/pdf', buffer: upperPdf });
   await expect(page.getByRole('alert')).toContainText('Die PDF konnte nicht vollständig gespeichert werden.');
+  expect(await storedPdf(page, digest(upperPdf))).toBeNull();
   expect((await storedWorkspace(page)).floorPlan).toBeUndefined();
   expect((await storedWorkspace(page)).rooms).toEqual([]);
   expect((await storedBuilding(page)).floors[0].workspace).toEqual(ground);

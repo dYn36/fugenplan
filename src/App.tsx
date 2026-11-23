@@ -15,8 +15,8 @@ import { usePlan } from './lib/usePlan';
 import { startLabel } from './lib/layout-start';
 import { addEmptyRoom, addPdfRoom, calibratePage, currentRoom, MAX_ROOMS, removeRoom, replaceRoomProject, withPdf } from './lib/workspace';
 import { MAX_PDF_BYTES, preparePdf } from './lib/pdf';
-import { getPdf, putPdf } from './lib/pdf-storage';
-import { addBuilding, addFloor, createLibrary, currentBuilding, currentFloor, insertBuilding, LIBRARY_KEY, loadLibrary, moveRoomToFloor, parseLibrary, removeBuilding, removeFloor, renameBuilding, renameFloor, replaceCurrentWorkspace, selectBuilding, selectFloor } from './lib/library';
+import { getPdf, putPdf, putPdfs } from './lib/pdf-storage';
+import { addBuilding, addFloor, createLibrary, currentBuilding, currentFloor, ensureBuildingCapacity, insertBuilding, LIBRARY_KEY, loadLibrary, moveRoomToFloor, parseLibrary, removeBuilding, removeFloor, renameBuilding, renameFloor, replaceCurrentWorkspace, selectBuilding, selectFloor } from './lib/library';
 import { MAX_BUILDING_BYTES, MAX_EMBEDDED_PDF_BYTES, readBuildingFile, writeBuildingFile } from './lib/library-file';
 import { mergeLibraryConflict, sameLibraryContents } from './lib/library-conflict';
 
@@ -360,7 +360,9 @@ export default function App() {
       try{parsed=JSON.parse(contents);}catch{throw new Error('Die Datei ist keine gültige Projektdatei.');}
       const next=await readBuildingFile(parsed);
       if(sequence!==importSequence.current)return;
-      for(const asset of next.assets){await putPdf(asset.id,asset.bytes);if(sequence!==importSequence.current)return;}
+      ensureBuildingCapacity(libraryRef.current);
+      await putPdfs(next.assets);
+      if(sequence!==importSequence.current)return;
       setPdfStorageError(false);commitLibrary(insertBuilding(libraryRef.current,next.building),true);setDrawing(false);setEditorEpoch(n=>n+1);setMode('project');focusWorkspace();setNotice('Projekt hinzugefügt.');
     }catch(e){setNotice(e instanceof Error?e.message:'Die Datei konnte nicht geladen werden.');}
     finally{setPendingImports(n=>n-1);if(input.current)input.current.value='';}

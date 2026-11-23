@@ -19,21 +19,22 @@ export function decodePdf(value: unknown): Uint8Array {
   let binary: string;
   try { binary = atob(value); } catch { throw new Error('Die eingebettete PDF ist beschädigt.'); }
   if (binary.length > MAX_PDF_BYTES) throw new Error('Die PDF darf höchstens 20 MB groß sein.');
-  return Uint8Array.from(binary, c => c.charCodeAt(0));
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < bytes.length; index++) bytes[index] = binary.charCodeAt(index);
+  return bytes;
 }
 
 export async function readProjectFile(value: unknown): Promise<{ workspace: Workspace; pdfBytes: Uint8Array | null }> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Die Projektdatei enthält ungültige Daten.');
   const file = value as Record<string, unknown>;
-  if (file.version === 1) return { workspace: createWorkspace(parseProject(file)), pdfBytes: null };
-  if (file.version !== 2 || file.format !== 'fugenplan') throw new Error('Diese Projektversion wird nicht unterstützt.');
-  const workspace = parseWorkspace(file.workspace);
+  if (file.version !== 1 && (file.version !== 2 || file.format !== 'fugenplan')) throw new Error('Diese Projektversion wird nicht unterstützt.');
+  const workspace = file.version === 1 ? createWorkspace(parseProject(file)) : parseWorkspace(file.workspace);
   for (const room of workspace.rooms) {
     const errors = validateRoom(room.project.room);
     if (errors.length) throw new Error(`${room.project.name}: ${errors.join(' ')}`);
   }
   if (!workspace.floorPlan) {
-    if (file.pdfBase64 !== undefined) throw new Error('Für die eingebettete PDF fehlen die Seitendaten.');
+    if (file.version === 2 && file.pdfBase64 !== undefined) throw new Error('Für die eingebettete PDF fehlen die Seitendaten.');
     return { workspace, pdfBytes: null };
   }
   const pdfBytes = decodePdf(file.pdfBase64);

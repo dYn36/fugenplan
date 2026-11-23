@@ -4,7 +4,7 @@ import { ArrowCounterClockwise, ArrowLeft, ArrowRight, ArrowsOut, CaretDown, Che
 import type { PDFDocumentProxy, PDFPageProxy, RenderTask } from 'pdfjs-dist';
 import type { Calibration, FloorPlanDocument, WorkspaceRoom } from '../floorplan-types';
 import type { Point } from '../types';
-import { openPdf } from '../lib/pdf';
+import { MAX_PREVIEW_PIXELS, openPdf } from '../lib/pdf';
 import { calibrationScale } from '../lib/calibration';
 import { MAX_ROOMS } from '../lib/workspace';
 import { isUnchangedExampleProject } from '../lib/project';
@@ -162,7 +162,7 @@ export default function FloorPlanEditor({ document: floorPlan, pdfBytes, rooms, 
     // Each task paints a separate canvas. A cancelled or old task can never overwrite the current page.
     const timer = window.setTimeout(() => {
       const pixels = Math.min(window.devicePixelRatio || 1, 2);
-      const renderScale = Math.min(displayScale * pixels, Math.sqrt(16_000_000 / (width * height)), 8192 / Math.max(width, height));
+      const renderScale = Math.min(displayScale * pixels, Math.sqrt(MAX_PREVIEW_PIXELS / (width * height)), 8192 / Math.max(width, height));
       const viewport = currentPage.page.getViewport({ scale: renderScale });
       const buffer = window.document.createElement('canvas');
       buffer.width = Math.max(1, Math.ceil(viewport.width));
@@ -183,7 +183,7 @@ export default function FloorPlanEditor({ document: floorPlan, pdfBytes, rooms, 
         setRenderedPage(pageKey); setPainting(false); setLoadError('');
       }).catch(error => {
         if (!cancelled && error?.name !== 'RenderingCancelledException') {
-          setLoadError('Diese PDF-Seite konnte nicht dargestellt werden. Öffne eine neue PDF-Kopie.'); setPainting(false);
+          setLoadError('Diese PDF-Seite konnte nicht dargestellt werden. Bei einem großen Scan verringere die Auflösung und öffne die PDF erneut.'); setPainting(false);
         }
       }).finally(() => { buffer.width = 1; buffer.height = 1; });
     }, 50);
