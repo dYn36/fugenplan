@@ -37,6 +37,8 @@ Der [automatische GitHub-Workflow](.github/workflows/checks.yml) führt `npm aud
 
 Die Prüfung läuft bei Pushes auf `main` und bei Pull Requests nach `main`. Der Workflow überspringt reine Dokumentations- und Screenshotänderungen. Ein Push auf `netlify-preview` löst keinen zusätzlichen Push-Lauf aus. Ein neuer Lauf für denselben Git-Ref bricht den vorigen ab. Für automatische Testwiederholungen ist `retries: 0` gesetzt. GitHub bewahrt Fehlerberichte sieben Tage auf. [Playwright-Konfiguration](playwright.config.ts)
 
+Bei jedem Push auf `main` und jedem Pull Request nach `main` prüft Lychee die lokalen Links, Sprungziele und Bildpfade in den versionierten `.md`-Dateien. So fällt auch auf, wenn ein Screenshot oder eine verlinkte Quelldatei verschoben wird. Gitleaks prüft im selben Lauf die Git-Historie des getesteten Stands auf Zugangsdaten. Für ein Update eines der beiden Werkzeuge ändere die Versionsnummer und den SHA-256-Digest seines Container-Images. [Workflow für Zugangsdaten und Doku-Links](.github/workflows/repository.yml)
+
 Für Änderungen an PDF-Verarbeitung, Speicherung, Browserkompatibilität oder größeren Bedienabläufen prüfe zusätzlich die betroffenen Tests in Chromium und WebKit. Vor einer Veröffentlichung läuft die vollständige Sammlung gegen die Netlify-Vorschau. Mit diesen Befehlen führst du sie lokal aus. [Deployment und Betrieb](docs/DEPLOYMENT.md)
 
 ```sh
