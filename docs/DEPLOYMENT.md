@@ -2,11 +2,21 @@
 
 Die Webanwendung ist unter [fugenplan.netlify.app](https://fugenplan.netlify.app) erreichbar. Netlify liefert ausschließlich `dist/` aus. PDFs und Projektdateien werden im Browser verarbeitet und gespeichert.
 
+## Version erhöhen und GitHub-Release veröffentlichen
+
+1. Öffne **Actions → GitHub-Release → Run workflow**. Wähle `main` und den Versionssprung. Aus `1.0.0` wird mit **patch** die Version `1.0.1`, mit **minor** die Version `1.1.0` und mit **major** die Version `2.0.0`. [Release-Workflow](../.github/workflows/release.yml)
+2. Öffne den Release-PR über den Link im Workflow-Lauf. Der PR aktualisiert `package.json` und `package-lock.json` und zeigt eine Vorschau der Release-Notizen. Ein weiterer Start aktualisiert denselben offenen PR. Zeigt GitHub **Approve workflows to run**, gib die Prüfungen frei und prüfe das Ergebnis. [GitHub zum Workflow-Token](https://docs.github.com/en/actions/concepts/security/github_token#when-github_token-triggers-workflow-runs)
+3. Merge den Release-PR als `@dYn36` nach `main`. GitHub setzt den Tag `vX.Y.Z` auf den Merge-Stand und veröffentlicht das Release. [GitHub-Releases](https://github.com/dYn36/fugenplan/releases)
+
+Unter **Was ist neu?** stehen Funktionen und Fehlerkorrekturen aus `feat`- und `fix`-Commits. Die Notizen verlinken die gemergten PRs und alle Commits seit dem letzten veröffentlichten stabilen Release auf `main`. Sie nennen die Mitwirkenden einschließlich der Mitautoren. Das erste Release umfasst die gesamte Historie bis zum Merge.
+
+Bricht die Veröffentlichung nach dem Taggen ab, starte den fehlgeschlagenen Job erneut. Er prüft den Ziel-Commit und setzt die Veröffentlichung fort. Für die Veröffentlichung der Webanwendung auf Netlify gilt der folgende Ablauf.
+
 ## Vorschau vor Produktion
 
 `netlify.toml` legt Node.js 24, `npm run check`, den Ausgabeordner und die HTTP-Header fest. `scripts/netlify-ignore.mjs` verhindert automatische Produktionsbuilds bei Git-Pushes. Ohne Vergleichsstand wird eine Vorschau gebaut. Reine Dokumentationsänderungen lösen keinen Netlify-Build aus.
 
-Das private GitHub-Repository `dYn36/fugenplan` ist mit Netlify verbunden. `main` ist der Produktionsbranch; `netlify-preview` ist für Branch-Deploys freigegeben. Änderungen an der Anwendung auf diesem Vorschau-Branch werden gebaut. Reine Teständerungen prüft GitHub bei Push auf `main` oder in einem Pull Request nach `main`, ohne den unveränderten Web-Build erneut zu veröffentlichen. Ein zusätzlicher Push desselben Stands auf `netlify-preview` startet keine weitere GitHub-Prüfung. Die [Testauswahl](../CONTRIBUTING.md#änderungen-prüfen) unterscheidet den kurzen Standardlauf von der manuell startbaren vollständigen Browserprüfung.
+Das GitHub-Repository `dYn36/fugenplan` ist mit Netlify verbunden. `main` ist der Produktionsbranch. Für Branch-Deploys ist `netlify-preview` freigegeben. Änderungen an der Anwendung auf diesem Vorschau-Branch werden gebaut. Reine Teständerungen prüft GitHub bei Push auf `main` oder in einem Pull Request nach `main`, ohne den unveränderten Web-Build erneut zu veröffentlichen. Ein zusätzlicher Push desselben Stands auf `netlify-preview` startet keine weitere GitHub-Prüfung. Die [Testauswahl](../CONTRIBUTING.md#änderungen-prüfen) unterscheidet den kurzen Standardlauf von der manuell startbaren vollständigen Browserprüfung.
 
 Der Produktionsschutz ist absichtlich strenger als die Dateiprüfung: Auch ein geänderter Anwendungscode auf `main` veröffentlicht noch keine neue Version. Ein ausdrücklicher CLI-Deploy oder die Veröffentlichung eines geprüften Deploys im Netlify-Dashboard ist erforderlich.
 

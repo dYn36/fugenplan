@@ -63,6 +63,8 @@ Automatisch erzeugte Testbilder sind keine geplanten Änderungen der Dokumentati
 
 ## Änderungen veröffentlichen
 
+Neue Paketversionen entstehen über einen Release-PR. Sein Merge erzeugt den Git-Tag und die Release-Notizen auf GitHub. [GitHub-Release vorbereiten](docs/DEPLOYMENT.md#version-erhöhen-und-github-release-veröffentlichen)
+
 Für eine geplante Veröffentlichung prüfe zuerst die Netlify-Vorschau. Der Produktions-Deploy übernimmt denselben geprüften Build in einem eigenen Schritt. [Deployment und Betrieb](docs/DEPLOYMENT.md)
 
 Der eigene Quellcode trägt in `package.json` den Lizenzstatus `UNLICENSED`. [Projektstatus und Lizenz](README.md#projektstatus-und-lizenz)
