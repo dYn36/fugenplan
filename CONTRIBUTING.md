@@ -21,6 +21,13 @@ Beschreibe die Schritte, das erwartete und das tatsächliche Ergebnis. Nenne Bro
 2. Öffne einen Pull Request mit Ziel `dYn36/fugenplan:main`. Beschreibe in der [PR-Vorlage](.github/pull_request_template.md) das Problem und die Wirkung der Änderung. Verlinke das zugehörige Issue, falls es eines gibt. Zeige Änderungen an der Oberfläche bei Bedarf mit synthetischen Beispieldaten.
 3. Nenne die ausgeführten Prüfungen und ihre Ergebnisse. Kennzeichne offene Prüfungen und Auswirkungen auf vorhandene Projekte. Für Beiträge mit Coding-Agenten gelten dieselben Kriterien.
 
+Der Workflow prüft die drei Abschnitte der Beschreibung, sobald dein Pull Request zur Prüfung bereit ist. Du kannst fehlende Angaben direkt im PR-Text ergänzen. Jede Bearbeitung löst die Prüfung erneut aus. Für reine Dokumentation genügt zum Beispiel der Hinweis, welchen Link du geöffnet hast und ob das Ziel stimmt. Dependabot verwendet seine eigene Beschreibung. [Workflow für die PR-Beschreibung](.github/workflows/pr-beschreibung.yml)
+
+Für die folgenden Dateien prüft GitHub zusätzlich, ob die passende Zwischenüberschrift einen Eintrag enthält. Betrifft deine Änderung in diesen Dateien weder Rechenweg noch Bestandsdaten, genügt darunter eine kurze Begründung.
+
+- Bei Änderungen an Geometrieberechnung oder PDF-Kalibrierung gehört unter `### Rechenbeispiel` ein Vergleich mit Einheiten. Fünf Fliesen zu je 600 mm und vier Fugen zu je 3 mm ergeben beispielsweise 3.012 mm. Vergleiche deinen Sollwert mit dem Ergebnis der Anwendung. [Geometrie](src/lib/geometry.ts) · [Kalibrierung](src/lib/calibration.ts)
+- Bei Änderungen an Projektdateien oder am PDF-Speicher beschreibe unter `### Bestandsdaten`, welchen älteren, synthetischen Projektstand du geprüft hast und was erhalten blieb. Bei einem geänderten Import beschreibe auch, was nach einer fehlerhaften Datei mit dem geöffneten Projekt passiert. [Gebäudedateien](src/lib/library-file.ts) · [Raumprojekte](src/lib/workspace-file.ts) · [PDF-Speicher](src/lib/pdf-storage.ts)
+
 Der Repository-Inhaber `@dYn36` prüft Beiträge und führt den Merge nach `main` durch. Die technischen Einstellungen dazu stehen in der [Vorbereitung für die öffentliche Freigabe](docs/OEFFENTLICHE-FREIGABE.md#merge-rechte-für-main).
 
 ## Änderungen prüfen
