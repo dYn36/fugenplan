@@ -6,7 +6,7 @@ Stand: 28. Oktober 2026. Status: **Gestaltungsvertrag für die Umsetzung. Noch k
 
 Fugenplan soll mehrere unabhängige Projekte verwalten. Jedes Projekt enthält Etagen. Jede Etage enthält Räume. Eine Etagenübersicht zeigt die Räume gemeinsam an ihrer tatsächlichen Position. Der vorhandene PDF-Assistent bleibt der Weg vom Grundriss zur Raumkontur und zum Verlegeplan.
 
-Der gewünschte Qualitätsmaßstab ist eine sorgfältig gestaltete, leicht verständliche Anwendung. Eine Auszeichnung durch Apple wird weder behauptet noch durch diesen Vertrag geprüft. Geprüft werden konkrete Abläufe, erkennbare Zustände, Lesbarkeit und räumliche Richtigkeit.
+Der gewünschte Qualitätsmaßstab ist eine sorgfältig gestaltete, leicht verständliche Anwendung. Geprüft werden konkrete Abläufe, erkennbare Zustände, Lesbarkeit und räumliche Richtigkeit.
 
 ## Belegter Ausgangszustand
 

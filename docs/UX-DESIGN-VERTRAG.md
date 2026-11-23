@@ -22,6 +22,6 @@ Fugenplan ist ein Werkzeug für maßhaltige Verlegepläne. Die Oberfläche zeigt
 
 ## Nachweise vor Abschluss
 
-Der Ausgangsaudit steht in [UX-AUDIT.md](UX-AUDIT.md). Der UX Architect prüft das vollständige Ablaufinventar. Danach prüft der UI Finish-Gate Reviewer die fertige Oberfläche anhand von Bildschirmbildern und Laufzeitbelegen. Zum Schluss bereinigt ein eigener Agent unnötige Texte, Dekoration und uneinheitliche Bedienmuster. Ergebnisse, Korrekturen und verbleibende Grenzen werden getrennt dokumentiert.
+Die [Liste der Bedienabläufe](UX-AUDIT.md) bildet die Grundlage der Prüfung. Die [Ablaufprüfung](UX-ABLAEUFE.md) beschreibt die Bedienung im Browser. Die [Sichtprüfung](UI-FINISH-GATE.md) dokumentiert Messwerte und Bildschirmbilder.
 
 Zusätzlich werden die bestehenden Geometrie-, Datei- und Browsertests sowie neue Mehrraum-/Wizard-Prüfungen ausgeführt. Ein automatischer Accessibility-Scan ersetzt keinen manuellen Screenreader-Test.

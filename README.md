@@ -147,7 +147,7 @@ Eigene Grundrisse und Projektdateien gehören außerhalb des Quellcode-Repositor
 <details>
 <summary><strong>Welche PDF-Grundrisse kann ich verwenden?</strong></summary>
 
-Vektor-PDFs und gescannte Vorlagen sind möglich. Eine PDF darf bis zu 200 Seiten und 20 MiB enthalten. Jede Etage verwendet eine Seite mit eigenem Maßstab. Mehrere Etagen können verschiedene Seiten oder Dateien verwenden.
+Vektor-PDFs und gescannte Vorlagen sind möglich. Eine PDF darf bis zu 200 Seiten und 20 MiB enthalten. Für die Anzeige darf ein einzelnes eingebettetes Rasterbild höchstens 64 Megapixel haben. Jede Etage verwendet eine Seite mit eigenem Maßstab. Mehrere Etagen können verschiedene Seiten oder Dateien verwenden.
 
 Die Räume werden manuell markiert. Der Maßstab muss in beiden Richtungen gleich sein. Verzerrte Scans müssen vor dem Import korrigiert werden. Automatische Raumerkennung und Scan-Entzerrung sind nicht enthalten.
 

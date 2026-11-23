@@ -107,14 +107,14 @@ npm run test:e2e:all
 
 Die Ausgabedateien werden beim Test erzeugt und nicht in Git gespeichert:
 
-- [HTML-Bericht mit einzelnen Testfällen und Anhängen](../test-results/pdf-storage-all/report/index.html)
-- [Maschinenlesbare Ergebnisse](../test-results/pdf-storage-all/results.json)
-- [Gezielte Speicherprüfung in Microsoft Edge](../test-results/pdf-storage-edge/report/index.html)
-- [Reproduktion vor der Korrektur](../test-results/pdf-floor-before/report/index.html)
-- [Zusätzlicher Prüflauf der beiden neuen Abläufe](../test-results/pdf-floor-regression/report/index.html)
-- [Erzeugter A4-Verlegeplan](../test-results/e2e-evidence/verlegeplan-a4.pdf)
-- [Druckdarstellung in Chromium](../test-results/pdf-storage-all/screenshots/druck-chromium.png)
-- [Druckdarstellung in WebKit](../test-results/pdf-storage-all/screenshots/druck-webkit.png)
+- HTML-Bericht mit einzelnen Testfällen und Anhängen (`test-results/pdf-storage-all/report/index.html`)
+- Maschinenlesbare Ergebnisse (`test-results/pdf-storage-all/results.json`)
+- Gezielte Speicherprüfung in Microsoft Edge (`test-results/pdf-storage-edge/report/index.html`)
+- Reproduktion vor der Korrektur (`test-results/pdf-floor-before/report/index.html`)
+- Zusätzlicher Prüflauf der beiden neuen Abläufe (`test-results/pdf-floor-regression/report/index.html`)
+- Erzeugter A4-Verlegeplan (`test-results/e2e-evidence/verlegeplan-a4.pdf`)
+- Druckdarstellung in Chromium (`test-results/pdf-storage-all/screenshots/druck-chromium.png`)
+- Druckdarstellung in WebKit (`test-results/pdf-storage-all/screenshots/druck-webkit.png`)
 
 ## Grenzen
 

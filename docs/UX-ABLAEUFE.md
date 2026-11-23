@@ -45,7 +45,7 @@ Layout: vorhandene Schrift, Farben und Schaltflächen bleiben bestehen. Desktop 
 
 ## Laufzeitprüfung
 
-Durchgeführt am 26. Oktober 2026 durch den UX Architect. Browser: eingebetteter Chromium-Browser, `http://localhost:5173/`, Desktop mit 1280 × 720 px und schmale Ansicht mit 390 × 844 px. Die Bedienung erfolgte über echte Browseraktionen mit Maus, Tastatur und Dateiauswahl. Die Testdaten waren ausdrücklich für diesen Durchgang freigegeben. Es wurden keine echten Baupläne verwendet.
+Prüfung vom 26. Oktober 2026 im eingebetteten Chromium-Browser auf `http://localhost:5173/`, Desktop mit 1280 × 720 px und schmale Ansicht mit 390 × 844 px. Die Bedienung erfolgte über echte Browseraktionen mit Maus, Tastatur und Dateiauswahl. Die Prüfung verwendete einen synthetischen Grundriss.
 
 PDF-Testdatei: `tests/fixtures/grundriss-drei-seiten.pdf`. Seite 1 enthält Vektorgrafik, Seite 2 ist um 90 Grad gedreht, Seite 3 enthält ein Rasterbild. Für Fehlerfälle wurden eine leere PDF und eine syntaktisch ungültige JSON-Datei verwendet. Eine Kopie der PDF mit anderem Dateiinhalt diente dem Ersetzungsdialog.
 
@@ -79,11 +79,11 @@ PDF-Testdatei: `tests/fixtures/grundriss-drei-seiten.pdf`. Seite 1 enthält Vekt
 
 ### Befunde während des Durchgangs
 
-- **Zoomleiste verdeckt eine Raumecke:** Der automatisierte Zeigertest traf bei 125 % Zoom die Leiste. Die Leiste und die mobile Weiter-Aktion wurden unter die Zeichenfläche versetzt. Im anschließenden manuellen Durchgang waren die unteren Ecken erreichbar. Der erneut ausgeführte Zeigertest des Hauptagenten bestätigte vier Ecken und 24,96 m².
-- **Unlesbarer aktiver Zuschnittschalter:** In der Projektübersicht war der aktive Zustand unter dem Mauszeiger zu hell. Der Hauptagent verwendet dafür nun die vorhandene primäre Schaltfläche. Das aktualisierte Desktop-Bild und das mobile Bild zeigen lesbare Beschriftung.
+- **Zoomleiste verdeckt eine Raumecke:** Der automatisierte Zeigertest traf bei 125 % Zoom die Leiste. Die Leiste und die mobile Weiter-Aktion wurden unter die Zeichenfläche versetzt. Im anschließenden manuellen Durchgang waren die unteren Ecken erreichbar. Der wiederholte Zeigertest bestätigte vier Ecken und 24,96 m².
+- **Unlesbarer aktiver Zuschnittschalter:** In der Projektübersicht war der aktive Zustand unter dem Mauszeiger zu hell. Der aktive Zustand verwendet die vorhandene primäre Schaltfläche. Das aktualisierte Desktop-Bild und das mobile Bild zeigen lesbare Beschriftung.
 - **Beispielraum nach Wiederaufnahme nicht erkannt:** Der Vergleich über `JSON.stringify` hing von der Reihenfolge der Objektschlüssel ab. Nach dem Laden änderte sich diese Reihenfolge. Der gemeinsame semantische Vergleich in `project.ts` ersetzt diesen Vergleich. Die bewusste Ersetzen-Option gilt weiterhin nur für einen unveränderten Beispielraum ohne PDF-Zuordnung.
-- **Projektverlauf verwirft PDF-Entwurf:** Bei geändertem Namen im Wizard verwarf die Kopfaktion „Rückgängig“ den Entwurf ohne Rückfrage. Der Hauptagent hat den Verlauf geschützt. Gezielte Nachprüfung: Die Kopfaktion öffnet jetzt „Markierung verwerfen?“. „Weiter markieren“ erhält den Namen und erlaubt die spätere Übernahme.
-- **Fokus nach Schrittaktion und Dialogschluss:** Nach dem Entfernen der aktiven Schaltfläche landete der Fokus auf `BODY`. Der Wizard fokussiert jetzt nach bestätigtem Schrittwechsel die jeweilige Überschrift. Der Hauptagent hat die Fokus-Rückgabe im gemeinsamen Dialog korrigiert. Per DOM-Lesung nachgeprüft: „Maßstab prüfen“ fokussiert `H2` mit „Maßstab festlegen“; Escape im Abbruchdialog fokussiert die auslösende Schaltfläche „Abbrechen“; erfolgreiche Raumübernahme fokussiert `H2` mit „Raum übernommen“. Punktmarkierungen direkt auf der PDF lösen keinen Fokuswechsel aus.
+- **Projektverlauf verwirft PDF-Entwurf:** Bei geändertem Namen im Wizard verwarf die Kopfaktion „Rückgängig“ den Entwurf ohne Rückfrage. Gezielte Nachprüfung: Die Kopfaktion öffnet jetzt „Markierung verwerfen?“. „Weiter markieren“ erhält den Namen und erlaubt die spätere Übernahme.
+- **Fokus nach Schrittaktion und Dialogschluss:** Nach dem Entfernen der aktiven Schaltfläche landete der Fokus auf `BODY`. Der Wizard fokussiert jetzt nach bestätigtem Schrittwechsel die jeweilige Überschrift. Der gemeinsame Dialog gibt den Fokus an die auslösende Schaltfläche zurück. Per DOM-Lesung nachgeprüft: „Maßstab prüfen“ fokussiert `H2` mit „Maßstab festlegen“; Escape im Abbruchdialog fokussiert die auslösende Schaltfläche „Abbrechen“; erfolgreiche Raumübernahme fokussiert `H2` mit „Raum übernommen“. Punktmarkierungen direkt auf der PDF lösen keinen Fokuswechsel aus.
 
 ### Sichtbare Belege
 
@@ -103,4 +103,4 @@ PDF-Testdatei: `tests/fixtures/grundriss-drei-seiten.pdf`. Seite 1 enthält Vekt
 
 Der Durchgang deckt alle Prozessgruppen ab. Er ist keine vollständige Prüfung aller Grenzwerte. Die Grenzen von 20 MiB, 32 Eckpunkten, zwölf Varianten und 50 Räumen wurden hier nicht jeweils manuell ausgeschöpft. Die Wiederherstellung bei absichtlich gelöschtem IndexedDB-Eintrag gehört zum automatisierten Test `Fehlende PDF in IndexedDB lässt sich ohne Verlust der Räume und Maßstäbe wiederherstellen`.
 
-Die schmale Ansicht ist ein Browserfenster mit 390 × 844 px. Es wurde kein echtes iPhone, kein Bildschirmkeyboard und kein Screenreader verwendet. Eine vergrößerte Betriebssystemschrift wurde nicht geprüft. Es gibt daher keine Aussage über vollständige Barrierefreiheit, echte Touch-Bedienung oder physisch maßhaltigen Druck. Die separat ausgeführten Browser- und Geometrietests ergänzen diesen Bediennachweis; ihre Ergebnisse stehen im Abschlussbericht des Hauptagenten.
+Die schmale Ansicht ist ein Browserfenster mit 390 × 844 px. Es wurde kein echtes iPhone, kein Bildschirmkeyboard und kein Screenreader verwendet. Eine vergrößerte Betriebssystemschrift wurde nicht geprüft. Es gibt daher keine Aussage über vollständige Barrierefreiheit, echte Touch-Bedienung oder physisch maßhaltigen Druck. Die [Abnahme](UX-ABNAHME.md) enthält die ergänzenden Browser- und Geometrietests.

@@ -25,4 +25,4 @@ npx playwright test tests/project.e2e.spec.ts --grep 'Projekt zeigt getrennte R�
 npx vitest run tests/geometry.test.ts -t 'zieht Hindernisse|subtrahiert überlappende'
 ```
 
-Dies war eine gezielte Nachprüfung. Die abschließenden Bildschirmbilder, der vollständige Testlauf und der Build folgen beim Hauptagenten. Es wurde hier kein echter iPhone-Test, Screenreader-Test oder physischer Druck durchgeführt.
+Diese Nachprüfung umfasste die beschriebenen Browser- und Geometriefälle. Die [Abnahme](UX-ABNAHME.md) dokumentiert den vollständigen Lauf und den Build. Tests auf einem physischen iPhone, mit Screenreader oder am Drucker standen hier aus.

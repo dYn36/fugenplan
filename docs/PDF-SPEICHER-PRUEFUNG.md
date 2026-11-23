@@ -4,19 +4,15 @@ Prüfdatum: 28. Oktober 2026.
 
 ## Anlass und gesicherter Befund
 
-Im untersuchten Edge-Profil fehlte die Original-PDF der ersten Etage tatsächlich in IndexedDB. Der Verweis auf diese PDF, ihre sechs Räume und der Maßstab waren weiterhin in den Projektdaten vorhanden. Die neue PDF der zweiten Etage war gespeichert und ihre SHA-256-Prüfsumme stimmte mit der gespeicherten Kennung überein. Der Fehler war daher durch die fehlenden Original-Bytes erklärbar.
+In Microsoft Edge konnte eine gespeicherte Etage ihre PDF nach dem Neuladen nicht anzeigen. Raumdaten, Maßstab und Dokumentkennung waren vorhanden. In IndexedDB fehlten die Originaldaten dieser PDF.
 
 Der Grund für den früheren Verlust ist nicht belegt. Der verbliebene Speicherstand enthält kein Löschprotokoll. Der Anwendungscode enthält keine Funktion zum Löschen von PDF-Datensätzen. Die Übernahme des älteren Speicherformats erhält die PDF-Kennung und verwendet dieselbe IndexedDB-Datenbank. Beide gezielten Edge-Neustarttests bestanden bereits vor der zusätzlichen Absicherung.
 
 Der Browser meldete den Speicher vor und nach der Wiederherstellung als nicht dauerhaft geschützt (`persisted() === false`). Edge kann ungeschützte Websitedaten bei Speicherknappheit entfernen. Eine Freigabe für dauerhaften Speicher hängt vom Browser ab. Das belegt keinen solchen Löschvorgang in diesem konkreten Fall. Quellen: [Microsoft: Store data on the device](https://learn.microsoft.com/en-us/microsoft-edge/progressive-web-apps/how-to/offline#data-eviction), [MDN: StorageManager.persist](https://developer.mozilla.org/en-US/docs/Web/API/StorageManager/persist).
 
-## Wiederherstellung des betroffenen Stands
+## Fehlende PDF wiederherstellen
 
-Die identische Originaldatei wurde im ursprünglichen Projektordner gefunden. Ihre SHA-256-Prüfsumme entsprach der bereits gespeicherten Dokumentkennung. Die gleichnamige Datei im Downloads-Ordner hatte eine andere Prüfsumme und wurde nicht verwendet.
-
-Die Wiederherstellung erfolgte über die normale Dateiauswahl der Anwendung. Danach waren beide PDFs mit gültiger Prüfsumme gespeichert. Der kanonische Vergleich aller Projektinhalte vor und nach der Wiederherstellung war identisch; reine Auswahlzustände wurden dabei ausgenommen. Räume, Maße und PDF-Zuordnungen blieben erhalten. Die Original-PDF wurde anschließend nach einem Neuladen tatsächlich dargestellt. Eine vollständige Projektdatei mit beiden PDFs und allen sechs Räumen wurde zusätzlich exportiert und geprüft.
-
-Private PDFs, Projektdaten, Speicherberichte und der Screenshot des echten Grundrisses bleiben außerhalb von Git. Sie liegen nur lokal in der Projektsicherung bzw. im ignorierten Testausgabeordner.
+Öffne die betroffene Etage und wähle die ursprüngliche PDF erneut aus. Fugenplan vergleicht ihre SHA-256-Prüfsumme mit der gespeicherten Dokumentkennung. Bei identischer Datei bleiben Räume und Maßstab erhalten. Prüfe die Darstellung nach dem Neuladen und exportiere das Projekt mit seinen Original-PDFs.
 
 ## Zusätzliche Absicherung
 
@@ -54,7 +50,7 @@ Ergebnisse gegen den Produktionsbuild:
 | Fachtests | 230 von 230 Tests in 8 Dateien bestanden. |
 | TypeScript und Produktionsbuild | Erfolgreich. |
 
-Lokale Berichte: [Microsoft Edge](../test-results/pdf-storage-edge/report/index.html), [vollständiger Gesamtlauf](../test-results/pdf-storage-all/report/index.html). Die GitHub-Prüfung bewahrt ihren Bericht unter dem Artefaktnamen `pdf-speicher-pruefung` auf.
+Die Befehle unten erzeugen die Berichte unter `test-results/pdf-storage-edge/report/` und `test-results/pdf-storage-all/report/`. Die [Beitragsanleitung](../CONTRIBUTING.md) beschreibt die aktuellen GitHub-Prüfungen.
 
 Nach `npm run build` und dem Start eines separaten Vorschau-Servers auf Port 52501:
 

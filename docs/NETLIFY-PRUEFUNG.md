@@ -34,7 +34,7 @@ Die vollständige Browserprüfung lief gegen die Netlify-Vorschau mit dem Testst
 
 Die Hosting-Prüfung kontrolliert die ausgelieferten Sicherheitsheader und Cache-Regeln. Sie prüft echte 404-Antworten für fehlende Dateien und den PDF-Import unter CSP. Ein importierter HTML-Angriffstext bleibt in Oberfläche, Druckdarstellung und SVG-Export Text. Der Versuch, über `__proto__` globale Objekte zu verändern, blieb ohne Wirkung.
 
-Ein Aufruf über HTTP wird mit Status 301 auf HTTPS umgeleitet. Die Live-Startseite wurde zusätzlich im vorhandenen Microsoft Edge geöffnet und als Screenshot gesichert. Das vorhandene lokale Nutzerprojekt wurde bei diesen Prüfungen nicht verändert.
+Ein Aufruf über HTTP wird mit Status 301 auf HTTPS umgeleitet. Die Live-Startseite wurde zusätzlich im vorhandenen Microsoft Edge geöffnet und als Screenshot gesichert.
 
 Die vollständige Browsersammlung umfasst PDF-Import, Maßstab, mehrere Etagen und Originaldateien, Raumkonturen, Verlegemuster, Zuschnitte, Export, Tastaturbedienung und mobile Ansichten. Die Speicherfälle beenden den Browserprozess und öffnen dasselbe getrennte Testprofil erneut. Die [PDF-Speicherprüfung](PDF-SPEICHER-PRUEFUNG.md) beschreibt den früheren Datenverlust und die weiterhin unbekannte historische Ursache.
 
@@ -65,6 +65,6 @@ Der abschließende Stilbericht meldet vor allem kurze, ähnlich lange Sätze. Di
 
 React und Geometriebibliotheken liegen in getrennten Dateien. Der Hauptblock sank von etwa 628 kB auf 242 kB; das ist keine entsprechende Verringerung der gesamten Downloadmenge. Der PDF-Editor wird bei Bedarf geladen. Statische Dateien mit Inhalts-Hash und versionierte PDF.js-Dateien erhalten lange Cache-Zeiten. HTML wird erneut validiert.
 
-Die stündliche Build-Prüfung in Codex ist eingerichtet. Git-Pushes veröffentlichen keine neue Produktion. Die genaue Bedienung, der Umgang mit übersprungenen Builds und die getrennten Browserspeicher für lokale und gehostete Nutzung stehen in [DEPLOYMENT.md](DEPLOYMENT.md).
+Git-Pushes veröffentlichen keine neue Produktion. Die genaue Bedienung, der Umgang mit übersprungenen Builds und die getrennten Browserspeicher für lokale und gehostete Nutzung stehen in [DEPLOYMENT.md](DEPLOYMENT.md).
 
 Lokale Rohberichte liegen unter `test-results/public-release/` und bleiben aus Git ausgeschlossen. Die GitHub-Prüfung bewahrt Browserberichte als `browser-pruefung-chromium` und `browser-pruefung-webkit` auf. Alle Browserfälle verwenden synthetische Daten und getrennte Testprofile.

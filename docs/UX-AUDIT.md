@@ -100,5 +100,5 @@ Für den nächsten Durchgang sind folgende Nachweise erforderlich:
 - Der Wizard führt vom PDF-Öffnen bis zum fertigen Plan. Ein zweiter Raum kann im selben Ablauf entstehen.
 - Wechsel und Abbruch verwerfen keine ungespeicherten Punkte ohne erkennbare Entscheidung.
 - Die Vorlage 12 × 30 cm ist auswählbar und wird korrekt berechnet.
-- UX Architect, UI Finish-Gate Reviewer und abschließende Text-/Gestaltungsbereinigung erhalten das vollständige Prozessinventar. Ihre Prüfungen werden am umgebauten Stand dokumentiert.
+- Die [Ablaufprüfung](UX-ABLAEUFE.md) und die [Sichtprüfung](UI-FINISH-GATE.md) dokumentieren die Ergebnisse am überarbeiteten Stand.
 - Neue Testläufe und Screenshots gehören zum umgebauten Stand. Dieser Ausgangsaudit allein ist keine Freigabe.

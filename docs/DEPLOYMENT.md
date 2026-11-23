@@ -60,7 +60,7 @@ Prüfe in Netlify den fehlgeschlagenen Deploy und dessen Build-Log. Korrigiere d
 
 Ein zuvor funktionierender Produktions-Deploy lässt sich im Dashboard wieder veröffentlichen. Netlify beschreibt diese Rückkehr als kostenfrei. Lokale Projektdaten gehören weiterhin zum Browser und zur Webadresse; ein Deployment setzt sie nicht zurück.
 
-Der Codex-Auftrag „Fugenplan-Builds prüfen“ prüft stündlich neue Netlify-Builds und GitHub-Ergebnisse. Belegte Fehler werden zuerst in einer Vorschau korrigiert. Die absichtliche Meldung „Canceled build due to no content change“ gilt dabei als übersprungener Build. Die Automatisierung läuft über die Codex-App und gehört nicht zum Netlify-Build.
+Die Netlify-Meldung „Canceled build due to no content change“ kennzeichnet einen absichtlich übersprungenen Build.
 
 Beim ersten Verbinden des Repositorys wurde ein Produktionsbuild ausgelöst. Die nachfolgenden Git-Pushes wurden durch den Schutzbefehl beendet. Ein manuell gestarteter Build oder Build-Hook kann die normale Änderungserkennung umgehen; die [Netlify-Dokumentation zum Überspringen von Builds](https://docs.netlify.com/build/configure-builds/ignore-builds/) beschreibt diese Grenzen. Solche Auslöser nicht für Probeänderungen verwenden.
 

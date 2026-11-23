@@ -47,7 +47,7 @@ Gelesen wurden die drei UX-Dokumente sowie `ProjectOverview`, `FloorPlanEditor`,
 | F2 | Das mobile CSS setzt Hauptkopf- und normale Planwerkzeuge auf 31–36 px. Der PDF-Wizard verwendet bereits 44 px. | Die betroffenen Aktionen auf mindestens 44 × 44 px bringen und auf 390 sowie 320 px ohne horizontalen Überlauf prüfen. |
 | F3 | Der PDF-Zoom lag zuvor über einer markierbaren Ecke. Der aktuelle Quellstand setzt die Leiste außerhalb der Zeichenfläche. | Den aktuellen Zustand im Browser prüfen. Eine Markierung an der unteren Raumkante darf kein Zoom-Werkzeug treffen. |
 
-Die übergreifenden Korrekturen für Entwurfsschutz bei Rückgängig/Wiederholen, Beispielraum-Erkennung nach dem Neuladen und Varianten-Bestätigung bearbeitet der Hauptagent. Sie werden hier nach der Integration geprüft.
+Die [Abnahme](UX-ABNAHME.md) dokumentiert auch den Entwurfsschutz, die Erkennung des Beispielraums und die Bestätigung für Varianten.
 
 ## Bereits passende Entscheidungen
 
@@ -63,12 +63,12 @@ Die übergreifenden Korrekturen für Entwurfsschutz bei Rückgängig/Wiederholen
 | --- | --- | --- |
 | F1: Mobile Vorschau zu weit unten | Den wiederholten Einleitungstext nur auf schmalen Bildschirmen ausblenden und den Abstand vor der Raumwahl verkürzen. Beide Aktionen und die direkte Raumwahl bleiben sichtbar. | Bei 390 × 844 px liegt die erste Vorschau zwischen y = 604,05 und 794,05 px. Ihre Höhe beträgt 190 px. Sie ist vollständig im ersten Bildschirm sichtbar. |
 | F2: Kleine Kopf- und Planaktionen | Mobile Schaltflächen auf 44 px vergrößern. Unter 361 px die Planwerkzeuge zwischen Auswahl/Verschieben und Zoom umbrechen. | Alle vier sichtbaren Kopfaktionen und alle sechs Planwerkzeuge messen bei 390 und 320 px jeweils 44 × 44 px. Kein horizontaler Dokumentüberlauf. Bei 320 px liegen die Werkzeuge in zwei Zeilen. |
-| F3: Werkzeugleiste über der PDF | Der UX Architect hat die Leiste unter die Zeichenfläche verschoben. | Gemessen: Unterkante der Zeichenfläche und Oberkante der Werkzeugzeile liegen beide bei y = 912,38 px. Die Zeile überdeckt keine Zeichenfläche. |
+| F3: Werkzeugleiste über der PDF | Die Leiste liegt unter der Zeichenfläche. | Gemessen: Unterkante der Zeichenfläche und Oberkante der Werkzeugzeile liegen beide bei y = 912,38 px. Die Zeile überdeckt keine Zeichenfläche. |
 | F4: Fokusverlust nach Sammelauswahl | „Alle anzeigen“, „Auswahl aufheben“ und die Wiederherstellung der leeren Auswahl fokussieren das erste Raumauswahlfeld. | Nach „Auswahl aufheben“ bleibt der Fokus beim Eingabefeld „Wohnzimmer“. Die leere Auswahl bietet einen sichtbaren Rückweg. |
-| F5: Raumwechsel behält alten Scrollstand | Der Hauptagent fokussiert nach dem Öffnen eines Raums den Hauptbereich und scrollt zu dessen Anfang. | Vorher: Beim zweiten Raum stand die Überschrift bei y = −293,5 px, Fokus auf `BODY`. Nachher: Fokus auf `workspace-main`, Überschrift „Küche“ bei y = 36,5 px. |
-| F6: Zweiter präziser Wandpunkt verliert den Fokus | Der Hauptagent setzt nach dem zweiten Punkt aus den Prozentfeldern den Fokus auf die neu verfügbare Wandlänge. Direkte Zeigereingaben bleiben unverändert. | Nach der Korrektur ist `INPUT` mit dem Namen „Länge der Wand“ fokussiert. 480 cm lassen sich direkt eingeben. |
+| F5: Raumwechsel behält alten Scrollstand | Nach dem Öffnen eines Raums erhält der Hauptbereich den Fokus und scrollt an den Anfang. | Vorher: Beim zweiten Raum stand die Überschrift bei y = −293,5 px, Fokus auf `BODY`. Nachher: Fokus auf `workspace-main`, Überschrift „Küche“ bei y = 36,5 px. |
+| F6: Zweiter präziser Wandpunkt verliert den Fokus | Nach dem zweiten Punkt aus den Prozentfeldern erhält die Eingabe der Wandlänge den Fokus. Direkte Zeigereingaben bleiben unverändert. | Nach der Korrektur ist `INPUT` mit dem Namen „Länge der Wand“ fokussiert. 480 cm lassen sich direkt eingeben. |
 
-Die Korrekturen F1, F2 und F4 liegen in `ProjectOverview.tsx`, `ProjectOverview.css` und `styles.css`. Die mit dem Hauptagenten abgestimmten Korrekturen F5/F6 liegen in dessen App-/Wizard-Bereich.
+Die Korrekturen F1, F2 und F4 liegen in `ProjectOverview.tsx`, `ProjectOverview.css` und `styles.css`. F5 und F6 betreffen die Navigation und den Grundriss-Assistenten.
 
 ## Eigener Laufzeitnachweis
 
@@ -103,7 +103,7 @@ Bedienung über CUA im eingebetteten Chromium-Browser auf `http://localhost:5173
 
 ## Grenzen und weitere Freigabe
 
-Der Hauptagent hat 167 bestandene Unit-Tests und fünf bestandene gezielte Browserregressionen für die zuletzt korrigierten Fokus-, Mobil- und Verlaufsfälle gemeldet. Diese Angaben sind ergänzende Testnachweise. Sie sind von der eigenen manuellen Sichtprüfung oben getrennt. Der vollständige finale Testlauf und Build stehen im Abschlussbericht des Hauptagenten.
+Für die damalige Fassung meldete die automatische Prüfung 167 bestandene Unit-Tests und fünf gezielte Browserregressionen. Die [Abnahme](UX-ABNAHME.md) enthält die Ergebnisse für Tests und Build.
 
 Ein echter iPhone-Test, ein Bildschirmkeyboard, vergrößerte Betriebssystemschrift, ein manueller Screenreader-Durchgang und ein physischer Ausdruck wurden hier nicht geprüft. Es gibt keine Aussage über vollständige Barrierefreiheit oder physisch maßhaltigen Druck.
 

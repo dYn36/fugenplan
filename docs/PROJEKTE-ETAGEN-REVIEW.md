@@ -6,7 +6,7 @@ Stand: 28. Oktober 2026. Entscheidung: **PASS für den unten geprüften UI-Umfan
 
 Fugenplan wird zur Planung von Fliesen und Dielen anhand von Raummaßen und PDF-Grundrissen verwendet. In dieser Erweiterung ist die aktive Etage das erste Arbeitsobjekt. Ihre Zeichnung muss Raumlage und Belag zeigen. Projekt und Etage bilden den sichtbaren Kontext. Ein Raum führt von dort in den vorhandenen Editor. Die Oberfläche verwendet weiterhin Manrope, Phosphor-Symbole, eine grüne Auswahlfarbe und helle Planflächen. Eine allgemeine Statistikübersicht würde die verlangte räumliche Aufgabe verfehlen.
 
-Die Prüfung bewertet konkrete Oberflächen und Abläufe. Sie bestätigt keine Auszeichnung durch Apple. Der vollständige Funktionsnachweis, Datei-Rundläufe und Regressionstests werden vom Hauptagenten getrennt geführt.
+Diese Prüfung bewertet die Oberfläche und die Bedienabläufe. Die [Funktionsprüfung](PROJEKTE-ETAGEN-PRUEFUNG.md) belegt den Dateiimport, den Export und die Regressionstests.
 
 ## Gestaltungsvertrag und Vergleichsmuster
 
@@ -53,7 +53,7 @@ Geprüft wurde der aktuelle Quellstand über CUA auf einer getrennten lokalen Ad
 
 ## Nachprüfung: Räume anordnen und Änderungen in einem anderen Tab
 
-Die Nachprüfung verwendete zwei eigene Edge-Tabs auf derselben getrennten Adresse `127.0.0.1:52470`. Der In-App-Browser war für diesen Prüfagenten nicht verfügbar. Da Edge einen eigenen leeren Speicher hatte, wurden „Haus am Garten · Nachprüfung“, die Etage „Erdgeschoss“ und der manuelle Raum „Bad“ durch die Oberfläche angelegt. Der Raum misst 240 × 300 cm. Es wurden keine App-Dateien geändert und keine vollständigen Testsuiten gestartet.
+Die Nachprüfung verwendete zwei eigene Edge-Tabs auf derselben getrennten Adresse `127.0.0.1:52470`. Da Edge einen eigenen leeren Speicher hatte, wurden „Haus am Garten · Nachprüfung“, die Etage „Erdgeschoss“ und der manuelle Raum „Bad“ durch die Oberfläche angelegt. Der Raum misst 240 × 300 cm. Es wurden keine App-Dateien geändert und keine vollständigen Testsuiten gestartet.
 
 Das zusätzliche Gestaltungskriterium ist konkret: Der Anordnungsmodus muss die Änderung einer Raumposition von der Verschiebung der Ansicht unterscheiden. Ein Konflikthinweis muss die Folgen seiner Aktionen nennen und die laufende Eingabe erhalten. Das bloße Betrachten eines anderen Projekts darf keine Inhaltsänderung vortäuschen.
 
@@ -128,8 +128,8 @@ Das zusätzliche Gestaltungskriterium ist konkret: Der Anordnungsmodus muss die 
 
 ## Grenzen
 
-Diese Prüfung verwendet Browser mit nachgebildeten Ansichtsgrößen. Ein physisches iPhone, Bildschirmtastatur, manuelle Screenreader-Bedienung und Druck wurden nicht geprüft. Die direkte manuelle Raumverschiebung wurde in der Nachprüfung über CUA geprüft. Die CUA-Aktion `drag(from, to)` verarbeitet Escape in diesem Prüfweg erst nach Ende des Zeigerzugs. Daher ist Escape während eines laufenden Zugs kein eigener CUA-Nachweis. Der Hauptagent meldet dafür den erfolgreichen gezielten Browserfall in `tests/arrangement.e2e.spec.ts`, einschließlich `pointercancel`; dieser Lauf wurde nicht von diesem Prüfagenten ausgeführt.
+Die Nachprüfung verwendete nachgebildete Ansichtsgrößen. Die Raumverschiebung wurde im Browser geprüft. Die verwendete Zeigersimulation konnte Escape erst nach Ende des Ziehens senden. Für den Abbruch mit Escape und `pointercancel` gibt es [automatische Browserfälle](../tests/arrangement.e2e.spec.ts). Prüfungen auf einem physischen iPhone, mit Bildschirmtastatur, Screenreader und Drucker standen hier aus.
 
-Ein erneuter PDF-Upload war in Edge durch die fehlende Erweiterungsoption „Allow access to file URLs“ gesperrt. Die Berechtigung wurde nicht geändert. Die festen PDF-Positionen im neuen Anordnungsmodus wurden deshalb nicht erneut durch diesen Agenten bedient. Dafür liegen laut Hauptagent ein gesonderter CUA-Nachweis des Spatial-Agenten und gezielte automatische Anordnen-Tests vor. Der frühere eigene Nachweis der PDF-Raumlage steht oben. Diese Nachweise sind von der neuen eigenen Prüfung zu unterscheiden.
+In diesem Edge-Durchgang blockierte die Erweiterung den erneuten PDF-Upload. Die feste Raumposition auf der PDF wurde im früheren Durchgang geprüft. Die [Funktionsprüfung](PROJEKTE-ETAGEN-PRUEFUNG.md) dokumentiert die zugehörigen automatischen Tests.
 
 Die Datei-Rundläufe, fehlende PDF-Dateien, Speicherfehler und Geometrieregressionen gehören in den gesonderten Funktionsnachweis. Die hier gezeigten positiven UI-Befunde ersetzen diese Prüfungen nicht.

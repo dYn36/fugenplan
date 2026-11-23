@@ -1,16 +1,24 @@
 # Vorbereitung für ein öffentliches Repository
 
-Die Inhaltsprüfung stammt vom 29. Oktober 2026. Die Prüfung der Merge-Rechte stammt vom 23. November 2026.
+Die Prüfung vom 23. November 2026 begann mit dem [Quellstand 932fa34](https://github.com/dYn36/fugenplan/commit/932fa34dbaa8ad7242429c5ff4b04a01062a5028). Der nächste Commit enthält die [Korrekturen am Import](https://github.com/dYn36/fugenplan/commit/d799d926a4371c0d220700d38f8e948983aa9bc3).
 
-## Geprüfte Inhalte
+## Ergebnisse der Inhaltsprüfung
 
-- Gitleaks hat die gesamte vorhandene Git-Historie geprüft, nicht nur den aktuellen Stand. Die Prüfung meldete keine Zugangsdaten.
-- Die versionierten Textdateien und historischen Textobjekte wurden auf persönliche Dateipfade, private Grundrissnamen und die im Arbeitskontext bekannten privaten Angaben geprüft. Es gab keine Treffer.
-- Die 92 versionierten Bilder und zwölf ältere Bildfassungen aus der Historie wurden als Kontaktbögen gesichtet. Bei der älteren GIF-Fassung wurden Anfang, Mitte und Ende geprüft. Die Bilder zeigen Beispielräume und synthetische Grundrisse. Die einzige versionierte PDF wird aus `tests/fixtures/create-floorplan-fixture.mjs` erzeugt; auch die Historie enthält nur diesen PDF-Inhalt. Die Historie enthält keine inzwischen entfernten PDF- oder Bildpfade.
-- Git-Commits verwenden die GitHub-Noreply-Adresse des Repository-Eigentümers.
-- Persönliche Projektdateien, PDFs, lokale Diagnoseberichte, `.env`-Dateien und `.netlify/` sind ausgeschlossen. Die lokalen Wiederherstellungsdateien sind nicht Teil des Repositorys und nicht Teil von `dist/`.
-- README, Anleitung, Sicherheitsregeln, Hinweise zur Mitarbeit und ein Fehlerformular sind vorhanden. Dependabot prüft npm und GitHub Actions.
-- Lizenztexte der ausgelieferten Bibliotheken werden mit dem Build veröffentlicht. Ergänzende Texte stehen in `public/licenses/`.
+| Bereich | Geprüfter Umfang und Ergebnis |
+| --- | --- |
+| Git und Zugangsdaten | Gitleaks 8.30.1 prüfte die 28 am Anfang erreichbaren Commits aus vier GitHub-Branches und vier PR-Ständen einschließlich der Merge-Änderungen. Die ergänzende Suche in historischen Texten erfasste auch Passwortzuweisungen, persönliche Dateipfade, Adressen und URLs mit Zugangsdaten. Es gab keinen bestätigten Fund. Die Autor- und Committer-Adressen gehörten zu GitHub-Noreply-Konten. |
+| GitHub-Inhalte | Geprüft wurden die vier PR-Beschreibungen, drei Kommentare, die Commit-Nachrichten und alle 33 zu diesem Zeitpunkt abrufbaren Actions-Protokolle. Gitleaks meldete keine Zugangsdaten. GitHub führte keine Release-Dateien oder Testartefakte. |
+| Bilder und PDF | Die Historie enthielt 102 unterschiedliche JPG- und PNG-Dateiinhalte sowie zwei GIF-Fassungen. Alle Standbilder und fünf Ansichten je GIF wurden als Kontaktbögen gesichtet. Zusätzlich lief eine lokale Texterkennung über alle Standbilder und alle 763 GIF-Einzelbilder. Die Sichtung zeigte Beispielräume. Es gab keine Hinweise auf private Anschriften oder Zugangsdaten. Die einzige Prüf-PDF hat drei Seiten. Der [Generator](../tests/fixtures/create-floorplan-fixture.mjs) reproduzierte die Datei mit Node.js 26.9.0 bytegenau. Mit Node.js 24.22.3 stimmten Text, Seitenbilder und Sollmaße überein. |
+| Abhängigkeiten | Alle 120 Paketpositionen der Lockdatei verwendeten das npm-Register und enthielten einen Integritätswert. `npm audit` meldete keine bekannten Schwachstellen. Die Dependabot-Sicherheitsmeldungen für dieses Repository sind aktiviert. |
+| Anwendung und Hosting | Geprüft wurden Projekt- und PDF-Import, IndexedDB, CSV- und SVG-Ausgabe, Druckdarstellung und Workflow-Berechtigungen. Der Produktionsbuild mit Node.js 24 enthielt 227 Dateien. Die Prüfung fand darin keine Zugangsdaten, Source Maps, Testdaten oder privaten Pläne. Die Lizenzdateien lagen bei. Die öffentliche Startseite lieferte alle sechs in der [Netlify-Konfiguration](../netlify.toml) gesetzten Sicherheitsheader. |
+
+## Korrekturen am Import
+
+- Beim Öffnen alter Einzelraumdateien gilt dieselbe Konturprüfung wie bei neueren Projekten. Gültige ältere Dateien bleiben lesbar.
+- PDF.js begrenzt jedes eingebettete Rasterbild bei der Anzeige auf 64 Megapixel. Die Vorschau verwendet einen begrenzten Zeichenpuffer.
+- Vor dem Speichern der zugehörigen PDFs prüft die Anwendung, ob die Sammlung Platz für das Projekt hat. Alle PDFs eines Projektimports werden gemeinsam geschrieben und vor Abschluss der Transaktion gelesen und verglichen. Ein Schreibfehler bricht die Transaktion ab. Ein Browsertest prüft den Fehler beim zweiten Original sowie den anschließenden erfolgreichen Import.
+
+Die 235 Fachtests, die TypeScript-Prüfung und der Produktionsbuild bestanden mit Node.js 24.22.3. Anschließend bestanden alle 148 Browserfälle in Chromium und WebKit gegen den lokalen Produktionsbuild.
 
 ## Lizenz des eigenen Codes
 
@@ -46,15 +54,17 @@ gh api repos/dYn36/fugenplan/rules/branches/main --jq '.[] | select(.type == "up
 
 ## Prüfung vor einer späteren Freigabe
 
-Prüfe vor der Veröffentlichung die Dateien und Commits, die seit der Inhaltsprüfung vom 29. Oktober 2026 hinzugekommen sind.
+Prüfe vor der Veröffentlichung alle Änderungen seit dem oben angegebenen Stand. Beziehe neue Branches, Tags, Pull Requests und veröffentlichte Artefakte ein.
 
 ```sh
 git status --short
 git diff --cached
-gitleaks git --redact --no-banner .
+gitleaks git --log-opts="--all --full-history --diff-merges=first-parent" --redact --no-banner .
 npm audit
 npm run check
 ```
+
+Prüfe nach dem Sichtbarkeitswechsel auch den Status von Secret Scanning und Push Protection in GitHub. [GitHub-Dokumentation zum Secret Scanning](https://docs.github.com/en/code-security/secret-scanning/introduction/about-secret-scanning)
 
 Neue Screenshots vollständig ansehen. Ein Dateiname oder ein bestandener Secret-Scan allein belegt nicht, dass ein Bild keine persönlichen Angaben enthält. Ein vollständiger Ausschluss unbekannter Geheimnisse lässt sich aus automatischen Suchregeln nicht ableiten.
 
