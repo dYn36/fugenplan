@@ -252,6 +252,50 @@ test('Echte PDF: Wandmaß und Raum bleiben bei Zeiger-Eingabe unabhängig vom Zo
   await accessible(page);
 });
 
+test('Hochkant-PDF nutzt die verfügbare Höhe und behält Wandpunkte beim Wechsel zur Seitenbreite', async ({ page }) => {
+  await page.setViewportSize({ width: 1800, height: 900 });
+  await upload(page);
+  await selectPdfPage(page, 2);
+  await readyPdf(page, 2);
+  await page.getByRole('button', { name: 'Seite verwenden', exact: true }).click();
+  await page.getByRole('button', { name: 'Wand markieren', exact: true }).click();
+  const stage = page.getByTestId('pdf-stage');
+  const initialHeight = (await overlay(page).boundingBox())!.height;
+  const stageHeight = (await stage.boundingBox())!.height;
+  const coordinateEntry = page.locator('details.fpdf-precise summary');
+  await coordinateEntry.click();
+  expect((await stage.boundingBox())!.height).toBeCloseTo(stageHeight, 0);
+  await coordinateEntry.click();
+  await page.setViewportSize({ width: 1800, height: 1200 });
+  await expect.poll(async () => (await overlay(page).boundingBox())!.height).toBeGreaterThan(initialHeight + 200);
+
+  const start = await pointerPoint(page, { x: 80, y: 300 }, 2);
+  const fitWidth = page.getByRole('button', { name: 'Seitenbreite', exact: true });
+  await fitWidth.focus();
+  await fitWidth.press('Enter');
+  const sideMargin = () => stage.evaluate(element => {
+    const frame = element.getBoundingClientRect();
+    const sheet = element.querySelector('canvas')!.getBoundingClientRect();
+    return Math.max(Math.abs(sheet.left - frame.left), Math.abs(frame.right - sheet.right));
+  });
+  await expect(fitWidth).toHaveAttribute('aria-pressed', 'true');
+  await expect.poll(sideMargin).toBeLessThan(20);
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await expect.poll(sideMargin).toBeLessThan(20);
+  const end = await pointerPoint(page, { x: 320, y: 300 }, 2);
+
+  await page.getByRole('button', { name: 'PDF einpassen', exact: true }).click();
+  await expect(page.getByLabel('PDF-Zoom')).toHaveText('100 %');
+  await page.getByRole('textbox', { name: 'Länge der Wand', exact: true }).fill('120');
+  await page.getByRole('button', { name: 'Maßstab speichern', exact: true }).click();
+  await expect.poll(async () => (await storedWorkspace(page)).floorPlan?.pages[1].calibration?.lengthMm).toBe(1200);
+  const saved = (await storedWorkspace(page)).floorPlan!.pages[1].calibration!;
+  for (const axis of ['x', 'y'] as const) {
+    expect(saved.start[axis]).toBeCloseTo(start[axis], 3);
+    expect(saved.end[axis]).toBeCloseTo(end[axis], 3);
+  }
+});
+
 test('Eigene Maßstäbe für Vektor, gedrehte Seite und Raster; neue Kalibrierung ändert nur zugeordnete Räume', async ({ page }) => {
   test.setTimeout(90_000);
   await upload(page); await calibrate(page);

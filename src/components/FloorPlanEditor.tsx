@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import type { ChangeEvent, DragEvent, KeyboardEvent, PointerEvent } from 'react';
-import { ArrowCounterClockwise, ArrowLeft, ArrowRight, ArrowsOut, CaretDown, Check, CheckCircle, Crosshair, FilePdf, Hand, Minus, Plus, Polygon, Ruler, SquaresFour, Trash, UploadSimple, WarningCircle, X } from '@phosphor-icons/react';
+import { ArrowCounterClockwise, ArrowLeft, ArrowRight, ArrowsHorizontal, ArrowsOut, CaretDown, Check, CheckCircle, Crosshair, FilePdf, Hand, Minus, Plus, Polygon, Ruler, SquaresFour, Trash, UploadSimple, WarningCircle, X } from '@phosphor-icons/react';
 import type { PDFDocumentProxy, PDFPageProxy, RenderTask } from 'pdfjs-dist';
 import type { Calibration, FloorPlanDocument, WorkspaceRoom } from '../floorplan-types';
 import type { Point } from '../types';
@@ -31,10 +31,13 @@ type Mode = 'view' | 'calibrate' | 'room';
 type WizardStep = 'file' | 'scale' | 'room' | 'done';
 type PendingAction = { kind: 'page'; page: number } | { kind: 'file'; file: File } | { kind: 'discard' };
 type PageState = { page: PDFPageProxy; documentId: string; number: number; width: number; height: number };
-type View = { zoom: number; pan: Point };
+type View = { zoom: number | 'width'; pan: Point };
 type Drag = { pointer: number; start: Point; pan: Point; moved: boolean; roomId?: string };
 const MAX_BYTES = 20 * 1024 * 1024;
 const MAX_POINTS = 32;
+const MAX_ZOOM = 8;
+const PAGE_MARGIN = 12;
+const wholePage: View = { zoom: 1, pan: { x: 0, y: 0 } };
 const steps: { id: WizardStep; label: string }[] = [
   { id: 'file', label: 'PDF & Seite' },
   { id: 'scale', label: 'Maßstab' },
@@ -83,7 +86,7 @@ export default function FloorPlanEditor({ document: floorPlan, pdfBytes, rooms, 
   const [justSaved, setJustSaved] = useState(false);
   const [replaceExample, setReplaceExample] = useState(false);
   const [panTool, setPanTool] = useState(false);
-  const [view, setView] = useState<View>({ zoom: 1, pan: { x: 0, y: 0 } });
+  const [view, setView] = useState<View>(wholePage);
   const [stageSize, setStageSize] = useState({ width: 800, height: 620 });
   const [calibrationPoints, setCalibrationPoints] = useState<Point[]>([]);
   const [lengthInput, setLengthInput] = useState('');
@@ -100,8 +103,12 @@ export default function FloorPlanEditor({ document: floorPlan, pdfBytes, rooms, 
   const currentPage = pageState && pageState.documentId === docId && pageState.number === activePage ? pageState : null;
   const width = currentPage?.width ?? pageInfo?.width ?? 600;
   const height = currentPage?.height ?? pageInfo?.height ?? 800;
-  const fitScale = Math.max(0.00001, Math.min(Math.max(80, stageSize.width - 44) / width, Math.max(80, stageSize.height - 44) / height));
-  const displayScale = fitScale * view.zoom;
+  const widthScale = Math.max(1, stageSize.width - 2 * PAGE_MARGIN) / width;
+  const heightScale = Math.max(1, stageSize.height - 2 * PAGE_MARGIN) / height;
+  const fitScale = Math.min(widthScale, heightScale);
+  const widthZoom = Math.min(MAX_ZOOM, widthScale / fitScale);
+  const zoom = view.zoom === 'width' ? widthZoom : view.zoom;
+  const displayScale = fitScale * zoom;
   const ready = !!currentPage && renderedPage === pageKey && !!pdfBytes && !loadError;
   const pageRooms = rooms.filter(room => room.source?.documentId === docId && room.source?.page === activePage);
   const calibration = pageInfo?.calibration ?? null;
@@ -199,7 +206,7 @@ export default function FloorPlanEditor({ document: floorPlan, pdfBytes, rooms, 
   }, [!!floorPlan]);
 
   useEffect(() => {
-    setMode('view'); setPanTool(false); setView({ zoom: 1, pan: { x: 0, y: 0 } });
+    setMode('view'); setPanTool(false); setView(wholePage);
     setCalibrationPoints([]); setLengthInput(''); setDraft([]); setName(''); setClosed(false); setCursor(null);
     setActionError(''); setAnnouncement(''); setConfirmRemove(null); setPositionX('50'); setPositionY('50');
     setPendingAction(null); setJustSaved(false);
@@ -338,11 +345,13 @@ export default function FloorPlanEditor({ document: floorPlan, pdfBytes, rooms, 
     }
   };
 
-  const zoomTo = (next: number, anchor?: Point) => {
-    const zoom = Math.min(8, Math.max(0.5, next));
-    const rect = stage.current?.getBoundingClientRect();
-    const target = anchor && rect ? { x: anchor.x - rect.left - stageSize.width / 2, y: anchor.y - rect.top - stageSize.height / 2 } : { x: 0, y: 0 };
-    setView(current => ({ zoom, pan: { x: target.x - (target.x - current.pan.x) * zoom / current.zoom, y: target.y - (target.y - current.pan.y) * zoom / current.zoom } }));
+  const zoomBy = (factor: number) => {
+    setView(current => {
+      const previous = current.zoom === 'width' ? widthZoom : current.zoom;
+      const next = Math.min(MAX_ZOOM, Math.max(0.5, previous * factor));
+      const ratio = next / previous;
+      return { zoom: next, pan: { x: current.pan.x * ratio, y: current.pan.y * ratio } };
+    });
   };
 
   const pointerDown = (event: PointerEvent<HTMLDivElement>) => {
@@ -374,8 +383,8 @@ export default function FloorPlanEditor({ document: floorPlan, pdfBytes, rooms, 
     if (event.target !== event.currentTarget) return;
     if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); cancel(); return; }
     if ((event.ctrlKey || event.metaKey) && !event.shiftKey && event.key.toLowerCase() === 'z' && mode !== 'view') { event.preventDefault(); event.stopPropagation(); undoPoint(); return; }
-    if (event.key === '+' || event.key === '=') { event.preventDefault(); zoomTo(view.zoom * 1.25); return; }
-    if (event.key === '-') { event.preventDefault(); zoomTo(view.zoom / 1.25); return; }
+    if (event.key === '+' || event.key === '=') { event.preventDefault(); zoomBy(1.25); return; }
+    if (event.key === '-') { event.preventDefault(); zoomBy(1 / 1.25); return; }
     if (event.key.startsWith('Arrow')) {
       event.preventDefault();
       const amount = (event.shiftKey ? 10 : 1) / displayScale;
@@ -501,9 +510,30 @@ export default function FloorPlanEditor({ document: floorPlan, pdfBytes, rooms, 
               {confirmRemove === room.id && <div className="fpdf-remove-confirm"><p>Raum und Verlegeplan entfernen?</p><button type="button" onClick={() => { if (perform(() => onRemoveRoom(room.id), 'Der Raum konnte nicht entfernt werden.')) setConfirmRemove(null); }}>Entfernen</button><button type="button" onClick={() => setConfirmRemove(null)}>Behalten</button></div>}
             </li>)}</ul> : <p>Hier erscheinen deine markierten Räume.</p>}
           </section>}
+          <p className="fpdf-scale-note">{calibrated ? 'Maße werden aus dem gespeicherten Wandmaß berechnet.' : 'Die PDF-Größe allein legt keinen verlässlichen Raummaßstab fest.'}</p>
         </aside>
         <div className="fpdf-drawing-area">
-          <div className="fpdf-stage-title"><span>{mode === 'calibrate' ? 'Wandmaß markieren' : mode === 'room' ? 'Raumkontur markieren' : `Grundriss · Seite ${activePage}`}</span><span>{mode === 'view' ? 'Ziehen verschiebt die Ansicht' : 'Klicken setzt Punkte · Ziehen verschiebt die Ansicht'}</span></div>
+          <div className="fpdf-stage-title">
+            <div className="fpdf-stage-instructions">
+              <strong>{mode === 'calibrate' ? 'Wandmaß markieren' : mode === 'room' ? 'Raumkontur markieren' : `Grundriss · Seite ${activePage}`}</strong>
+              <span>{mode === 'view' || panTool ? 'Ziehen verschiebt die Ansicht' : 'Klicken setzt Punkte · Ziehen verschiebt die Ansicht'}</span>
+            </div>
+            {ready && <div className="fpdf-view-tools" role="group" aria-label="PDF-Ansicht">
+              {mode !== 'view' && <div className="fpdf-tool-group">
+                <button type="button" aria-label="Punkte markieren" title="Punkte markieren" aria-pressed={!panTool} onClick={() => setPanTool(false)}><Crosshair size={18} /></button>
+                <button type="button" aria-label="PDF-Ansicht verschieben" title="PDF-Ansicht verschieben" aria-pressed={panTool} onClick={() => setPanTool(true)}><Hand size={18} /></button>
+              </div>}
+              <div className="fpdf-tool-group">
+                <button type="button" aria-label="PDF verkleinern" title="Verkleinern" disabled={zoom <= .5} onClick={() => zoomBy(1 / 1.25)}><Minus size={17} /></button>
+                <output aria-label="PDF-Zoom">{Math.round(zoom * 100)} %</output>
+                <button type="button" aria-label="PDF vergrößern" title="Vergrößern" disabled={zoom >= MAX_ZOOM} onClick={() => zoomBy(1.25)}><Plus size={17} /></button>
+              </div>
+              <div className="fpdf-tool-group fpdf-fit-options">
+                <button type="button" aria-label="PDF einpassen" title="Ganze Seite einpassen" aria-pressed={view.zoom === 1 && view.pan.x === 0 && view.pan.y === 0} onClick={() => setView(wholePage)}><ArrowsOut size={16} />Einpassen</button>
+                <button type="button" aria-pressed={view.zoom === 'width'} onClick={() => setView({ zoom: 'width', pan: { x: 0, y: 0 } })}><ArrowsHorizontal size={16} />Seitenbreite</button>
+              </div>
+            </div>}
+          </div>
           <div ref={stage} className={`fpdf-stage${mode !== 'view' && !panTool ? ' is-marking' : ' is-panning'}`} data-testid="pdf-stage" onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp} onPointerCancel={() => { drag.current = null; }} onPointerLeave={() => { if (!drag.current) setCursor(null); }}>
             {!!pdfBytes && <div ref={paper} className="fpdf-paper" style={{ width: width * displayScale, height: height * displayScale, left: stageSize.width / 2 + view.pan.x, top: stageSize.height / 2 + view.pan.y, visibility: ready ? 'visible' : 'hidden' }}>
               <canvas ref={canvas} data-testid="pdf-canvas" aria-hidden="true" />
@@ -533,17 +563,11 @@ export default function FloorPlanEditor({ document: floorPlan, pdfBytes, rooms, 
               {painting && <span className="fpdf-rendering" role="status">Ansicht wird geschärft …</span>}
             </>}
           </div>
-          {ready && <div className="fpdf-canvas-actions">
-              {(mode === 'calibrate' && calibrationPoints.length === 2 || mode === 'room' && draft.length >= 3) && <button type="button" className="button primary fpdf-mobile-next" onClick={() => {
+          {ready && (mode === 'calibrate' && calibrationPoints.length === 2 || mode === 'room' && draft.length >= 3) &&
+            <div className="fpdf-canvas-actions"><button type="button" className="button primary fpdf-mobile-next" onClick={() => {
                 const target = window.document.getElementById(`${fieldId}-${mode === 'calibrate' ? 'length' : 'room-name'}`);
                 target?.scrollIntoView({ block: 'center', behavior: 'instant' }); target?.focus({ preventScroll: true });
-              }}>{mode === 'calibrate' ? 'Wandlänge eingeben' : 'Raum benennen'}<ArrowRight size={15} /></button>}
-              <div className="fpdf-view-tools" role="group" aria-label="PDF-Ansicht">
-                {mode !== 'view' && <><button type="button" aria-label="Punkte markieren" title="Punkte markieren" aria-pressed={!panTool} className={!panTool ? 'is-active' : ''} onClick={() => setPanTool(false)}><Crosshair size={18} /></button><button type="button" aria-label="PDF-Ansicht verschieben" title="PDF-Ansicht verschieben" aria-pressed={panTool} className={panTool ? 'is-active' : ''} onClick={() => setPanTool(true)}><Hand size={18} /></button><span className="fpdf-tool-separator" /></>}
-                <button type="button" aria-label="PDF verkleinern" title="Verkleinern" disabled={view.zoom <= .5} onClick={() => zoomTo(view.zoom / 1.25)}><Minus size={17} /></button><output aria-label="PDF-Zoom">{Math.round(view.zoom * 100)} %</output><button type="button" aria-label="PDF vergrößern" title="Vergrößern" disabled={view.zoom >= 8} onClick={() => zoomTo(view.zoom * 1.25)}><Plus size={17} /></button><button type="button" aria-label="PDF einpassen" title="Seite einpassen" onClick={() => setView({ zoom: 1, pan: { x: 0, y: 0 } })}><ArrowsOut size={18} /></button>
-              </div>
-          </div>}
-          <p className="fpdf-canvas-footer">{calibrated ? 'Maße werden aus dem gespeicherten Wandmaß berechnet.' : 'Die PDF-Größe allein legt keinen verlässlichen Raummaßstab fest.'}</p>
+              }}>{mode === 'calibrate' ? 'Wandlänge eingeben' : 'Raum benennen'}<ArrowRight size={15} /></button></div>}
           <span id={keyboardHelpId} className="visually-hidden">Pfeiltasten bewegen den Markierungszeiger. Mit Umschalt bewegt er sich schneller. Enter setzt einen Punkt. Plus und Minus ändern die Ansicht. Escape bricht die Markierung ab. Alternativ kannst du die Position als Prozentwert der Seite eingeben.</span>
         </div>
       </div>
