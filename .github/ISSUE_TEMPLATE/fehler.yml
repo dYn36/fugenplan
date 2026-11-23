@@ -1,5 +1,6 @@
 name: Fehler melden
 description: Einen reproduzierbaren Fehler beschreiben
+labels: ["bug"]
 body:
   - type: markdown
     attributes:

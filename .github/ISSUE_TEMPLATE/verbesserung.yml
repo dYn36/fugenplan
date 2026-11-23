@@ -1,0 +1,11 @@
+name: Verbesserung vorschlagen
+description: Eine neue Funktion oder eine Änderung an Fugenplan vorschlagen
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: wunsch
+    attributes:
+      label: Was möchtest du mit Fugenplan erreichen?
+      description: Beschreibe dein Ziel und was dir dafür heute fehlt. Verwende für Beispiele nur erfundene Projektdaten.
+    validations:
+      required: true
